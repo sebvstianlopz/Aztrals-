@@ -1,0 +1,33 @@
+---
+// How to buy, written as four lines that step across the page.
+import { t } from '../../i18n';
+import type { Lang } from '../../config/site';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+---
+<section class="how grid wrap" aria-label={d.how.title} data-reveal>
+  {d.how.steps.map(([line, text], i) => {
+    const Tag = i === 0 ? 'h2' : 'p';
+    return (
+      <div class="stage" style={`--s:${1 + i * 2}`}>
+        <Tag class={`line${i === 3 ? ' last' : ''}`}>{line}</Tag>
+        <p class="text">{text}</p>
+      </div>
+    );
+  })}
+</section>
+
+<style>
+  .how { background: #dfe6ec; padding-block: calc(var(--section) * 0.8); row-gap: 48px; }
+  .stage { grid-column: var(--s) / -1; }
+  .line { font-size: clamp(2.25rem, 4.2vw, 4.25rem); font-weight: 500; letter-spacing: -0.035em; line-height: 1; white-space: nowrap; }
+  .last { color: var(--accent); }
+  .text { margin-top: 12px; max-width: 34ch; font-size: var(--step-body); }
+  @media (max-width: 900px) {
+    .how { row-gap: 40px; }
+    .stage { grid-column: 1 / -1; padding-left: calc(var(--k) * 6vw); }
+    .stage:nth-child(1) { --k: 0; } .stage:nth-child(2) { --k: 1; } .stage:nth-child(3) { --k: 2; } .stage:nth-child(4) { --k: 3; }
+    .line { font-size: 8.4vw; white-space: normal; }
+  }
+</style>

@@ -1,0 +1,16 @@
+# SAMPLE
+name: Flamenco
+order: 12
+shape: round
+price: 124
+size: [48, 22, 145]
+fit: medio
+place:
+  es: La arena blanca de Culebra, a cualquier hora.
+  en: The white sand of Culebra, at any hour.
+description:
+  es: Redondo de acetato color hueso con lente verde. Suave en las formas y en el color, como la arena.
+  en: A round frame in bone acetate with a green lens. Soft in shape and colour, like the sand.
+variants:
+  - { id: hueso-verde, frame: hueso, lens: verde }
+  - { id: arena-marron, frame: arena, lens: marron }

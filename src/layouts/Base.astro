@@ -1,0 +1,85 @@
+---
+import '../styles/global.css';
+import erode500 from '../assets/fonts/erode-500.woff2?url';
+import erode400 from '../assets/fonts/erode-400.woff2?url';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import BagDrawer from '../components/BagDrawer.astro';
+import { t, asset } from '../i18n';
+import { site, type Lang } from '../config/site';
+import { getProducts, toClient } from '../lib/products';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  /** Same page in the other language, as a path. */
+  alternate: string;
+  /** Social preview image, relative to public/. */
+  image?: string;
+  jsonLd?: object | object[];
+  noindex?: boolean;
+  /** Ground colour of the page behind the header. */
+  field?: string;
+}
+const { lang, title, description, alternate, image = 'products/condado/negro-ambar.webp', jsonLd, noindex = false, field } = Astro.props;
+const d = t(lang);
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const alt = new URL(alternate, Astro.site);
+const esUrl = lang === 'es' ? canonical : alt;
+const enUrl = lang === 'en' ? canonical : alt;
+const ogUrl = new URL(asset(image), Astro.site);
+const catalog = (await getProducts()).map(toClient);
+const bagText = { less: d.bag.less, more: d.bag.more, remove: d.bag.remove };
+---
+<!doctype html>
+<html lang={lang === 'es' ? 'es-PR' : 'en'} data-lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="preload" href={erode500} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={erode400} as="font" type="font/woff2" crossorigin />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es" href={esUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={esUrl} />
+    <link rel="icon" href={asset('favicon.svg')} type="image/svg+xml" />
+    <link rel="sitemap" href={asset('sitemap-index.xml')} />
+    <meta name="theme-color" content="#eff0ed" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content={lang === 'es' ? 'es_PR' : 'en_US'} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      try {
+        if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');
+      } catch (e) {}
+    </script>
+  </head>
+  <body style={field ? `--field:${field}` : undefined}>
+    <a class="skip" href="#main">{d.skip}</a>
+    <Header lang={lang} alternate={alternate} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} alternate={alternate} />
+    <BagDrawer lang={lang} />
+    <script type="application/json" id="catalog" set:html={JSON.stringify(catalog)} />
+    <script type="application/json" id="bag-text" set:html={JSON.stringify(bagText)} />
+    <script>
+      import { initBag } from '../scripts/bag';
+      import { initReveal } from '../scripts/reveal';
+      initBag();
+      initReveal();
+    </script>
+  </body>
+</html>

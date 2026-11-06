@@ -1,0 +1,16 @@
+# SAMPLE
+name: Isabela
+order: 11
+shape: oval
+price: 128
+size: [50, 20, 140]
+fit: estrecho
+place:
+  es: El acantilado de Jobos y su ola de la tarde.
+  en: The cliffs at Jobos and the afternoon swell.
+description:
+  es: Ovalado y fino, en metal dorado con lente ámbar. Discreto en la cara, generoso con la luz.
+  en: Slim and oval, in gold metal with an amber lens. Quiet on the face, generous with the light.
+variants:
+  - { id: oro-ambar, frame: oro, lens: ambar }
+  - { id: plata-espejo-azul, frame: plata, lens: espejo-azul }

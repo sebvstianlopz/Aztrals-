@@ -1,0 +1,66 @@
+---
+import { path } from '../i18n';
+import type { Lang } from '../config/site';
+import { money, poster, variantName, type Product } from '../lib/products';
+import { frames, lenses, shapeNames } from '../lib/palette';
+import { t } from '../i18n';
+interface Props { lang: Lang; product: Product; eager?: boolean }
+const { lang, product: p, eager = false } = Astro.props;
+const d = t(lang);
+const v0 = p.data.variants[0];
+const url = path(lang, 'shop', p.id);
+---
+<li
+  class="tile"
+  data-shape={p.data.shape}
+  data-lenses={[...new Set(p.data.variants.map((v) => v.lens))].join(' ')}
+  data-season={p.data.season ? '1' : '0'}
+  data-price={p.data.price}
+  data-order={p.data.order}
+  style={`--field:${lenses[v0.lens].field}`}
+>
+  <a class="pic" href={`${url}?v=${v0.id}`} tabindex="-1" aria-hidden="true">
+    <img src={poster(p.id, v0.id)} alt="" width="1200" height="900" loading={eager ? 'eager' : 'lazy'} />
+  </a>
+  <div class="meta">
+    <h3 class="name"><a href={`${url}?v=${v0.id}`}>{p.data.name}</a></h3>
+    <span class="price num">{money(p.data.price, lang)}</span>
+  </div>
+  <p class="small soft">{shapeNames[p.data.shape][lang]}, {d.shop.colours(p.data.variants.length)}</p>
+  <div class="swatches" role="group" aria-label={d.product.variant}>
+    {p.data.variants.map((v, i) => (
+      <button
+        type="button"
+        class="sw"
+        aria-pressed={i === 0 ? 'true' : 'false'}
+        aria-label={variantName(v, lang)}
+        title={variantName(v, lang)}
+        data-poster={poster(p.id, v.id)}
+        data-href={`${url}?v=${v.id}`}
+        data-field={lenses[v.lens].field}
+        style={`--f:${frames[v.frame].hex};--l:${lenses[v.lens].hex}`}
+      ></button>
+    ))}
+  </div>
+</li>
+
+<style>
+  .tile { display: grid; gap: 6px; align-content: start; }
+  .pic { display: block; aspect-ratio: 4 / 3; background: var(--field); overflow: hidden; margin-bottom: 10px; transition: background-color 400ms var(--ease); }
+  .pic img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.06); transition: transform 900ms var(--ease); }
+  .tile:hover .pic img { transform: scale(1.12) rotate(-1.5deg); }
+  .meta { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .name { font-size: var(--step-lead); font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; }
+  .name a { text-decoration: none; }
+  .name a:hover { color: var(--accent); }
+  .price { font-size: var(--step-body); }
+  .swatches { display: flex; gap: 6px; margin-top: 6px; }
+  .sw {
+    width: 30px; height: 30px; border-radius: 50%; padding: 0; cursor: pointer;
+    background: var(--l); border: 7px solid var(--f);
+    transition: transform var(--fast) var(--ease);
+    outline-offset: 3px;
+  }
+  .sw:hover { transform: scale(1.1); }
+  .sw[aria-pressed='true'] { outline: 2px solid var(--ink); }
+</style>

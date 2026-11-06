@@ -1,0 +1,18 @@
+# SAMPLE
+name: Culebra
+season: true
+order: 2
+shape: round
+price: 152
+size: [49, 21, 145]
+fit: estrecho
+place:
+  es: El agua clara de Flamenco, vista desde la arena.
+  en: The clear water of Flamenco, seen from the sand.
+description:
+  es: Redondo, en metal fino, con lente verde mar que devuelve los tonos reales del agua y la arena. Ligero para todo un día de playa.
+  en: Round, in fine metal, with a sea-green lens that keeps the true colours of water and sand. Light enough for a whole day at the beach.
+variants:
+  - { id: oro-verde, frame: oro, lens: verde }
+  - { id: plata-humo, frame: plata, lens: humo }
+  - { id: oro-rosa, frame: oro, lens: rosa }

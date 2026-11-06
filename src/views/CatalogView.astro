@@ -1,0 +1,116 @@
+---
+import Base from '../layouts/Base.astro';
+import ProductTile from '../components/ProductTile.astro';
+import { t, path } from '../i18n';
+import type { Lang } from '../config/site';
+import { getProducts } from '../lib/products';
+import { lenses, shapeNames, shapes, type LensId } from '../lib/palette';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const products = await getProducts();
+const usedShapes = shapes.filter((s) => products.some((p) => p.data.shape === s));
+const usedLenses = (Object.keys(lenses) as LensId[]).filter((l) => products.some((p) => p.data.variants.some((v) => v.lens === l)));
+---
+<Base lang={lang} title={d.meta.shopTitle} description={d.meta.shopDesc} alternate={path(lang === 'es' ? 'en' : 'es', 'shop')}>
+  <section class="shop wrap">
+    <div class="intro grid" data-reveal>
+      <h1 class="title">{d.shop.title}</h1>
+      <p class="text">{d.shop.text}</p>
+    </div>
+
+    <form class="filters" aria-label={lang === 'es' ? 'Filtros' : 'Filters'} onsubmit="return false">
+      <fieldset>
+        <legend class="small soft">{d.shop.shape}</legend>
+        <label><input type="radio" name="shape" value="" checked /><span>{d.shop.all}</span></label>
+        {usedShapes.map((s) => <label><input type="radio" name="shape" value={s} /><span>{shapeNames[s][lang]}</span></label>)}
+      </fieldset>
+      <fieldset>
+        <legend class="small soft">{d.shop.lens}</legend>
+        <label><input type="radio" name="lens" value="" checked /><span>{d.shop.allLens}</span></label>
+        {usedLenses.map((l) => <label><input type="radio" name="lens" value={l} /><span><span class="dot" style={`--c:${lenses[l].hex}`}></span> {lenses[l].name[lang]}</span></label>)}
+      </fieldset>
+      <div class="end">
+        <label class="check"><input type="checkbox" name="season" /><span>{d.shop.seasonOnly}</span></label>
+        <label class="sort"><span class="small soft">{d.shop.sort}</span>
+          <select name="sort">
+            <option value="order">{d.shop.sortFeatured}</option>
+            <option value="low">{d.shop.sortLow}</option>
+            <option value="high">{d.shop.sortHigh}</option>
+          </select>
+        </label>
+        <output class="count small soft" aria-live="polite">{d.shop.count(products.length)}</output>
+      </div>
+    </form>
+
+    <ul role="list" class="tiles">
+      {products.map((p, i) => <ProductTile lang={lang} product={p} eager={i < 3} />)}
+    </ul>
+    <p class="none" hidden>{d.shop.none}</p>
+  </section>
+  <script type="application/json" id="shop-text" set:html={JSON.stringify({ one: d.shop.count(1), many: d.shop.count(2) })} />
+</Base>
+
+<style>
+  .shop { padding-top: calc(var(--header) + clamp(40px, 6vw, 96px)); padding-bottom: var(--section); }
+  .intro { align-items: end; row-gap: 16px; }
+  .title { grid-column: 1 / span 7; font-size: var(--step-display-2); letter-spacing: -0.05em; line-height: 0.85; }
+  .text { grid-column: 9 / -1; max-width: 36ch; padding-bottom: 0.6em; }
+  .filters { display: none; margin: clamp(40px, 5vw, 72px) 0 40px; gap: 20px 40px; flex-wrap: wrap; align-items: start; }
+  :global(.js) .filters { display: flex; }
+  fieldset { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
+  legend { padding: 0; margin-bottom: 8px; }
+  .filters label { cursor: pointer; }
+  fieldset input, .check input { position: absolute; opacity: 0; pointer-events: none; }
+  fieldset label > span, .check span {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px;
+    background: var(--surface); font-size: var(--step-small); transition: background-color var(--fast) var(--ease), color var(--fast) var(--ease);
+  }
+  fieldset label:hover > span, .check:hover span { background: #dcd9d1; }
+  fieldset input:checked + span, .check input:checked + span { background: var(--ink); color: var(--ground); }
+  fieldset input:focus-visible + span, .check input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .end { display: flex; flex-wrap: wrap; align-items: end; gap: 16px 24px; margin-left: auto; padding-top: 28px; }
+  .sort { display: grid; gap: 4px; }
+  select { min-height: 40px; padding: 0 12px; background: var(--surface); border: 0; border-radius: 0; font-size: var(--step-small); }
+  .count { min-height: 40px; display: inline-flex; align-items: center; }
+  .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 56px var(--gap); padding: 0; margin: 0; }
+  :global(.tile[hidden]) { display: none; }
+  .none { padding: 48px 0; font-size: var(--step-lead); }
+  @media (max-width: 1100px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 760px) {
+    .title, .text { grid-column: 1 / -1; }
+    .tiles { gap: 40px 12px; }
+    .end { margin-left: 0; padding-top: 0; }
+  }
+</style>
+
+<script>
+  import { initSwatches } from '../scripts/swatches';
+  initSwatches();
+  const form = document.querySelector<HTMLFormElement>('.filters');
+  const list = document.querySelector<HTMLElement>('.tiles');
+  const none = document.querySelector<HTMLElement>('.none');
+  const count = form?.querySelector('output');
+  const words = JSON.parse(document.getElementById('shop-text')!.textContent!);
+  const apply = () => {
+    if (!form || !list) return;
+    const f = new FormData(form);
+    const shape = String(f.get('shape') || '');
+    const lens = String(f.get('lens') || '');
+    const season = f.get('season') === 'on';
+    const sort = String(f.get('sort') || 'order');
+    const tiles = Array.from(list.querySelectorAll<HTMLElement>('.tile'));
+    let n = 0;
+    for (const tile of tiles) {
+      const show = (!shape || tile.dataset.shape === shape) && (!lens || (tile.dataset.lenses || '').split(' ').includes(lens)) && (!season || tile.dataset.season === '1');
+      tile.hidden = !show;
+      if (show) n++;
+    }
+    const key = (t: HTMLElement) => (sort === 'order' ? Number(t.dataset.order) : Number(t.dataset.price) * (sort === 'high' ? -1 : 1));
+    tiles.sort((a, b) => key(a) - key(b)).forEach((t) => list.appendChild(t));
+    if (count) count.textContent = n === 1 ? words.one : words.many.replace(/\d+/, String(n));
+    if (none) none.hidden = n > 0;
+  };
+  form?.addEventListener('change', apply);
+</script>

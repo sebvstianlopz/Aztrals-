@@ -1,0 +1,16 @@
+# SAMPLE
+name: San Juan
+order: 10
+shape: square
+price: 118
+size: [51, 21, 145]
+fit: medio
+place:
+  es: Los adoquines azules de la calle del Cristo.
+  en: The blue cobblestones of Calle del Cristo.
+description:
+  es: Cuadrado clásico de acetato negro con lente humo. El par que va con todo, de la oficina a la Placita.
+  en: A classic square in black acetate with a smoke lens. The pair that goes with everything, from the office to La Placita.
+variants:
+  - { id: negro-humo, frame: negro, lens: humo }
+  - { id: carey-verde, frame: carey, lens: verde }

@@ -1,0 +1,91 @@
+---
+// Flat drawings of the places the season's pairs are named after, in one graphic language:
+// a sky, the sun, the sea in bands and one landmark. They stand in for photographs.
+interface Props { place: 'condado' | 'culebra' | 'rincon' | 'vieques'; class?: string; label: string }
+const { place, class: cls, label } = Astro.props;
+---
+<svg class={cls} viewBox="0 0 400 600" preserveAspectRatio="xMidYMid slice" role="img" aria-label={label}>
+  {place === 'condado' && (
+    <g>
+      <rect width="400" height="600" fill="#f2e3cb" />
+      <circle cx="306" cy="132" r="40" fill="#f0b46e" />
+      <g fill="#dcc1a0">
+        <rect x="8" y="196" width="46" height="148" />
+        <rect x="106" y="176" width="54" height="168" />
+        <rect x="214" y="208" width="62" height="136" />
+        <rect x="330" y="228" width="58" height="116" />
+      </g>
+      <g fill="#c9a681">
+        <rect x="58" y="246" width="40" height="98" />
+        <rect x="166" y="262" width="40" height="82" />
+        <rect x="282" y="258" width="40" height="86" />
+      </g>
+      <g fill="#efdcc0">
+        <rect x="18" y="210" width="26" height="6" /><rect x="18" y="226" width="26" height="6" /><rect x="18" y="242" width="26" height="6" />
+        <rect x="116" y="192" width="34" height="6" /><rect x="116" y="208" width="34" height="6" /><rect x="116" y="224" width="34" height="6" /><rect x="116" y="240" width="34" height="6" />
+        <rect x="226" y="224" width="38" height="6" /><rect x="226" y="240" width="38" height="6" />
+        <rect x="340" y="244" width="38" height="6" />
+      </g>
+      <rect y="344" width="400" height="40" fill="#255f7e" />
+      <rect y="384" width="400" height="46" fill="#3a83a2" />
+      <rect y="430" width="400" height="22" fill="#69aebf" />
+      <path d="M0 452 Q50 444 100 452 T200 452 T300 452 T400 452 V462 H0Z" fill="#f7f0e4" />
+      <rect y="462" width="400" height="138" fill="#e8cfa5" />
+      <path d="M52 600 C58 540 70 500 92 470" stroke="#6b5640" stroke-width="7" fill="none" />
+      <g fill="#5d7e57"><path d="M92 470 q-40 -6 -64 18 q34 -10 64 -18z" /><path d="M92 470 q30 -30 70 -22 q-40 4 -70 22z" /><path d="M92 470 q-10 -40 10 -64 q-6 34 -10 64z" /><path d="M92 470 q44 -2 62 28 q-30 -20 -62 -28z" /></g>
+    </g>
+  )}
+  {place === 'culebra' && (
+    <g>
+      <rect width="400" height="600" fill="#d8ecec" />
+      <ellipse cx="96" cy="120" rx="58" ry="14" fill="#edf6f5" />
+      <ellipse cx="290" cy="80" rx="40" ry="10" fill="#edf6f5" />
+      <path d="M0 312 C40 250 110 240 168 300 L168 312Z" fill="#6f9472" />
+      <path d="M232 312 C270 262 340 246 400 280 V312Z" fill="#5a7f60" />
+      <rect y="312" width="400" height="36" fill="#1f6f86" />
+      <rect y="348" width="400" height="48" fill="#2f9aa6" />
+      <rect y="396" width="400" height="44" fill="#6cc7c0" />
+      <path d="M0 440 Q40 432 80 440 T160 440 T240 440 T320 440 T400 440 V452 H0Z" fill="#f8f4ea" />
+      <rect y="452" width="400" height="148" fill="#f3e9d2" />
+      <path d="M330 600 C322 520 300 470 276 430" stroke="#6b5640" stroke-width="8" fill="none" />
+      <g fill="#4f7a52"><path d="M276 430 q-44 -4 -70 22 q36 -12 70 -22z" /><path d="M276 430 q34 -34 78 -26 q-44 4 -78 26z" /><path d="M276 430 q-14 -44 8 -70 q-4 38 -8 70z" /><path d="M276 430 q50 0 70 34 q-34 -24 -70 -34z" /><path d="M276 430 q-40 18 -50 56 q16 -34 50 -56z" /></g>
+    </g>
+  )}
+  {place === 'rincon' && (
+    <g>
+      <rect width="400" height="600" fill="#f3cdbd" />
+      <circle cx="176" cy="318" r="74" fill="#e8735a" />
+      <rect y="330" width="400" height="270" fill="#5c5270" />
+      <g fill="#e99a86">
+        <rect x="124" y="344" width="104" height="5" />
+        <rect x="136" y="362" width="80" height="5" />
+        <rect x="146" y="382" width="60" height="5" />
+        <rect x="156" y="404" width="40" height="5" />
+        <rect x="164" y="430" width="24" height="4" />
+      </g>
+      <rect y="470" width="400" height="130" fill="#4b4560" />
+      <path d="M262 330 C290 300 330 292 400 290 V600 H300 C300 470 280 380 262 330Z" fill="#3c3649" />
+      <rect x="338" y="196" width="22" height="96" fill="#f4ede6" />
+      <rect x="334" y="184" width="30" height="14" fill="#3c3649" />
+      <rect x="341" y="172" width="16" height="12" fill="#f7c9a0" />
+      <path d="M336 172 L349 160 L362 172Z" fill="#3c3649" />
+    </g>
+  )}
+  {place === 'vieques' && (
+    <g>
+      <rect width="400" height="600" fill="#d2e0ee" />
+      <circle cx="92" cy="112" r="30" fill="#fbf6ea" />
+      <path d="M180 330 C220 300 270 296 310 312 C340 300 380 304 400 318 V330Z" fill="#8ea6c2" />
+      <rect y="330" width="400" height="80" fill="#2a5c99" />
+      <rect y="410" width="400" height="90" fill="#346fb0" />
+      <rect y="500" width="400" height="100" fill="#4384c4" />
+      <g fill="#bcd4ec">
+        <rect x="40" y="440" width="70" height="4" /><rect x="250" y="470" width="90" height="4" /><rect x="120" y="530" width="60" height="4" /><rect x="300" y="560" width="70" height="4" />
+      </g>
+      <path d="M96 392 H196 L184 408 H108Z" fill="#f7f4ee" />
+      <rect x="126" y="378" width="40" height="14" fill="#f7f4ee" />
+      <rect x="132" y="382" width="26" height="5" fill="#2a5c99" />
+      <rect x="96" y="408" width="104" height="3" fill="#bcd4ec" />
+    </g>
+  )}
+</svg>

@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import { t, path } from '../i18n';
+const d = t('es');
+const e = t('en');
+---
+<Base lang="es" title={`${d.notFound.title} · Aztrals`} description={d.notFound.text} alternate={path('en', 'home')} noindex>
+  <section class="nf wrap">
+    <h1>{d.notFound.title}</h1>
+    <p>{d.notFound.text} <span lang="en" class="soft">{e.notFound.text}</span></p>
+    <a class="btn" href={path('es', 'shop')}>{d.notFound.cta}<span class="arrow" aria-hidden="true">→</span></a>
+  </section>
+</Base>
+<style>
+  .nf { min-height: 80svh; padding-top: calc(var(--header) + 12vh); display: grid; align-content: start; gap: 24px; justify-items: start; }
+  h1 { font-size: var(--step-head); letter-spacing: -0.035em; }
+  p { max-width: 52ch; }
+</style>

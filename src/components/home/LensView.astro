@@ -1,0 +1,183 @@
+---
+// The live thing: drag a pair of lenses across San Juan Bay. Outside them, the glare of noon;
+// inside them, the colour each polarized tint lets through.
+import Bay from '../Bay.astro';
+import { t, path } from '../../i18n';
+import type { Lang } from '../../config/site';
+import { lenses, type LensId } from '../../lib/palette';
+import { pairPath } from '../../lib/outline';
+import type { Product } from '../../lib/products';
+interface Props { lang: Lang; products: Product[] }
+const { lang, products } = Astro.props;
+const d = t(lang);
+
+// How each tint changes what you see: a multiply colour, plus the stronger contrast of polarized glass.
+const view: Record<LensId, [number, number, number]> = {
+  ambar: [1.0, 0.8, 0.52],
+  verde: [0.74, 0.92, 0.78],
+  humo: [0.62, 0.64, 0.67],
+  rosa: [1.0, 0.8, 0.8],
+  marron: [0.86, 0.68, 0.52],
+  'espejo-azul': [0.6, 0.7, 0.82],
+  'espejo-oro': [0.9, 0.76, 0.52],
+};
+const ids = Object.keys(lenses) as LensId[];
+const pairsFor = Object.fromEntries(
+  ids.map((id) => [id, products.filter((p) => p.data.variants.some((v) => v.lens === id)).map((p) => ({ name: p.data.name, url: `${path(lang, 'shop', p.id)}?v=${p.data.variants.find((v) => v.lens === id)!.id}` }))]),
+);
+const lensD = pairPath('wayfarer', 680);
+const first: LensId = 'ambar';
+const matrix = (id: LensId) => {
+  // Multiply by the tint, then add a little of it back so the lens reads as its own colour.
+  const [r, g, b] = view[id];
+  const k = 0.82;
+  const o = (c: number) => ((1 - k) * c * 0.7).toFixed(3);
+  return `${(k * r).toFixed(3)} 0 0 0 ${o(r)}  0 ${(k * g).toFixed(3)} 0 0 ${o(g)}  0 0 ${(k * b).toFixed(3)} 0 ${o(b)}  0 0 0 1 0`;
+};
+---
+<section class="lens grid wrap" id="lentes" aria-labelledby="lens-title" data-lens={first}>
+  <div class="copy" data-reveal>
+    <h2 id="lens-title" class="title">{d.lens.title}</h2>
+    <p>{d.lens.text}</p>
+  </div>
+  <div class="controls" data-reveal>
+    <fieldset class="tints">
+      <legend class="small soft">{d.lens.pick}</legend>
+      {ids.map((id) => (
+        <label class="tint">
+          <input type="radio" name="tint" value={id} checked={id === first} />
+          <span class="dot" style={`--c:${lenses[id].hex}`}></span>
+          <span>{lenses[id].name[lang]}</span>
+        </label>
+      ))}
+    </fieldset>
+    <div class="pairs">
+      <p class="small soft">{d.lens.pairs}</p>
+      {ids.map((id) => (
+        <ul role="list" data-for={id} hidden={id !== first}>
+          {pairsFor[id].map((p) => <li><a class="link" href={p.url}>{p.name}</a></li>)}
+        </ul>
+      ))}
+    </div>
+  </div>
+  <figure class="scene" data-reveal>
+    <svg viewBox="0 0 1600 900" role="img" aria-label={lang === 'es' ? 'La bahía de San Juan con El Morro, vista a través de un par de lentes' : 'San Juan Bay and El Morro, seen through a pair of lenses'} tabindex="0">
+      <defs>
+        <Bay />
+        <filter id="tint" color-interpolation-filters="sRGB">
+          <feComponentTransfer>
+            <feFuncR type="linear" slope="1.18" intercept="-0.08" />
+            <feFuncG type="linear" slope="1.18" intercept="-0.08" />
+            <feFuncB type="linear" slope="1.18" intercept="-0.08" />
+          </feComponentTransfer>
+          <feColorMatrix type="saturate" values="1.3" />
+          <feColorMatrix id="tint-matrix" type="matrix" values={matrix(first)} />
+        </filter>
+        <clipPath id="lens-clip">
+          <path class="lens-shape" d={lensD} transform="translate(800 470)" />
+        </clipPath>
+      </defs>
+      <use href="#bay" />
+      <g class="glare">
+        <rect width="1600" height="900" fill="#ffffff" opacity="0.3" />
+        <g fill="#ffffff">
+          <path d="M210 600 l14 -5 l14 5 l-14 5z" /><path d="M420 650 l22 -7 l22 7 l-22 7z" /><path d="M700 590 l18 -6 l18 6 l-18 6z" />
+          <path d="M930 700 l26 -8 l26 8 l-26 8z" /><path d="M1180 620 l20 -6 l20 6 l-20 6z" /><path d="M1420 690 l24 -8 l24 8 l-24 8z" />
+          <path d="M560 780 l30 -9 l30 9 l-30 9z" /><path d="M1050 830 l28 -9 l28 9 l-28 9z" /><path d="M300 820 l24 -8 l24 8 l-24 8z" />
+          <rect x="1180" y="455" width="260" height="10" opacity="0.8" /><rect x="900" y="560" width="420" height="8" opacity="0.7" />
+        </g>
+      </g>
+      <g clip-path="url(#lens-clip)">
+        <use href="#bay" filter="url(#tint)" />
+      </g>
+      <path class="lens-shape lens-rim" d={lensD} transform="translate(800 470)" fill="none" stroke="#12161c" stroke-width="14" stroke-linejoin="round" />
+    </svg>
+    <figcaption class="small soft">{d.lens.hint}</figcaption>
+  </figure>
+  <script type="application/json" id="lens-matrices" set:html={JSON.stringify(Object.fromEntries(ids.map((id) => [id, matrix(id)])))} />
+</section>
+
+<style>
+  .lens { padding-top: var(--section); row-gap: 28px; align-items: start; grid-template-rows: auto 1fr; }
+  .copy { grid-column: 1 / span 4; grid-row: 1; display: grid; gap: 20px; max-width: 40ch; }
+  .controls { grid-column: 1 / span 4; grid-row: 2; display: grid; gap: 20px; }
+  .title { font-size: var(--step-head); letter-spacing: -0.03em; }
+  .tints { border: 0; padding: 0; margin: 8px 0 0; display: grid; gap: 2px; }
+  .tints legend { padding: 0; margin-bottom: 8px; }
+  .tint { display: flex; align-items: center; gap: 12px; padding: 7px 0; cursor: pointer; font-size: var(--step-body); color: var(--soft); transition: color var(--fast) var(--ease); }
+  .tint:hover { color: var(--ink); }
+  .tint input { position: absolute; opacity: 0; pointer-events: none; }
+  .tint .dot { width: 22px; height: 22px; transition: transform var(--fast) var(--ease); }
+  .tint:has(input:checked) { color: var(--ink); font-weight: 500; }
+  .tint:has(input:checked) .dot { transform: scale(1.25); }
+  .tint:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pairs ul[hidden] { display: none; }
+  .pairs ul { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 6px; padding: 0; }
+  .scene { grid-column: 5 / -1; grid-row: 1 / span 2; display: grid; gap: 12px; }
+  .scene svg { width: 100%; height: auto; touch-action: none; cursor: grab; background: #cfe3f3; }
+  .scene svg:active { cursor: grabbing; }
+  .lens-shape { transition: transform 500ms var(--ease); }
+  .dragging .lens-shape { transition: none; }
+  @media (max-width: 900px) {
+    .copy, .scene, .controls { grid-column: 1 / -1; }
+    .copy { max-width: none; }
+    .scene { grid-row: 2; margin-inline: calc(-1 * var(--margin)); }
+    .controls { grid-row: 3; }
+    .scene figcaption { padding-inline: var(--margin); }
+    .scene svg { aspect-ratio: 4 / 3; height: auto; }
+    .tints { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('.lens');
+  if (root) {
+    const svg = root.querySelector('svg')!;
+    const shapes = root.querySelectorAll<SVGPathElement>('.lens-shape');
+    const fm = root.querySelector('#tint-matrix')!;
+    const matrices: Record<string, string> = JSON.parse(root.querySelector('#lens-matrices')!.textContent!);
+    const place = (x: number, y: number) => shapes.forEach((s) => s.setAttribute('transform', `translate(${x.toFixed(0)} ${y.toFixed(0)})`));
+    const toSvg = (e: PointerEvent) => {
+      const r = svg.getBoundingClientRect();
+      const vb = svg.viewBox.baseVal;
+      const k = Math.max(vb.width / r.width, vb.height / r.height);
+      return [vb.x + (e.clientX - r.left - (r.width - vb.width / k) / 2) * k, vb.y + (e.clientY - r.top - (r.height - vb.height / k) / 2) * k];
+    };
+    let pos = [800, 470];
+    let drag = false;
+    svg.addEventListener('pointerdown', (e) => {
+      drag = true;
+      svg.setPointerCapture(e.pointerId);
+      pos = toSvg(e);
+      place(pos[0], pos[1]); // glides to where you touched
+    });
+    svg.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      root.classList.add('dragging'); // then follows the finger exactly
+      pos = toSvg(e);
+      place(pos[0], pos[1]);
+    });
+    const end = () => {
+      drag = false;
+      root.classList.remove('dragging');
+    };
+    svg.addEventListener('pointerup', end);
+    svg.addEventListener('pointercancel', end);
+    svg.addEventListener('keydown', (e) => {
+      const step = 60;
+      const d: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
+      const m = d[e.key];
+      if (!m) return;
+      e.preventDefault();
+      pos = [Math.min(1400, Math.max(200, pos[0] + m[0])), Math.min(760, Math.max(140, pos[1] + m[1]))];
+      place(pos[0], pos[1]);
+    });
+    root.querySelectorAll<HTMLInputElement>('input[name="tint"]').forEach((input) =>
+      input.addEventListener('change', () => {
+        fm.setAttribute('values', matrices[input.value]);
+        root.dataset.lens = input.value;
+        root.querySelectorAll<HTMLElement>('[data-for]').forEach((ul) => (ul.hidden = ul.dataset.for !== input.value));
+      }),
+    );
+  }
+</script>

@@ -1,0 +1,18 @@
+# SAMPLE
+name: Vieques
+season: true
+order: 4
+shape: aviator
+price: 168
+size: [58, 14, 140]
+fit: ancho
+place:
+  es: Mar abierto, sin sombra, de la mañana a la tarde.
+  en: Open sea and no shade, from morning to afternoon.
+description:
+  es: Aviador de metal con lente espejo azul polarizado. Para el ferry, el bote y las horas de sol de frente.
+  en: A metal aviator with a polarized blue mirror lens. For the ferry, the boat and the hours facing the sun.
+variants:
+  - { id: plata-espejo-azul, frame: plata, lens: espejo-azul }
+  - { id: oro-espejo-oro, frame: oro, lens: espejo-oro }
+  - { id: grafito-humo, frame: grafito, lens: humo }

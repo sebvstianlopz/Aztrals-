@@ -1,0 +1,37 @@
+---
+// Dev-only page (see astro.config.mjs): draws every pair in every colourway and hands the
+// images to scripts/render-posters.mjs. Open /render/ in `npm run dev` to watch it.
+import { getProducts, toClient } from '../src/lib/products';
+const items = (await getProducts()).map(toClient);
+---
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8" /><title>Render posters</title>
+    <style>body{margin:0;background:#eee}canvas{width:1200px;height:900px;display:block}</style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <script type="application/json" id="items" set:html={JSON.stringify(items)} />
+    <script>
+      import { Stage } from '../src/three/stage';
+      import { spec } from '../src/lib/palette';
+      import type { ClientProduct } from '../src/lib/products';
+      const items: ClientProduct[] = JSON.parse(document.getElementById('items')!.textContent!);
+      const only = new URLSearchParams(location.search).get('only');
+      const stage = new Stage(document.getElementById('c') as HTMLCanvasElement, { idle: false, capture: true, yaw: -0.55, pitch: 0.16, fill: 0.78 });
+      const out: Record<string, string> = {};
+      (async () => {
+        for (const p of items) {
+          if (only && p.slug !== only) continue;
+          for (const v of p.variants) {
+            stage.setPair(spec(p.shape, v.frame, v.lens));
+            await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+            out[`${p.slug}/${v.id}`] = stage.snapshot();
+          }
+        }
+        (window as any).__posters = out;
+        document.title = 'done';
+      })();
+    </script>
+  </body>
+</html>

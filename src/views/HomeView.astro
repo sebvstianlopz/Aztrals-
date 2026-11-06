@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+import Story from '../components/home/Story.astro';
+import Showcase from '../components/home/Showcase.astro';
+import LensView from '../components/home/LensView.astro';
+import Features from '../components/home/Features.astro';
+import Lineup from '../components/home/Lineup.astro';
+import How from '../components/home/How.astro';
+import Faq from '../components/home/Faq.astro';
+import Closing from '../components/home/Closing.astro';
+import { t, path } from '../i18n';
+import { site, type Lang } from '../config/site';
+import { getProducts } from '../lib/products';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const products = await getProducts();
+const season = products.filter((p) => p.data.season);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Store',
+  name: site.name,
+  url: new URL(path(lang, 'home'), Astro.site).href,
+  telephone: site.phoneDisplay,
+  address: { '@type': 'PostalAddress', addressLocality: site.city, addressRegion: 'PR', addressCountry: 'US' },
+  currenciesAccepted: 'USD',
+};
+---
+<Base lang={lang} title={d.meta.homeTitle} description={d.meta.homeDesc} alternate={path(lang === 'es' ? 'en' : 'es', 'home')} jsonLd={jsonLd}>
+  <Story lang={lang} season={season} />
+  <Showcase lang={lang} season={season} />
+  <LensView lang={lang} products={products} />
+  <Features lang={lang} />
+  <Lineup lang={lang} products={products} />
+  <How lang={lang} />
+  <Faq lang={lang} />
+  <Closing lang={lang} />
+</Base>
