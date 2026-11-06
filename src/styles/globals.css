@@ -24,7 +24,7 @@
 .fsh-spacer { position: relative; margin-top: calc(-1 * (100svh - var(--header))); pointer-events: none; }
 
 .fsh-canvas-wrap { position: absolute; inset: 0; display: grid; place-items: center; }
-.fsh-canvas { width: min(100%, 124svh); aspect-ratio: 4 / 3; object-fit: contain; transform: translateY(-1%); user-select: none; }
+.fsh-canvas { grid-area: 1 / 1; width: min(100%, 124svh); height: auto; aspect-ratio: 4 / 3; object-fit: contain; transform: translateY(-1%); user-select: none; }
 
 .fsh-copy { position: absolute; z-index: 2; left: 0; right: 0; top: clamp(28px, 6svh, 72px); display: grid; justify-items: center; gap: 14px; text-align: center; padding-inline: var(--margin); }
 .fsh-title { font-family: var(--serif); font-weight: 300; font-size: var(--t-hero); letter-spacing: 0.16em; line-height: 0.95; text-transform: uppercase; padding-left: 0.16em; }
@@ -56,7 +56,7 @@
 .fsh-card-label { font-size: var(--t-caps); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; }
 
 .fsh-progress { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; height: 2px; background: var(--line); }
-.fsh-progress-fill { display: block; height: 100%; background: var(--ink); }
+.fsh-progress-fill { display: block; width: 100%; height: 100%; background: var(--ink); transform-origin: left; }
 
 /* Loading: covers the hero only, as a thin bar; the component's English label stays hidden. */
 .fsh-loader {
@@ -67,7 +67,7 @@
 .fsh-loader-done { opacity: 0; visibility: hidden; }
 .fsh-loader-text { display: none; }
 .fsh-loader-track { width: 160px; height: 1px; background: var(--line); }
-.fsh-loader-fill { display: block; height: 100%; background: var(--ink); transition: width 200ms linear; }
+.fsh-loader-fill { display: block; width: 100%; height: 100%; background: var(--ink); transform-origin: left; transition: transform 200ms linear; }
 
 /* Without JavaScript: the first frame and the title, no loader and no scroll run. */
 html:not(.js) .fsh-loader, html:not(.js) .fsh-spacer, html:not(.js) .fsh-cards { display: none; }
@@ -77,6 +77,9 @@ html:not(.js) .fsh-loader, html:not(.js) .fsh-spacer, html:not(.js) .fsh-cards {
   .fsh-cards { bottom: 24px; height: 250px; }
   .fsh-card-title { font-size: 1.5rem; }
 }
+
+/* The shimmer repaints the title each frame; hold it while the page scrolls. */
+.fsh-scrolling .fsh-title-rainbow { animation-play-state: paused; }
 
 @media (prefers-reduced-motion: reduce) {
   .fsh-title-rainbow { animation: none; }
