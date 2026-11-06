@@ -59,9 +59,12 @@ Until a photo exists, the site uses renders of code-drawn models from `public/re
 `src/components/ui/mac-book-neo-hero.tsx` (a React component, styled in `src/styles/globals.css`).
 Scrolling plays `public/hero/frames/frame_0001.webp` … `frame_0240.webp`, rendered from the 3D
 models by `npm run hero-frames` (the choreography is in `src/three/stack.ts`; preview single
-points with `npm run hero-frames -- 0,0.1,0.2`). Re-run it after changing which pairs are in the season. To use a
+points with `npm run hero-frames -- 0,0.1,0.2`). Phones (screens up to 760 px wide) load the
+800 × 600 copies in `public/hero/frames-phone/` instead, about 40% of the download; the same
+command makes them, or run `node scripts/hero-phone-frames.mjs` after replacing the full-size frames. Re-run it after changing which pairs are in the season. To use a
 filmed or photographed sequence instead, replace those files (same names, 4:3, the pair centred on a
-transparent or light grey background) and set `HERO_FRAMES` in `src/lib/hero.ts` to the new count.
+transparent or light grey background), set `HERO_FRAMES` in `src/lib/hero.ts` to the new count and
+run `node scripts/hero-phone-frames.mjs` to remake the phone copies.
 
 ## Components (shadcn structure)
 
