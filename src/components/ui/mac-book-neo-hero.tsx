@@ -33,6 +33,19 @@ export type FrameSequenceHeroProps = {
 const cx = (...c: (string | false | null | undefined)[]) =>
   c.filter(Boolean).join(" ");
 
+/*
+ * Performance notes:
+ * - Frames are preloaded and decoded (img.decode()) before they are shown; the visible <img>
+ *   only ever switches to a frame that is ready, falling back to the nearest ready frame, so
+ *   fast scrolling never waits on the network or shows a blank frame.
+ * - Scroll only records where the page is; one requestAnimationFrame loop does all the work,
+ *   and the frame is set by writing img.src directly, not through React state.
+ * - Per-frame values (progress bar, step ticks) are written straight to the DOM, not React
+ *   state; state changes only when the active step, loader or header threshold changes.
+ * - The progress bar and ticks move with transform: scaleX(), never width.
+ * - Layout (the scroll distance) is measured on resize, not on every scroll event.
+ * - Easing towards the target frame is time-based, so it feels the same at 60 Hz and 120 Hz.
+ */
 export function FrameSequenceHero({
   frameCount,
   framePath,
@@ -47,111 +60,192 @@ export function FrameSequenceHero({
   steps,
   className,
 }: FrameSequenceHeroProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const spacerRef = useRef<HTMLDivElement | null>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+  const progressRef = useRef<HTMLSpanElement | null>(null);
+  const ticksRef = useRef<HTMLSpanElement[][]>([]);
 
-  const cacheRef = useRef<HTMLImageElement[]>(new Array(frameCount));
-  const loadedRef = useRef(0);
-  const targetFrameRef = useRef(0);
-  const displayFrameRef = useRef(0);
-  const lastShownRef = useRef(-1);
-  const rafActiveRef = useRef(false);
+  const imagesRef = useRef<(HTMLImageElement | null)[]>(new Array(frameCount).fill(null));
+  const readyRef = useRef<boolean[]>(new Array(frameCount).fill(false));
+  const totalRef = useRef(1);
+  const targetRef = useRef(0);
+  const displayRef = useRef(0);
+  const drawnRef = useRef(-1);
+  const activeRef = useRef(-1);
+  const localRef = useRef(-1);
+  const rafRef = useRef(0);
+  const lastTimeRef = useRef(0);
+  const flagsRef = useRef({ nav: false, sub: false });
 
   const [loadPct, setLoadPct] = useState(0);
   const [loaderDone, setLoaderDone] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
   const [subHidden, setSubHidden] = useState(false);
   const [activeIdx, setActiveIdx] = useState<number>(-1);
-  const [progress, setProgress] = useState(0);
-  const [stepLocal, setStepLocal] = useState(0);
-  const [currentSrc, setCurrentSrc] = useState<string>(() => framePath(1));
 
-  const showFrame = (i: number) => {
-    if (i === lastShownRef.current) return;
-    setCurrentSrc(framePath(i + 1));
-    lastShownRef.current = i;
+  /** Shows frame i, or the nearest frame that has finished decoding. */
+  const draw = (i: number) => {
+    const view = imgRef.current;
+    if (!view) return;
+    let j = i;
+    if (!readyRef.current[i]) {
+      j = -1;
+      for (let d = 1; d < frameCount; d++) {
+        if (i - d >= 0 && readyRef.current[i - d]) { j = i - d; break; }
+        if (i + d < frameCount && readyRef.current[i + d]) { j = i + d; break; }
+      }
+      if (j < 0) return;
+    }
+    if (j === drawnRef.current) return;
+    const img = imagesRef.current[j];
+    if (!img) return;
+    view.src = img.src;
+    drawnRef.current = j;
   };
 
-  const loop = () => {
-    if (rafActiveRef.current) return;
-    rafActiveRef.current = true;
-    const tick = () => {
-      const diff = targetFrameRef.current - displayFrameRef.current;
-      if (Math.abs(diff) < 0.08) displayFrameRef.current = targetFrameRef.current;
-      else displayFrameRef.current += diff * 0.28;
-      const idx = Math.max(0, Math.min(frameCount - 1, Math.round(displayFrameRef.current)));
-      if (idx !== lastShownRef.current) showFrame(idx);
-      if (displayFrameRef.current !== targetFrameRef.current) requestAnimationFrame(tick);
-      else rafActiveRef.current = false;
-    };
-    requestAnimationFrame(tick);
-  };
-
-  useEffect(() => {
-    const eager = Math.min(eagerCount, frameCount);
-    const loadOne = (i: number) => {
-      const img = new Image();
-      img.decoding = "async";
-      img.src = framePath(i + 1);
-      const onSettle = () => {
-        loadedRef.current += 1;
-        const pct = Math.round((loadedRef.current / frameCount) * 100);
-        setLoadPct(pct);
-        if (loadedRef.current === eager) {
-          setLoaderDone(true);
-          for (let j = eager; j < frameCount; j++) loadOne(j);
-        }
-      };
-      img.onload = onSettle;
-      img.onerror = onSettle;
-      cacheRef.current[i] = img;
-    };
-    for (let i = 0; i < eager; i++) loadOne(i);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [frameCount, eagerCount]);
-
-  const onScroll = () => {
-    const spacer = spacerRef.current;
-    if (!spacer) return;
-    const total = spacer.offsetHeight - window.innerHeight;
-    const p = Math.max(0, Math.min(1, window.scrollY / Math.max(1, total)));
-    targetFrameRef.current = p * (frameCount - 1);
-    loop();
-    setProgress(p);
-    setNavScrolled(window.scrollY > 4);
-    setSubHidden(window.scrollY > 8);
+  /** Everything that follows the scroll position, once per animation frame. */
+  const update = (p: number) => {
+    if (progressRef.current) progressRef.current.style.transform = `scaleX(${p})`;
     let idx = -1;
     let local = 0;
     for (let i = 0; i < steps.length; i++) {
       const s = steps[i];
       if (p >= s.from && p < s.to) {
         idx = i;
-        local = (p - s.from) / (s.to - s.from);
+        local = Math.max(0, Math.min(1, (p - s.from) / (s.to - s.from)));
         break;
       }
     }
-    setActiveIdx(idx);
-    setStepLocal(Math.max(0, Math.min(1, local)));
+    const stepChanged = idx !== activeRef.current;
+    if (stepChanged) {
+      activeRef.current = idx;
+      setActiveIdx(idx);
+    }
+    if (stepChanged || Math.abs(local - localRef.current) > 0.002) {
+      localRef.current = local;
+      for (const ticks of ticksRef.current) {
+        ticks?.forEach((t, j) => {
+          if (!t) return;
+          const v = j < idx ? 1 : j === idx ? local : 0;
+          t.style.transform = `scaleX(${v})`;
+        });
+      }
+    }
   };
 
+  const tick = (now: number) => {
+    const dt = Math.min(64, now - (lastTimeRef.current || now));
+    lastTimeRef.current = now;
+    const diff = targetRef.current - displayRef.current;
+    if (Math.abs(diff) < 0.05) displayRef.current = targetRef.current;
+    else displayRef.current += diff * (1 - Math.pow(1 - 0.2, dt / 16.67));
+    const idx = Math.max(0, Math.min(frameCount - 1, Math.round(displayRef.current)));
+    draw(idx);
+    update(displayRef.current / Math.max(1, frameCount - 1));
+    if (displayRef.current !== targetRef.current) rafRef.current = requestAnimationFrame(tick);
+    else rafRef.current = 0;
+  };
+
+  const kick = () => {
+    if (rafRef.current) return;
+    lastTimeRef.current = 0;
+    rafRef.current = requestAnimationFrame(tick);
+  };
+
+  // Load: the first `eagerCount` frames before the loader clears, the rest a few at a time.
   useEffect(() => {
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    let cancelled = false;
+    let settled = 0;
+    const eager = Math.min(eagerCount, frameCount);
+    const loadOne = (i: number) =>
+      new Promise<void>((resolve) => {
+        const img = new Image();
+        img.decoding = "async";
+        img.src = framePath(i + 1);
+        imagesRef.current[i] = img;
+        img
+          .decode()
+          .then(() => {
+            if (cancelled) return;
+            readyRef.current[i] = true;
+            if (Math.abs(i - Math.round(displayRef.current)) <= 2) {
+              drawnRef.current = -1;
+              draw(Math.round(displayRef.current));
+            }
+          })
+          .catch(() => {})
+          .finally(() => {
+            if (cancelled) return resolve();
+            settled += 1;
+            const pct = Math.round((settled / frameCount) * 100);
+            setLoadPct((old) => (old === pct ? old : pct));
+            if (settled === eager) setLoaderDone(true);
+            resolve();
+          });
+      });
+    const queue = (from: number, to: number, parallel: number) => {
+      let next = from;
+      const worker = async (): Promise<void> => {
+        while (!cancelled && next < to) await loadOne(next++);
+      };
+      return Promise.all(Array.from({ length: parallel }, worker));
+    };
+    queue(0, eager, 8).then(() => queue(eager, frameCount, 4));
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [frameCount, eagerCount]);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    let idle = 0;
+    const measure = () => {
+      const spacer = spacerRef.current;
+      if (spacer) totalRef.current = Math.max(1, spacer.offsetHeight - window.innerHeight);
+    };
+    const onScroll = () => {
+      const y = window.scrollY;
+      const p = Math.max(0, Math.min(1, y / totalRef.current));
+      targetRef.current = p * (frameCount - 1);
+      const nav = y > 4;
+      const sub = y > 8;
+      if (nav !== flagsRef.current.nav) { flagsRef.current.nav = nav; setNavScrolled(nav); }
+      if (sub !== flagsRef.current.sub) { flagsRef.current.sub = sub; setSubHidden(sub); }
+      // Pause decorative CSS animation while the page is moving.
+      root?.classList.add("fsh-scrolling");
+      window.clearTimeout(idle);
+      idle = window.setTimeout(() => root?.classList.remove("fsh-scrolling"), 160);
+      kick();
+    };
+    const onResize = () => {
+      measure();
+      onScroll();
+    };
+    measure();
     onScroll();
+    displayRef.current = targetRef.current;
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
+      window.clearTimeout(idle);
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [steps, frameCount]);
 
   return (
-    <div className={cx("fsh-root", className)}>
+    <div ref={rootRef} className={cx("fsh-root", className)}>
       <div aria-hidden className={cx("fsh-loader", loaderDone && "fsh-loader-done")}>
         <div className="fsh-loader-text">
           {loadPct < 100 ? `Loading · ${loadPct}%` : "Ready"}
         </div>
         <div className="fsh-loader-track">
-          <span className="fsh-loader-fill" style={{ width: `${loadPct}%` }} />
+          <span className="fsh-loader-fill" style={{ transform: `scaleX(${loadPct / 100})` }} />
         </div>
       </div>
 
@@ -173,10 +267,12 @@ export function FrameSequenceHero({
       <div className="fsh-stage">
         <div className="fsh-canvas-wrap">
           <img
-            src={currentSrc}
+            ref={imgRef}
+            src={framePath(1)}
             alt=""
             className="fsh-canvas"
             draggable={false}
+            decoding="sync"
           />
         </div>
 
@@ -215,20 +311,16 @@ export function FrameSequenceHero({
                   <p className="fsh-card-desc">{s.description}</p>
                   <div className="fsh-card-foot">
                     <div className="fsh-ticks">
-                      {steps.map((_, j) => {
-                        const done = j < activeIdx;
-                        const cur = j === activeIdx;
-                        return (
-                          <i key={j} className="fsh-tick">
-                            <span
-                              style={{
-                                transform: `scaleX(${done ? 1 : cur ? stepLocal : 0})`,
-                                transition: done ? "none" : "transform 160ms linear",
-                              }}
-                            />
-                          </i>
-                        );
-                      })}
+                      {steps.map((_, j) => (
+                        <i key={j} className="fsh-tick">
+                          <span
+                            ref={(el) => {
+                              (ticksRef.current[i] ??= [])[j] = el as HTMLSpanElement;
+                            }}
+                            style={{ transform: "scaleX(0)" }}
+                          />
+                        </i>
+                      ))}
                     </div>
                     <span className="fsh-card-label">{s.label}</span>
                   </div>
@@ -239,7 +331,7 @@ export function FrameSequenceHero({
         </div>
 
         <div className="fsh-progress">
-          <span className="fsh-progress-fill" style={{ width: `${progress * 100}%` }} />
+          <span ref={progressRef} className="fsh-progress-fill" style={{ transform: "scaleX(0)" }} />
         </div>
       </div>
 
