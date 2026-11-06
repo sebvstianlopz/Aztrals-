@@ -5,6 +5,7 @@ import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
+import { makePhoneFrames } from './hero-phone-frames.mjs';
 
 // Needs Playwright with Chromium: npm i -D playwright && npx playwright install chromium
 const { chromium } = createRequire(import.meta.url)('playwright');
@@ -42,3 +43,4 @@ try {
   await browser.close();
   stop();
 }
+if (!at) await makePhoneFrames(root);
