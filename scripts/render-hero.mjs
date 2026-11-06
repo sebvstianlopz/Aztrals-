@@ -11,6 +11,8 @@ const { chromium } = createRequire(import.meta.url)('playwright');
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const port = 4398;
+// Optional preview: npm run hero-frames -- 0,0.1,0.2  (writes only those points, to public/hero/preview/)
+const at = process.argv[2] ?? '';
 const base = (process.env.BASE_PATH ?? '/Aztrals-').replace(/\/$/, '');
 
 const dev = spawn('npx', ['astro', 'dev', '--port', String(port), '--strictPort'], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
@@ -26,16 +28,16 @@ const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--ena
 try {
   const page = await browser.newPage({ viewport: { width: 1200, height: 900 }, deviceScaleFactor: 1 });
   page.on('console', (m) => m.type() === 'error' && console.error('page:', m.text()));
-  const out = join(root, 'public/hero/frames');
+  const out = join(root, at ? 'public/hero/preview' : 'public/hero/frames');
   await rm(out, { recursive: true, force: true });
   await mkdir(out, { recursive: true });
   await page.exposeFunction('saveFrame', async (n, url) => {
     await writeFile(join(out, `frame_${String(n).padStart(4, '0')}.webp`), Buffer.from(url.split(',')[1], 'base64'));
     if (n % 50 === 0) console.log('frame', n);
   });
-  await page.goto(`http://localhost:${port}${base}/render-hero/`);
+  await page.goto(`http://localhost:${port}${base}/render-hero/${at ? `?at=${at}` : ''}`);
   await page.waitForFunction(() => document.title === 'done', null, { timeout: 900_000 });
-  console.log('hero frames saved to public/hero/frames/');
+  console.log(`saved to ${out}`);
 } finally {
   await browser.close();
   stop();

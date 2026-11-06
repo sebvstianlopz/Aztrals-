@@ -10,8 +10,9 @@ project structure for interactive components. No server, no database, no payment
 
 ## What's on it
 
-- **Home**: a scroll-driven hero ("Sal y Sol") where the season's four pairs turn one after
-  another, each with its own card; then the season's pairs as product cards, a featured pair you
+- **Home**: a scroll-driven hero ("Sal y Sol"): the season's four pairs lie folded in a pile, and
+  as you scroll each one lifts, unfolds towards you and flies up out of the frame, each with its
+  own card; then the season's pairs as product cards, a featured pair you
   can turn in 360°, the full collection, benefits and questions.
 - **Catalog** (`/catalogo/`, `/en/shop/`): every pair, filter by shape or lens tint, sort by price.
 - **Product page** (`/catalogo/<pair>/`): drag to turn the pair in 360°, pick a colourway, quantity,
@@ -56,8 +57,9 @@ Until a photo exists, the site uses renders of code-drawn models from `public/re
 
 `src/components/SeasonHero.tsx` feeds the season's four pairs to the frame-sequence hero in
 `src/components/ui/mac-book-neo-hero.tsx` (a React component, styled in `src/styles/globals.css`).
-Scrolling plays `public/hero/frames/frame_0001.webp` … `frame_0200.webp`, rendered from the 3D
-models by `npm run hero-frames`. Re-run it after changing which pairs are in the season. To use a
+Scrolling plays `public/hero/frames/frame_0001.webp` … `frame_0240.webp`, rendered from the 3D
+models by `npm run hero-frames` (the choreography is in `src/three/stack.ts`; preview single
+points with `npm run hero-frames -- 0,0.1,0.2`). Re-run it after changing which pairs are in the season. To use a
 filmed or photographed sequence instead, replace those files (same names, 4:3, the pair centred on a
 transparent or light grey background) and set `HERO_FRAMES` in `src/lib/hero.ts` to the new count.
 

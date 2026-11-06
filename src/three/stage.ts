@@ -22,7 +22,7 @@ export interface StageOptions {
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
 /** A soft Caribbean sky and sea, with a few bright panels and a sun, for the lenses to reflect. */
-function environment(renderer: THREE.WebGLRenderer) {
+export function environment(renderer: THREE.WebGLRenderer) {
   const scene = new THREE.Scene();
   const sky = new THREE.Mesh(
     new THREE.SphereGeometry(20, 48, 24),
