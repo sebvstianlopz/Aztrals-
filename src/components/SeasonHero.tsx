@@ -18,7 +18,7 @@ export default function SeasonHero({ titleLead, titleAccent, subtitle, steps }: 
       className="aztrals-hero"
       frameCount={HERO_FRAMES}
       framePath={heroFrame}
-      eagerCount={50}
+      eagerCount={60}
       scrollHeight="460vh"
       title={
         <>

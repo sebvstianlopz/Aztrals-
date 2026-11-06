@@ -1,5 +1,5 @@
 // The home hero's frame sequence (rendered by `npm run hero-frames`).
-export const HERO_FRAMES = 200;
+export const HERO_FRAMES = 240;
 
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 

@@ -95,6 +95,10 @@ export interface Pair {
   group: THREE.Group;
   /** Width of the front, for framing. */
   width: number;
+  /** Folds the temples behind the lenses: 0 = open, 1 = folded. */
+  setFold(f: number): void;
+  /** Fades the whole pair: 1 = as made, 0 = invisible. */
+  setOpacity(o: number): void;
   dispose(): void;
 }
 
@@ -182,6 +186,7 @@ export function buildPair(spec: PairSpec): Pair {
   }
 
   // Hinges and temples
+  const arms: { arm: THREE.Group; side: number; y: number }[] = [];
   const hy = b.maxY * (shape === 'cateye' ? 0.5 : shape === 'aviator' ? 0.62 : 0.4);
   for (const side of [1, -1]) {
     const hx = side * (cx + edgeAt(outerR, hy, 'outer') - rimW * 0.15);
@@ -190,6 +195,7 @@ export function buildPair(spec: PairSpec): Pair {
     arm.position.set(hx, hy, hz - depth * 0.3);
     arm.rotation.y = side * 0.07; // temples open slightly wider than the face
     group.add(arm);
+    arms.push({ arm, side, y: hy });
     if (!metal) {
       const block = add(new THREE.BoxGeometry(rimW * 1.1, 0.13, 0.16), fMat, arm);
       block.position.set(-side * rimW * 0.2, 0, -0.06);
@@ -222,9 +228,33 @@ export function buildPair(spec: PairSpec): Pair {
   });
   const width = 2 * (cx + b.maxX + rimW);
 
+  // Remember each material's own opacity, so fading can scale it.
+  const mats = new Set<THREE.Material>();
+  group.traverse((o) => {
+    const m = (o as THREE.Mesh).material as THREE.Material | undefined;
+    if (m) mats.add(m);
+  });
+  mats.forEach((m) => (m.userData.baseOpacity = m.opacity));
+
   return {
     group,
     width,
+    setFold(f) {
+      for (const { arm, side, y } of arms) {
+        // The left temple folds a touch further and lower, so the two lie on each other.
+        const extra = side < 0 ? 0.08 : 0;
+        arm.rotation.y = side * (0.07 + f * (Math.PI / 2 - 0.2 + extra));
+        arm.position.y = y - (side < 0 ? f * 0.05 : 0);
+      }
+    },
+    setOpacity(o) {
+      mats.forEach((m) => {
+        const base = m.userData.baseOpacity ?? 1;
+        m.transparent = o < 1 || base < 1;
+        m.opacity = base * o;
+        m.depthWrite = o >= 1 && base >= 1;
+      });
+    },
     dispose() {
       geos.forEach((g) => g.dispose());
       group.traverse((o) => {
