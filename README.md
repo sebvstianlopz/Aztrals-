@@ -4,13 +4,15 @@ Bilingual (ES/EN) shop for Aztrals sunglasses, Puerto Rico. Every pair can be tu
 every purchase goes out as one ready-made WhatsApp message: the pairs, their colours, the
 quantities and the total.
 
-Built with [Astro](https://astro.build) as a static site. No server, no database, no payment provider.
-[three.js](https://threejs.org) draws the stand-in product renders at build time only.
+Built with [Astro](https://astro.build) as a static site, with React, Tailwind CSS 4 and the shadcn
+project structure for interactive components. No server, no database, no payment provider.
+[three.js](https://threejs.org) draws the stand-in product renders and the hero frames at build time only.
 
 ## What's on it
 
-- **Home**: full-width hero photo with the season's name, the season's pairs as product cards, a
-  featured pair you can turn in 360°, the full collection, benefits and questions.
+- **Home**: a scroll-driven hero ("Sal y Sol") where the season's four pairs turn one after
+  another, each with its own card; then the season's pairs as product cards, a featured pair you
+  can turn in 360°, the full collection, benefits and questions.
 - **Catalog** (`/catalogo/`, `/en/shop/`): every pair, filter by shape or lens tint, sort by price.
 - **Product page** (`/catalogo/<pair>/`): drag to turn the pair in 360°, pick a colourway, quantity,
   add to bag or buy straight away on WhatsApp, details in accordions.
@@ -40,8 +42,6 @@ web-sized copies. JPG, PNG, WebP or AVIF.
 
 | Photo | Where |
 |---|---|
-| Home hero (landscape, ≥ 2400 × 1350) | `src/assets/site/hero.jpg` |
-| Home hero for phones (portrait, optional) | `src/assets/site/hero-mobile.jpg` |
 | A colourway, ¾ view on white or light grey (4:3) | `src/content/products/<pair>/<colourway>/main.jpg` |
 | Second view shown when a card is hovered (optional) | `src/content/products/<pair>/<colourway>/front.jpg` |
 | 360° turn: photos taken evenly around the pair, same framing (optional, 24 is ideal) | `src/content/products/<pair>/<colourway>/spin/01.jpg`, `02.jpg`, … |
@@ -51,6 +51,24 @@ web-sized copies. JPG, PNG, WebP or AVIF.
 
 Until a photo exists, the site uses renders of code-drawn models from `public/renders/` (made by
 `npm run posters`, which needs Playwright: `npm i -D playwright && npx playwright install chromium`).
+
+## The home hero
+
+`src/components/SeasonHero.tsx` feeds the season's four pairs to the frame-sequence hero in
+`src/components/ui/mac-book-neo-hero.tsx` (a React component, styled in `src/styles/globals.css`).
+Scrolling plays `public/hero/frames/frame_0001.webp` … `frame_0200.webp`, rendered from the 3D
+models by `npm run hero-frames`. Re-run it after changing which pairs are in the season. To use a
+filmed or photographed sequence instead, replace those files (same names, 4:3, the pair centred on a
+transparent or light grey background) and set `HERO_FRAMES` in `src/lib/hero.ts` to the new count.
+
+## Components (shadcn structure)
+
+- `components.json` configures the shadcn CLI; `@/` points to `src/` (see `tsconfig.json`).
+- `src/components/ui/` holds reusable UI primitives (shadcn components and copied-in components
+  such as the hero). Add more with `npx shadcn@latest add <component>`.
+- `src/lib/utils.ts` has `cn()` for merging Tailwind classes.
+- Tailwind CSS 4 is loaded from `src/styles/globals.css`; the site's own design tokens live in
+  `src/styles/global.css`.
 
 ## Before launch
 
@@ -69,7 +87,8 @@ Everything marked `SAMPLE` is placeholder content to replace:
 npm install
 npm run dev        # http://localhost:4321/Aztrals-/
 npm run build      # outputs dist/
-npm run posters    # re-render the stand-in pictures and 360° frames (or: npm run posters -- condado)
+npm run posters      # re-render the stand-in pictures and 360° frames (or: npm run posters -- condado)
+npm run hero-frames  # re-render the home hero's frame sequence
 ```
 
 ## Publishing

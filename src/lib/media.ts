@@ -1,8 +1,6 @@
 // Where every picture of a pair comes from. Real photos win; rendered stand-ins fill the gaps.
 //
 // Drop photos in (no other edits needed):
-//   src/assets/site/hero.jpg                                   home page hero (landscape)
-//   src/assets/site/hero-mobile.jpg                            optional, portrait, for phones
 //   src/content/products/<pair>/<colourway>/main.jpg           the pair, ¾ view, on white (4:3)
 //   src/content/products/<pair>/<colourway>/front.jpg          optional, shown when a card is hovered
 //   src/content/products/<pair>/<colourway>/spin/01.jpg …      optional 360° turn, evenly spaced
@@ -15,7 +13,6 @@ type Img = { default: ImageMetadata };
 const variantPhotos = import.meta.glob<Img>('/src/content/products/*/*/{main,front}.{jpg,jpeg,png,webp,avif}', { eager: true });
 const spinPhotos = import.meta.glob<Img>('/src/content/products/*/*/spin/*.{jpg,jpeg,png,webp,avif}', { eager: true });
 const galleryPhotos = import.meta.glob<Img>('/src/content/products/*/gallery/*.{jpg,jpeg,png,webp,avif}', { eager: true });
-const sitePhotos = import.meta.glob<Img>('/src/assets/site/*.{jpg,jpeg,png,webp,avif}', { eager: true });
 
 const find = (map: Record<string, Img>, prefix: string, name?: string) =>
   Object.entries(map)
@@ -70,12 +67,4 @@ export async function gallery(slug: string) {
       height: src.height,
     })),
   );
-}
-
-/** The home hero photo(s), if they have been added. */
-export function heroPhotos() {
-  return {
-    desktop: find(sitePhotos, '/src/assets/site/', 'hero')[0],
-    mobile: find(sitePhotos, '/src/assets/site/', 'hero-mobile')[0],
-  };
 }

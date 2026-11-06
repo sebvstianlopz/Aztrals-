@@ -1,0 +1,83 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+
+@keyframes fsh-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+/* Frame-sequence hero (components/ui/mac-book-neo-hero.tsx), in the Aztrals look.
+   The page's own black header stays on top, so the hero pins just below it. */
+.fsh-root { position: relative; background: var(--soft); }
+.fsh-nav { display: none; }
+
+.fsh-stage {
+  position: sticky; top: var(--header); z-index: 1;
+  height: calc(100svh - var(--header)); overflow: hidden;
+}
+/* The spacer slides under the pinned stage, so the scroll distance is exactly its height. */
+.fsh-spacer { position: relative; margin-top: calc(-1 * (100svh - var(--header))); pointer-events: none; }
+
+.fsh-canvas-wrap { position: absolute; inset: 0; display: grid; place-items: center; }
+.fsh-canvas { width: min(100%, 124svh); aspect-ratio: 4 / 3; object-fit: contain; transform: translateY(-1%); user-select: none; }
+
+.fsh-copy { position: absolute; z-index: 2; left: 0; right: 0; top: clamp(28px, 6svh, 72px); display: grid; justify-items: center; gap: 14px; text-align: center; padding-inline: var(--margin); }
+.fsh-title { font-family: var(--serif); font-weight: 300; font-size: var(--t-hero); letter-spacing: 0.16em; line-height: 0.95; text-transform: uppercase; padding-left: 0.16em; }
+.fsh-title-dark { color: var(--ink); }
+.fsh-title-rainbow {
+  background-image: linear-gradient(90deg, #c98a3c, #d88a80, #3f8a6a, #2f6db0, #c98a3c);
+  background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: fsh-shimmer 7s linear infinite;
+}
+.fsh-sub { font-family: var(--sans); font-size: var(--t-caps); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey); transition: opacity 500ms var(--ease); }
+.fsh-sub-hidden { opacity: 0; }
+
+.fsh-cards { position: absolute; z-index: 3; left: var(--margin); bottom: 40px; width: min(380px, calc(100% - 2 * var(--margin))); height: 236px; }
+.fsh-card { position: absolute; left: 0; right: 0; bottom: 0; opacity: 0; transform: translateY(24px); transition: opacity 600ms var(--ease), transform 600ms var(--ease); }
+.fsh-card-active { opacity: 1; transform: none; }
+.fsh-card-prev { transform: translateY(-24px); }
+.fsh-card-inner { position: relative; overflow: hidden; background: var(--white); border: 1px solid var(--line); padding: 22px 24px 20px 27px; }
+.fsh-card-glow { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--c); }
+.fsh-card-head { display: flex; justify-content: space-between; align-items: center; font-size: var(--t-caps); font-weight: 500; letter-spacing: 0.14em; color: var(--grey); }
+.fsh-card-num strong { color: var(--ink); font-weight: 500; }
+.fsh-card-icon { color: var(--c); font-size: 1rem; }
+.fsh-card-title { margin: 12px 0 6px; font-family: var(--serif); font-size: 1.75rem; font-weight: 400; line-height: 1.1; }
+.fsh-card-desc { font-size: var(--t-small); color: var(--grey); line-height: 1.55; }
+.fsh-card-foot { display: flex; align-items: center; gap: 16px; margin-top: 18px; }
+.fsh-ticks { display: flex; gap: 4px; flex: 1; }
+.fsh-tick { flex: 1; height: 2px; background: var(--line); overflow: hidden; display: block; }
+.fsh-tick span { display: block; height: 100%; background: var(--ink); transform-origin: left; }
+.fsh-card-label { font-size: var(--t-caps); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; }
+
+.fsh-progress { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; height: 2px; background: var(--line); }
+.fsh-progress-fill { display: block; height: 100%; background: var(--ink); }
+
+/* Loading: covers the hero only, as a thin bar; the component's English label stays hidden. */
+.fsh-loader {
+  position: absolute; z-index: 5; left: 0; right: 0; top: 0; height: calc(100svh - var(--header));
+  display: grid; place-content: center; background: var(--soft);
+  transition: opacity 600ms var(--ease), visibility 0s linear 600ms;
+}
+.fsh-loader-done { opacity: 0; visibility: hidden; }
+.fsh-loader-text { display: none; }
+.fsh-loader-track { width: 160px; height: 1px; background: var(--line); }
+.fsh-loader-fill { display: block; height: 100%; background: var(--ink); transition: width 200ms linear; }
+
+/* Without JavaScript: the first frame and the title, no loader and no scroll run. */
+html:not(.js) .fsh-loader, html:not(.js) .fsh-spacer, html:not(.js) .fsh-cards { display: none; }
+
+@media (max-width: 700px) {
+  .fsh-canvas { position: absolute; left: 50%; top: 46%; width: 150vw; max-width: none; transform: translate(-50%, -50%); }
+  .fsh-cards { bottom: 24px; height: 250px; }
+  .fsh-card-title { font-size: 1.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fsh-title-rainbow { animation: none; }
+}

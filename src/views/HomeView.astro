@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import Hero from '../components/home/Hero.astro';
+import SeasonHero from '../components/SeasonHero';
 import SeasonGrid from '../components/home/SeasonGrid.astro';
 import Featured from '../components/home/Featured.astro';
 import Collection from '../components/home/Collection.astro';
@@ -8,7 +8,8 @@ import Benefits from '../components/home/Benefits.astro';
 import Faq from '../components/home/Faq.astro';
 import { t, path } from '../i18n';
 import { site, type Lang } from '../config/site';
-import { clientCatalog, getProducts } from '../lib/products';
+import { clientCatalog, getProducts, money } from '../lib/products';
+import { lenses, shapeNames } from '../lib/palette';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -19,6 +20,24 @@ const items = products.map((product) => ({ product, client: clients.find((c) => 
 const season = items.filter((i) => i.product.data.season).slice(0, 4);
 const rest = items.filter((i) => !season.includes(i));
 const featured = items.find((i) => i.product.data.featured) ?? season[0] ?? items[0];
+// One card per season pair, over its quarter of the hero's scroll.
+const icons = ['✦', '◯', '◐', '◇'];
+const stepColour: Record<string, string> = { ambar: '#c98a3c', verde: '#3f8a6a', rosa: '#d88a80', 'espejo-azul': '#2f6db0' };
+const steps = season.map(({ product }, i, all) => {
+  const v = product.data.variants[0];
+  const n = all.length;
+  return {
+    from: i === 0 ? 0.03 : i / n,
+    to: i === n - 1 ? 1.01 : (i + 1) / n,
+    color: stepColour[v.lens] ?? lenses[v.lens].hex,
+    num: String(i + 1).padStart(2, '0'),
+    total: String(n).padStart(2, '0'),
+    icon: icons[i % icons.length],
+    title: product.data.name,
+    description: product.data.description[lang],
+    label: `${shapeNames[product.data.shape][lang]} · ${money(product.data.price, lang)}`,
+  };
+});
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Store',
@@ -30,7 +49,7 @@ const jsonLd = {
 };
 ---
 <Base lang={lang} title={d.meta.homeTitle} description={d.meta.homeDesc} alternate={path(lang === 'es' ? 'en' : 'es', 'home')} jsonLd={jsonLd}>
-  <Hero lang={lang} lead={featured.client} />
+  <SeasonHero client:load titleLead={d.hero.titleLead} titleAccent={d.hero.titleAccent} subtitle={d.hero.scroll} steps={steps} />
   <SeasonGrid lang={lang} items={season} />
   <Featured lang={lang} client={featured.client} product={featured.product} />
   <Collection lang={lang} items={rest} />
