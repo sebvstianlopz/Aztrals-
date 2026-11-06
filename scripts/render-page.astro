@@ -1,0 +1,45 @@
+---
+// Dev-only page (see astro.config.mjs): draws every pair in every colourway, once as the main
+// picture and 24 times around for the 360° viewer, and hands each image to
+// scripts/render-posters.mjs. These are stand-ins until real product photos are added.
+import { getProducts, toClient } from '../src/lib/products';
+const items = await Promise.all((await getProducts()).map(toClient));
+---
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8" /><title>Render</title>
+    <style>body{margin:0;background:#fff}canvas{width:960px;height:720px;display:block}</style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <script type="application/json" id="items" set:html={JSON.stringify(items)} />
+    <script>
+      import { Stage } from '../src/three/stage';
+      import { spec } from '../src/lib/palette';
+      import type { ClientProduct } from '../src/lib/products';
+      const items: ClientProduct[] = JSON.parse(document.getElementById('items')!.textContent!);
+      const only = new URLSearchParams(location.search).get('only');
+      const FRAMES = 24;
+      const MAIN_YAW = -0.55;
+      const stage = new Stage(document.getElementById('c') as HTMLCanvasElement, { idle: false, capture: true, yaw: MAIN_YAW, pitch: 0.12, fill: 0.8 });
+      const save = (window as any).saveRender as (key: string, data: string) => Promise<void>;
+      const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      (async () => {
+        for (const p of items) {
+          if (only && p.slug !== only) continue;
+          for (const v of p.variants) {
+            stage.setPair(spec(p.shape, v.frame, v.lens));
+            stage.pose(MAIN_YAW);
+            await frame();
+            await save(`${p.slug}/${v.id}/main`, stage.snapshot('image/webp', 0.9));
+            for (let i = 0; i < FRAMES; i++) {
+              stage.pose(MAIN_YAW + (i / FRAMES) * Math.PI * 2, 0.08);
+              await save(`${p.slug}/${v.id}/spin/${String(i + 1).padStart(2, '0')}`, stage.snapshot('image/webp', 0.8));
+            }
+          }
+        }
+        document.title = 'done';
+      })();
+    </script>
+  </body>
+</html>

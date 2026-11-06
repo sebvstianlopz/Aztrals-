@@ -1,0 +1,20 @@
+# SAMPLE: name, price, size and copy are placeholders until the real catalog is ready.
+name: Condado
+season: true
+badge: mas-vendido
+featured: true
+order: 1
+shape: wayfarer
+price: 138
+size: [52, 20, 145]
+fit: medio
+place:
+  es: Por la avenida Ashford, con el mar a la derecha.
+  en: Down Ashford Avenue, with the sea on your right.
+description:
+  es: Un wayfarer de acetato pulido, de líneas firmes y lente ámbar polarizado que calienta el azul del mar y apaga el reflejo del asfalto al mediodía.
+  en: A polished acetate wayfarer with firm lines and a polarized amber lens that warms the blue of the sea and kills the glare off the road at noon.
+variants:
+  - { id: negro-ambar, frame: negro, lens: ambar }
+  - { id: carey-marron, frame: carey, lens: marron }
+  - { id: hueso-verde, frame: hueso, lens: verde }

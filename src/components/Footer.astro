@@ -1,0 +1,64 @@
+---
+import { t, path } from '../i18n';
+import { site, type Lang } from '../config/site';
+import { waLink } from '../lib/whatsapp';
+interface Props { lang: Lang; alternate: string }
+const { lang, alternate } = Astro.props;
+const d = t(lang);
+const home = path(lang, 'home');
+const year = new Date().getFullYear();
+---
+<footer class="site-footer on-black">
+  <div class="wrap top">
+    <div class="brand">
+      <a class="logo" href={home}>Aztrals</a>
+      <p>{d.footer.about}</p>
+    </div>
+    <div class="col">
+      <p class="caps head">{d.footer.shop}</p>
+      <ul role="list">
+        <li><a href={`${home}#temporada`}>{d.footer.links.season}</a></li>
+        <li><a href={path(lang, 'shop')}>{d.footer.links.shop}</a></li>
+        <li><a href="#bolsa" data-bag-open>{d.footer.links.bag}</a></li>
+      </ul>
+    </div>
+    <div class="col">
+      <p class="caps head">{d.footer.help}</p>
+      <ul role="list">
+        <li><a href={`${home}#ayuda`}>{d.footer.links.delivery}</a></li>
+        <li><a href={`${home}#ayuda`}>{d.footer.links.returns}</a></li>
+        <li><a href={`${home}#ayuda`}>{d.footer.links.faq}</a></li>
+      </ul>
+    </div>
+    <div class="col">
+      <p class="caps head">{d.footer.contact}</p>
+      <ul role="list">
+        <li><a href={waLink(d.wa.hi)} target="_blank" rel="noopener">WhatsApp {site.phoneDisplay}</a></li>
+        {site.social.instagram && <li><a href={site.social.instagram}>Instagram</a></li>}
+        <li><span>{site.city}, {site.country}</span></li>
+        <li><span class="soft">{site.hours[lang]}</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap bottom">
+    <p>{d.footer.legal(year)} {d.footer.sample}</p>
+    <p class="caps"><a href={alternate} lang={lang === 'es' ? 'en' : 'es'}>{d.switchTo}</a> · <a href="#main">{d.footer.top}</a></p>
+  </div>
+</footer>
+
+<style>
+  .site-footer { background: var(--black); color: var(--on-black); font-size: var(--t-small); }
+  .top { display: grid; grid-template-columns: 2fr 1fr 1fr 1.4fr; gap: 40px var(--gap); padding-block: clamp(56px, 7vw, 96px) 48px; }
+  .logo { font-family: var(--serif); font-size: 1.75rem; letter-spacing: 0.32em; text-transform: uppercase; text-decoration: none; }
+  .brand p { margin-top: 16px; max-width: 32ch; color: var(--on-black-soft); }
+  .head { color: var(--on-black-soft); margin-bottom: 16px; }
+  .col ul { display: grid; gap: 8px; }
+  .col a, .bottom a { text-decoration: none; transition: opacity var(--fast) var(--ease); }
+  .col a:hover, .bottom a:hover { opacity: 0.6; }
+  .soft { color: var(--on-black-soft); }
+  .bottom { display: flex; justify-content: space-between; gap: 16px 32px; flex-wrap: wrap; padding-block: 24px calc(24px + env(safe-area-inset-bottom)); border-top: 1px solid #262626; color: var(--on-black-soft); }
+  @media (max-width: 900px) {
+    .top { grid-template-columns: 1fr 1fr; }
+    .brand { grid-column: 1 / -1; }
+  }
+</style>

@@ -1,0 +1,30 @@
+---
+// The 360° viewer: a sequence of pictures around the pair, turned by dragging or with the arrow keys.
+// With a single picture it simply shows it.
+interface Props { frames: string[]; alt: string; label: string; hint: string; class?: string; eager?: boolean }
+const { frames, alt, label, hint, class: cls, eager = false } = Astro.props;
+const many = frames.length > 1;
+---
+<div class:list={['spin', cls, { many }]} data-frames={JSON.stringify(frames)} tabindex={many ? 0 : undefined} role={many ? 'slider' : undefined} aria-label={many ? label : undefined} aria-valuemin={many ? 1 : undefined} aria-valuemax={many ? frames.length : undefined} aria-valuenow={many ? 1 : undefined}>
+  {many && <span class="mark" aria-hidden="true">360<sup>°</sup></span>}
+  <svg class="floor" viewBox="0 0 400 60" preserveAspectRatio="none" aria-hidden="true"><ellipse cx="200" cy="30" rx="196" ry="26" /></svg>
+  <img class="frame" src={frames[0]} alt={alt} width="960" height="720" loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : 'auto'} draggable="false" />
+  {many && <p class="hint caps" aria-hidden="true">{hint}</p>}
+</div>
+
+<style>
+  .spin { position: relative; user-select: none; -webkit-user-select: none; outline-offset: -1px; }
+  .spin.many { cursor: grab; touch-action: pan-y; }
+  .spin.many:active { cursor: grabbing; }
+  .frame { position: relative; z-index: 1; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: contain; pointer-events: none; }
+  .floor { position: absolute; left: 12%; right: 12%; bottom: 13%; width: 76%; height: 12%; fill: none; stroke: #c9c9c6; stroke-width: 1.2; stroke-dasharray: 1 5; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+  .mark { position: absolute; z-index: 2; left: 0; top: 0; font-family: var(--sans); font-weight: 600; font-size: 0.9375rem; letter-spacing: 0.02em; }
+  .mark sup { font-size: 0.6em; }
+  .hint { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; text-align: center; color: var(--grey); transition: opacity 600ms var(--ease); }
+  .spin.touched .hint { opacity: 0; }
+</style>
+
+<script>
+  import { initSpins } from '../scripts/spin';
+  initSpins();
+</script>

@@ -1,0 +1,75 @@
+---
+import Icon from './Icon.astro';
+import { t, path } from '../i18n';
+import type { Lang } from '../config/site';
+interface Props { lang: Lang; alternate: string }
+const { lang, alternate } = Astro.props;
+const d = t(lang);
+const home = path(lang, 'home');
+const links = [
+  { href: `${home}#temporada`, label: d.nav.season },
+  { href: path(lang, 'shop'), label: d.nav.shop },
+  { href: `${home}#ayuda`, label: d.nav.help },
+];
+---
+<header class="site-header on-black">
+  <div class="bar">
+    <nav class="left" aria-label={lang === 'es' ? 'Principal' : 'Main'}>
+      <button type="button" class="menu-btn" aria-expanded="false" aria-controls="menu-sheet">
+        <Icon name="menu" /><span class="visually-hidden">{d.nav.menu}</span>
+      </button>
+      <ul role="list" class="links caps">
+        {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+    <a class="logo" href={home}>Aztrals</a>
+    <div class="right caps">
+      <a class="lang" href={alternate} hreflang={lang === 'es' ? 'en' : 'es'} lang={lang === 'es' ? 'en' : 'es'}>{lang === 'es' ? 'EN' : 'ES'}<span class="visually-hidden"> — {d.switchTo}</span></a>
+      <a href="#bolsa" class="bag-link" data-bag-open aria-label={d.bag.open}>
+        <Icon name="bag" class="bag-icon" /><span class="bag-word">{d.nav.bag}</span> (<span class="num" data-bag-count>0</span>)
+      </a>
+    </div>
+  </div>
+  <div class="sheet" id="menu-sheet" hidden>
+    <ul role="list" class="caps">
+      {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      <li><a href={alternate} lang={lang === 'es' ? 'en' : 'es'}>{d.switchTo}</a></li>
+    </ul>
+  </div>
+</header>
+
+<style>
+  .site-header { position: sticky; top: 0; z-index: 30; background: var(--black); color: var(--on-black); }
+  .bar { height: var(--header); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding-inline: var(--margin); }
+  .links { display: flex; gap: clamp(18px, 2.4vw, 36px); margin: 0; }
+  .links a, .right a { text-decoration: none; padding-block: 10px; transition: opacity var(--fast) var(--ease); }
+  .links a:hover, .right a:hover { opacity: 0.6; }
+  .logo { font-family: var(--serif); font-size: 1.5rem; font-weight: 500; letter-spacing: 0.32em; text-transform: uppercase; text-decoration: none; padding-left: 0.32em; }
+  .right { display: flex; justify-content: flex-end; align-items: center; gap: clamp(16px, 2.4vw, 32px); }
+  .bag-link { display: inline-flex; align-items: center; gap: 4px; }
+  .bag-icon { width: 20px; height: 20px; margin-right: 4px; }
+  .menu-btn { display: none; background: none; border: 0; padding: 8px 8px 8px 0; color: inherit; }
+  .sheet { border-top: 1px solid #2a2a2a; padding: 8px var(--margin) 20px; }
+  .sheet ul { display: grid; gap: 0; margin: 0; }
+  .sheet a { display: block; padding: 14px 0; text-decoration: none; border-bottom: 1px solid #222; }
+  @media (max-width: 820px) {
+    .links { display: none; }
+    .menu-btn { display: inline-flex; }
+    .lang, .bag-word { display: none; }
+    .logo { font-size: 1.25rem; letter-spacing: 0.26em; padding-left: 0.26em; }
+  }
+</style>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('.menu-btn');
+  const sheet = document.getElementById('menu-sheet');
+  btn?.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') !== 'true';
+    btn.setAttribute('aria-expanded', String(open));
+    if (sheet) sheet.hidden = !open;
+  });
+  sheet?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => {
+    btn?.setAttribute('aria-expanded', 'false');
+    sheet.hidden = true;
+  }));
+</script>

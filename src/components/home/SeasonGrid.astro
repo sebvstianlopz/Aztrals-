@@ -1,0 +1,28 @@
+---
+import ProductTile from '../ProductTile.astro';
+import { t } from '../../i18n';
+import type { Lang } from '../../config/site';
+import type { ClientProduct, Product } from '../../lib/products';
+interface Props { lang: Lang; items: { client: ClientProduct; product: Product }[] }
+const { lang, items } = Astro.props;
+const d = t(lang);
+---
+<section class="season section wrap" id="temporada" aria-labelledby="season-title">
+  <div class="heading" data-reveal>
+    <p class="caps grey">{d.seasonGrid.kicker}</p>
+    <h2 id="season-title">{d.seasonGrid.title}</h2>
+    <p class="caption">{d.seasonGrid.caption}</p>
+  </div>
+  <ul role="list" class="grid">
+    {items.map(({ client, product }, i) => <ProductTile lang={lang} product={client} data={product.data} eager={i < 2} />)}
+  </ul>
+</section>
+
+<style>
+  .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px var(--gap); margin: 0; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+<script>
+  import { initSwatches } from '../../scripts/swatches';
+  initSwatches(document.querySelector('.season')!);
+</script>

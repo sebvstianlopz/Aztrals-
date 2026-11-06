@@ -1,0 +1,17 @@
+# SAMPLE
+name: Ocean Park
+order: 14
+badge: nuevo
+shape: square
+price: 158
+size: [52, 18, 145]
+fit: medio
+place:
+  es: Las cometas sobre la playa, con el viento del este.
+  en: Kites over the beach, on the east wind.
+description:
+  es: Cuadrado de metal grafito con lente espejo azul. Líneas rectas para un lugar de viento y luz fuerte.
+  en: A graphite metal square with a blue mirror lens. Straight lines for a place of wind and strong light.
+variants:
+  - { id: grafito-espejo-azul, frame: grafito, lens: espejo-azul }
+  - { id: oro-humo, frame: oro, lens: humo }

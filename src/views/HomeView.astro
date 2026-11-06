@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/home/Hero.astro';
+import SeasonGrid from '../components/home/SeasonGrid.astro';
+import Featured from '../components/home/Featured.astro';
+import Collection from '../components/home/Collection.astro';
+import Benefits from '../components/home/Benefits.astro';
+import Faq from '../components/home/Faq.astro';
+import { t, path } from '../i18n';
+import { site, type Lang } from '../config/site';
+import { clientCatalog, getProducts } from '../lib/products';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const products = await getProducts();
+const clients = await clientCatalog();
+const items = products.map((product) => ({ product, client: clients.find((c) => c.slug === product.id)! }));
+const season = items.filter((i) => i.product.data.season).slice(0, 4);
+const rest = items.filter((i) => !season.includes(i));
+const featured = items.find((i) => i.product.data.featured) ?? season[0] ?? items[0];
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Store',
+  name: site.name,
+  url: new URL(path(lang, 'home'), Astro.site).href,
+  telephone: site.phoneDisplay,
+  address: { '@type': 'PostalAddress', addressLocality: site.city, addressRegion: 'PR', addressCountry: 'US' },
+  currenciesAccepted: 'USD',
+};
+---
+<Base lang={lang} title={d.meta.homeTitle} description={d.meta.homeDesc} alternate={path(lang === 'es' ? 'en' : 'es', 'home')} jsonLd={jsonLd}>
+  <Hero lang={lang} lead={featured.client} />
+  <SeasonGrid lang={lang} items={season} />
+  <Featured lang={lang} client={featured.client} product={featured.product} />
+  <Collection lang={lang} items={rest} />
+  <Benefits lang={lang} />
+  <Faq lang={lang} />
+</Base>

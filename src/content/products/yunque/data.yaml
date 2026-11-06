@@ -1,0 +1,16 @@
+# SAMPLE
+name: Yunque
+order: 13
+shape: wayfarer
+price: 132
+size: [54, 19, 145]
+fit: ancho
+place:
+  es: La luz que se filtra entre los helechos de El Yunque.
+  en: The light that slips between the ferns of El Yunque.
+description:
+  es: Wayfarer de acetato mate verde bosque con lente verde mar. Hecho para el sendero, la cascada y el regreso.
+  en: A matte forest-green acetate wayfarer with a sea-green lens. Made for the trail, the waterfall and the way back.
+variants:
+  - { id: bosque-verde, frame: bosque, lens: verde }
+  - { id: negro-marron, frame: negro, lens: marron }

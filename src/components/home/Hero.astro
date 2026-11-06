@@ -1,0 +1,64 @@
+---
+// Full-width lifestyle photo with the season's name in large spaced capitals.
+// Until src/assets/site/hero.jpg exists, the lead pair stands on a soft grey field instead.
+import { Picture } from 'astro:assets';
+import { t, path } from '../../i18n';
+import type { Lang } from '../../config/site';
+import { heroPhotos } from '../../lib/media';
+import type { ClientProduct } from '../../lib/products';
+interface Props { lang: Lang; lead?: ClientProduct }
+const { lang, lead } = Astro.props;
+const d = t(lang);
+const photo = heroPhotos();
+const hasPhoto = !!photo.desktop;
+---
+<section class:list={['hero', { photo: hasPhoto }]} aria-labelledby="hero-title">
+  {hasPhoto ? (
+    <div class="media">
+      {photo.mobile && <Picture class="m-only" src={photo.mobile} widths={[640, 900, 1200]} sizes="100vw" formats={['avif', 'webp']} alt="" loading="eager" fetchpriority="high" />}
+      <Picture class:list={['img', { 'd-only': !!photo.mobile }]} src={photo.desktop!} widths={[960, 1440, 1920, 2560]} sizes="100vw" formats={['avif', 'webp']} alt="" loading="eager" fetchpriority="high" />
+    </div>
+  ) : (
+    lead && <img class="pair" src={lead.variants[0].pics.main} alt={`${lead.name}, ${lead.variants[0].name[lang]}`} width="960" height="720" fetchpriority="high" />
+  )}
+  <div class="copy" data-reveal>
+    <p class="caps">{d.hero.kicker}</p>
+    <h1 id="hero-title" class="title">{d.hero.title}</h1>
+    <p class="sub">{d.hero.sub}</p>
+    <div class="ctas">
+      <a class:list={['btn', { white: hasPhoto }]} href="#temporada">{d.hero.cta}</a>
+      <a class:list={['btn', hasPhoto ? 'ghost-white' : 'outline']} href={path(lang, 'shop')}>{d.hero.shop}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero { position: relative; min-height: calc(92svh - var(--header)); display: grid; place-items: center; overflow: hidden; background: var(--soft); text-align: center; padding: 56px var(--margin); }
+  .copy { position: relative; z-index: 2; display: grid; justify-items: center; gap: 18px; }
+  .title { font-size: var(--t-hero); font-weight: 300; text-transform: uppercase; letter-spacing: 0.16em; line-height: 0.95; padding-left: 0.16em; }
+  .sub { font-family: var(--serif); font-style: italic; font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem); max-width: 34ch; }
+  .ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 14px; }
+
+  /* With the owner's photo */
+  .photo { color: var(--white); background: var(--black); }
+  .media, .media :global(picture), .media :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .media :global(img) { object-fit: cover; }
+  .motion .media :global(img) { animation: hero-in 2400ms var(--ease) both; }
+  @keyframes hero-in { from { transform: scale(1.06); } }
+  .photo::after { content: ''; position: absolute; inset: 0; z-index: 1; background: rgb(0 0 0 / 0.28); }
+  .m-only { display: none; }
+  @media (max-width: 700px) and (orientation: portrait) {
+    .m-only { display: block; }
+    .media :global(.d-only) { display: none; }
+  }
+
+  /* Without it: the lead pair under the headline, in the flow */
+  .hero:not(.photo) { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(8px, 2vh, 24px); padding-top: clamp(40px, 7vh, 88px); padding-bottom: 24px; }
+  .pair { order: 2; width: min(56vw, 760px, 58vh * 1.33); margin-top: -2%; }
+  .motion .pair { animation: pair-in 1600ms var(--ease) both; }
+  @keyframes pair-in { from { opacity: 0; transform: translateY(24px); } }
+  @media (max-width: 700px) {
+    .pair { width: 100%; }
+    .ctas { flex-direction: column; width: 100%; }
+  }
+</style>

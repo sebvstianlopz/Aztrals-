@@ -1,0 +1,19 @@
+# SAMPLE
+name: Rincón
+season: true
+badge: temporada
+order: 3
+shape: cateye
+price: 144
+size: [53, 18, 140]
+fit: medio
+place:
+  es: La última hora de sol sobre el Pasaje de la Mona.
+  en: The last hour of sun over the Mona Passage.
+description:
+  es: Ojo de gato en carey, con la esquina alzada justo lo necesario y un lente rosa degradado hecho para el atardecer del oeste.
+  en: A tortoiseshell cat-eye, its corner lifted just enough, with a gradient rose lens made for the west-coast sunset.
+variants:
+  - { id: carey-rosa, frame: carey, lens: rosa }
+  - { id: negro-humo, frame: negro, lens: humo }
+  - { id: hueso-ambar, frame: hueso, lens: ambar }

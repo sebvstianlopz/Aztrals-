@@ -1,0 +1,17 @@
+# SAMPLE
+name: Cabo Rojo
+order: 15
+badge: nuevo
+shape: cateye
+price: 136
+size: [52, 18, 140]
+fit: estrecho
+place:
+  es: El faro de Los Morrillos sobre las salinas rosadas.
+  en: The Los Morrillos lighthouse above the pink salt flats.
+description:
+  es: Ojo de gato en acetato rojo coral con lente humo. El color que más se ve en una foto de la costa.
+  en: A coral-red acetate cat-eye with a smoke lens. The colour that stands out most in a photo of the coast.
+variants:
+  - { id: coral-humo, frame: coral, lens: humo }
+  - { id: negro-rosa, frame: negro, lens: rosa }
