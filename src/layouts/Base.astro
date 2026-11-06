@@ -1,13 +1,17 @@
 ---
+import '@fontsource-variable/jost/wght.css';
+import '@fontsource/cormorant-garamond/latin-300.css';
+import '@fontsource/cormorant-garamond/latin-400.css';
+import '@fontsource/cormorant-garamond/latin-400-italic.css';
+import '@fontsource/cormorant-garamond/latin-500.css';
 import '../styles/global.css';
-import erode500 from '../assets/fonts/erode-500.woff2?url';
-import erode400 from '../assets/fonts/erode-400.woff2?url';
+import jostLatin from '@fontsource-variable/jost/files/jost-latin-wght-normal.woff2?url';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import BagDrawer from '../components/BagDrawer.astro';
 import { t, asset } from '../i18n';
 import { site, type Lang } from '../config/site';
-import { getProducts, toClient } from '../lib/products';
+import { clientCatalog } from '../lib/products';
 
 interface Props {
   lang: Lang;
@@ -15,21 +19,19 @@ interface Props {
   description: string;
   /** Same page in the other language, as a path. */
   alternate: string;
-  /** Social preview image, relative to public/. */
+  /** Social preview image URL (site-relative). Defaults to the featured pair. */
   image?: string;
   jsonLd?: object | object[];
   noindex?: boolean;
-  /** Ground colour of the page behind the header. */
-  field?: string;
 }
-const { lang, title, description, alternate, image = 'products/condado/negro-ambar.webp', jsonLd, noindex = false, field } = Astro.props;
+const { lang, title, description, alternate, image, jsonLd, noindex = false } = Astro.props;
 const d = t(lang);
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const alt = new URL(alternate, Astro.site);
 const esUrl = lang === 'es' ? canonical : alt;
 const enUrl = lang === 'en' ? canonical : alt;
-const ogUrl = new URL(asset(image), Astro.site);
-const catalog = (await getProducts()).map(toClient);
+const catalog = await clientCatalog();
+const ogUrl = new URL(image ?? catalog[0]?.variants[0].poster ?? asset('favicon.svg'), Astro.site);
 const bagText = { less: d.bag.less, more: d.bag.more, remove: d.bag.remove };
 ---
 <!doctype html>
@@ -37,8 +39,7 @@ const bagText = { less: d.bag.less, more: d.bag.more, remove: d.bag.remove };
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <link rel="preload" href={erode500} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={erode400} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={jostLatin} as="font" type="font/woff2" crossorigin />
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
@@ -48,7 +49,7 @@ const bagText = { less: d.bag.less, more: d.bag.more, remove: d.bag.remove };
     <link rel="alternate" hreflang="x-default" href={esUrl} />
     <link rel="icon" href={asset('favicon.svg')} type="image/svg+xml" />
     <link rel="sitemap" href={asset('sitemap-index.xml')} />
-    <meta name="theme-color" content="#eff0ed" />
+    <meta name="theme-color" content="#0d0d0d" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:locale" content={lang === 'es' ? 'es_PR' : 'en_US'} />
@@ -65,7 +66,7 @@ const bagText = { less: d.bag.less, more: d.bag.more, remove: d.bag.remove };
       } catch (e) {}
     </script>
   </head>
-  <body style={field ? `--field:${field}` : undefined}>
+  <body>
     <a class="skip" href="#main">{d.skip}</a>
     <Header lang={lang} alternate={alternate} />
     <main id="main">
@@ -73,7 +74,7 @@ const bagText = { less: d.bag.less, more: d.bag.more, remove: d.bag.remove };
     </main>
     <Footer lang={lang} alternate={alternate} />
     <BagDrawer lang={lang} />
-    <script type="application/json" id="catalog" set:html={JSON.stringify(catalog)} />
+    <script type="application/json" id="catalog" set:html={JSON.stringify(catalog.map((p) => ({ ...p, variants: p.variants.map(({ pics, ...v }) => v) })))} />
     <script type="application/json" id="bag-text" set:html={JSON.stringify(bagText)} />
     <script>
       import { initBag } from '../scripts/bag';

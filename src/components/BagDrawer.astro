@@ -1,4 +1,5 @@
 ---
+import Icon from './Icon.astro';
 import { t, path } from '../i18n';
 import type { Lang } from '../config/site';
 interface Props { lang: Lang }
@@ -8,54 +9,57 @@ const d = t(lang);
 <dialog id="bag" class="bag" aria-labelledby="bag-title">
   <div class="bag-inner">
     <div class="bag-head">
-      <h2 id="bag-title" class="lead">{d.bag.title}</h2>
-      <button type="button" class="bag-close" data-bag-close>{d.bag.close}</button>
+      <h2 id="bag-title" class="caps">{d.bag.title} (<span class="num" data-bag-count>0</span>)</h2>
+      <button type="button" class="bag-close" data-bag-close aria-label={d.bag.close}><Icon name="close" /></button>
     </div>
     <div data-bag-empty class="bag-empty">
-      <p>{d.bag.empty}</p>
+      <p class="empty-text">{d.bag.empty}</p>
       <a class="btn" href={`${path(lang, 'home')}#temporada`}>{d.bag.emptyCta}</a>
     </div>
     <ul role="list" class="bag-lines" data-bag-lines></ul>
     <div class="bag-foot" data-bag-foot hidden>
-      <p class="bag-total lead"><span>{d.bag.subtotal}</span><span class="num" data-bag-total></span></p>
+      <p class="bag-total"><span class="caps">{d.bag.subtotal}</span><span class="num" data-bag-total></span></p>
       <a class="btn" href="#" data-bag-send target="_blank" rel="noopener">{d.bag.send}</a>
-      <p class="small soft">{d.bag.note}</p>
+      <p class="note">{d.bag.note}</p>
     </div>
   </div>
 </dialog>
 
 <style is:global>
   .bag {
-    margin: 0 0 0 auto; height: 100dvh; max-height: none; width: min(460px, 100vw); max-width: none;
-    padding: 0; border: 0; background: var(--ground); color: var(--ink);
-    box-shadow: -20px 0 60px rgb(18 22 28 / 0.18); /* taste-skill-ignore: dialog overlay */
+    margin: 0 0 0 auto; height: 100dvh; max-height: none; width: min(440px, 100vw); max-width: none;
+    padding: 0; border: 0; background: var(--white); color: var(--ink);
   }
-  .bag::backdrop { background: rgb(18 22 28 / 0.35); }
-  .motion .bag[open] { animation: bag-in 520ms var(--ease); }
+  .bag::backdrop { background: rgb(13 13 13 / 0.4); }
+  .motion .bag[open] { animation: bag-in 500ms var(--ease); }
   .motion .bag[open]::backdrop { animation: fade-in 400ms var(--ease); }
   @keyframes bag-in { from { transform: translateX(100%); } }
   @keyframes fade-in { from { opacity: 0; } }
-  .bag-inner { display: flex; flex-direction: column; height: 100%; padding: 20px var(--margin) calc(20px + env(safe-area-inset-bottom)); }
-  .bag-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; }
-  .bag-close { background: none; border: 0; padding: 10px 0; font-size: var(--step-small); text-decoration: underline; text-underline-offset: 0.2em; }
-  .bag-close:hover { color: var(--accent); }
-  .bag-empty { display: grid; gap: 20px; justify-items: start; padding-top: 24px; }
+  .bag-inner { display: flex; flex-direction: column; height: 100%; padding: 0 24px calc(24px + env(safe-area-inset-bottom)); }
+  .bag-head { display: flex; justify-content: space-between; align-items: center; height: var(--header); border-bottom: 1px solid var(--line); margin-inline: -24px; padding-inline: 24px; }
+  .bag-head h2 { font-family: var(--sans); }
+  .bag-close { background: none; border: 0; padding: 8px; margin-right: -8px; display: inline-flex; transition: opacity var(--fast) var(--ease); }
+  .bag-close:hover { opacity: 0.6; }
+  .bag-empty { display: grid; gap: 20px; justify-items: start; padding-top: 32px; }
   .bag-empty[hidden] { display: none; }
-  .bag-lines { flex: 1; overflow: auto; display: grid; align-content: start; gap: 12px; margin: 0; }
-  .bag-line { display: grid; grid-template-columns: 112px 1fr auto; gap: 16px; align-items: start; padding: 0 0 12px; }
-  .bag-pic { display: block; background: var(--field); aspect-ratio: 4 / 3; }
-  .bag-pic img { width: 100%; height: 100%; object-fit: cover; }
+  .empty-text { font-family: var(--serif); font-size: 1.5rem; }
+  .bag-lines { flex: 1; overflow: auto; margin: 0; }
+  .bag-line { display: grid; grid-template-columns: 96px 1fr auto; gap: 16px; align-items: start; padding: 20px 0; border-bottom: 1px solid var(--line); }
+  .bag-pic { display: block; background: var(--soft); aspect-ratio: 1; }
+  .bag-pic img { width: 100%; height: 100%; object-fit: contain; }
   .bag-info { display: grid; gap: 2px; }
-  .bag-name { font-weight: 500; font-size: var(--step-body); text-decoration: none; }
-  .bag-name:hover { color: var(--accent); }
-  .bag-qty { display: flex; align-items: center; gap: 4px; margin-top: 8px; }
-  .bag-qty button[data-q] { width: 36px; height: 36px; border: 0; background: var(--surface); font-size: var(--step-body); transition: background-color var(--fast) var(--ease); }
-  .bag-qty button[data-q]:hover { background: #dcd9d1; }
-  .bag-qty output { min-width: 28px; text-align: center; }
-  .bag-qty .bag-remove { width: auto; background: none; margin-left: 10px; padding: 0; text-decoration: underline; text-underline-offset: 0.2em; color: var(--soft); }
-  .bag-qty .bag-remove:hover { background: none; color: var(--accent); }
-  .bag-price { font-weight: 500; }
-  .bag-foot { display: grid; gap: 14px; padding-top: 16px; background: var(--ground); }
+  .bag-name { font-family: var(--serif); font-size: 1.375rem; line-height: 1.1; text-decoration: none; }
+  .bag-name:hover { opacity: 0.6; }
+  .bag-info .soft { color: var(--grey); font-size: var(--t-small); }
+  .bag-qty { display: flex; align-items: center; margin-top: 10px; }
+  .bag-qty button[data-q] { width: 32px; height: 32px; border: 1px solid var(--line); background: var(--white); transition: border-color var(--fast) var(--ease); }
+  .bag-qty button[data-q]:hover { border-color: var(--ink); }
+  .bag-qty output { min-width: 32px; text-align: center; font-size: var(--t-small); }
+  .bag-qty .bag-remove { width: auto; border: 0; margin-left: 14px; padding: 0; font-size: var(--t-caps); letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey); text-decoration: underline; text-underline-offset: 3px; }
+  .bag-qty .bag-remove:hover { color: var(--ink); border: 0; }
+  .bag-price { font-size: var(--t-small); }
+  .bag-foot { display: grid; gap: 14px; padding-top: 20px; }
   .bag-foot[hidden] { display: none; }
-  .bag-total { display: flex; justify-content: space-between; }
+  .bag-total { display: flex; justify-content: space-between; align-items: baseline; font-size: 1.125rem; }
+  .note { font-size: var(--t-small); color: var(--grey); }
 </style>

@@ -1,0 +1,78 @@
+---
+// One pair in the spotlight on a soft band: turn it in 360°, pick a colour, add it to the bag.
+import Spin from '../Spin.astro';
+import { t } from '../../i18n';
+import type { Lang } from '../../config/site';
+import { money, type ClientProduct, type Product } from '../../lib/products';
+import { frames, lenses } from '../../lib/palette';
+interface Props { lang: Lang; client: ClientProduct; product: Product }
+const { lang, client: p, product } = Astro.props;
+const d = t(lang);
+const v0 = p.variants[0];
+const url = p.url[lang];
+---
+<section class="featured" aria-labelledby="featured-title" data-slug={p.slug}>
+  <div class="wrap inner">
+    <div class="viewer">
+      <Spin frames={v0.pics.spin} alt={`${p.name}, ${v0.name[lang]}`} label={d.product.view360} hint={d.featured.turn} />
+    </div>
+    <div class="copy" data-reveal>
+      <p class="caps grey">{d.featured.kicker}</p>
+      <h2 id="featured-title" class="name">{p.name}</h2>
+      <p class="place">{product.data.place[lang]}</p>
+      <p class="desc">{product.data.description[lang]}</p>
+      <p class="price num">{money(p.price, lang)}</p>
+      <div class="swatches" role="radiogroup" aria-label={d.product.variant}>
+        {p.variants.map((v, i) => (
+          <button type="button" role="radio" class="sw" aria-checked={i === 0 ? 'true' : 'false'} aria-label={v.name[lang]} title={v.name[lang]} data-id={v.id} data-frames={JSON.stringify(v.pics.spin)} data-name={v.name[lang]}>
+            <span class="swatch" style={`--f:${frames[v.frame].hex};--l:${lenses[v.lens].hex}`}></span>
+          </button>
+        ))}
+        <span class="vname grey">{v0.name[lang]}</span>
+      </div>
+      <div class="ctas">
+        <button type="button" class="btn add" data-add={`${p.slug}|${v0.id}`} data-added={d.product.added}>{d.product.add}</button>
+        <a class="link-caps more" href={`${url}?v=${v0.id}`}>{d.featured.details}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .featured { background: var(--soft); padding-block: var(--section); }
+  .inner { display: grid; grid-template-columns: 1.25fr 1fr; gap: clamp(32px, 5vw, 96px); align-items: center; }
+  .copy { display: grid; gap: 14px; justify-items: start; max-width: 460px; }
+  .name { font-size: var(--t-h1); }
+  .place { font-family: var(--serif); font-style: italic; font-size: 1.25rem; color: var(--grey); }
+  .desc { max-width: 46ch; }
+  .price { font-size: 1.25rem; margin-top: 4px; }
+  .swatches { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .sw { padding: 3px; border: 1px solid transparent; background: none; transition: border-color var(--fast) var(--ease); }
+  .sw:hover { border-color: var(--line); }
+  .sw[aria-checked='true'] { border-color: var(--ink); }
+  .vname { margin-left: 8px; font-size: var(--t-small); }
+  .ctas { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 28px; margin-top: 10px; }
+  @media (max-width: 900px) {
+    .inner { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.featured').forEach((root) => {
+    const spin = root.querySelector<HTMLElement>('.spin');
+    const add = root.querySelector<HTMLButtonElement>('.add')!;
+    const more = root.querySelector<HTMLAnchorElement>('.more')!;
+    const vname = root.querySelector<HTMLElement>('.vname')!;
+    const buttons = root.querySelectorAll<HTMLButtonElement>('.sw');
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        buttons.forEach((x) => x.setAttribute('aria-checked', String(x === b)));
+        const id = b.dataset.id!;
+        add.dataset.add = `${root.dataset.slug}|${id}`;
+        more.href = more.href.replace(/\?v=.*/, `?v=${id}`);
+        vname.textContent = b.dataset.name || '';
+        spin?.dispatchEvent(new CustomEvent('spin:set', { detail: { frames: JSON.parse(b.dataset.frames || '[]'), alt: b.dataset.name } }));
+      }),
+    );
+  });
+</script>

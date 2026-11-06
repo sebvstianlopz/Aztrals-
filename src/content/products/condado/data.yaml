@@ -1,6 +1,8 @@
 # SAMPLE: name, price, size and copy are placeholders until the real catalog is ready.
 name: Condado
 season: true
+badge: mas-vendido
+featured: true
 order: 1
 shape: wayfarer
 price: 138

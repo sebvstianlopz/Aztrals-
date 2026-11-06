@@ -1,6 +1,7 @@
 # SAMPLE
 name: Ocean Park
 order: 14
+badge: nuevo
 shape: square
 price: 158
 size: [52, 18, 145]

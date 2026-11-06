@@ -31,6 +31,10 @@ const products = defineCollection({
       /** Lens width – bridge – temple length, in millimetres. */
       size: z.tuple([z.number(), z.number(), z.number()]),
       fit: z.enum(['estrecho', 'medio', 'ancho']).default('medio'),
+      /** Small label on the card: nuevo, temporada or mas-vendido. */
+      badge: z.enum(['nuevo', 'temporada', 'mas-vendido']).optional(),
+      /** The pair spotlighted on the home page (the first one marked wins). */
+      featured: z.boolean().default(false),
       order: z.number().default(100),
       available: z.boolean().default(true),
     })

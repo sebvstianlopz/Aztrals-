@@ -1,20 +1,19 @@
 # Aztrals — website
 
-Bilingual (ES/EN) shop for Aztrals sunglasses, Puerto Rico. Every pair is shown in real-time 3D,
-built from code, and every purchase goes out as one ready-made WhatsApp message: the pairs,
-their colours, the quantities and the total.
+Bilingual (ES/EN) shop for Aztrals sunglasses, Puerto Rico. Every pair can be turned in 360°, and
+every purchase goes out as one ready-made WhatsApp message: the pairs, their colours, the
+quantities and the total.
 
-Built with [Astro](https://astro.build) as a static site and [three.js](https://threejs.org) for the 3D.
-No server, no database, no payment provider.
+Built with [Astro](https://astro.build) as a static site. No server, no database, no payment provider.
+[three.js](https://threejs.org) draws the stand-in product renders at build time only.
 
 ## What's on it
 
-- **Home**: the name AZTRALS set huge, pinned while the season's four pairs turn in one after another,
-  each in front of a drawing of the place it's named after. Then the season up close, a live
-  "see the island through each lens" demo, materials, every pair in one table, how to buy, questions.
+- **Home**: full-width hero photo with the season's name, the season's pairs as product cards, a
+  featured pair you can turn in 360°, the full collection, benefits and questions.
 - **Catalog** (`/catalogo/`, `/en/shop/`): every pair, filter by shape or lens tint, sort by price.
-- **Product page** (`/catalogo/<pair>/`): drag to turn the pair in 3D, pick frame and lens (the model
-  recolours), quantity, add to bag or buy straight away on WhatsApp.
+- **Product page** (`/catalogo/<pair>/`): drag to turn the pair in 360°, pick a colourway, quantity,
+  add to bag or buy straight away on WhatsApp, details in accordions.
 - **Bag**: a drawer on every page; kept in the visitor's browser; "Send order on WhatsApp".
 
 ## Everyday changes
@@ -22,27 +21,36 @@ No server, no database, no payment provider.
 | I want to… | Edit |
 |---|---|
 | Change a price, name, description or size | `src/content/products/<pair>/data.yaml` |
-| Add a pair | Copy any pair folder, rename it (the folder name becomes the URL), edit `data.yaml`, then run `npm run posters -- <folder>` |
-| Add or change a colourway | Add a line under `variants:` (`frame` and `lens` must be names from `src/lib/palette.ts`), then `npm run posters -- <folder>` |
-| Add a new frame colour or lens tint | `src/lib/palette.ts` |
-| Hide a pair without deleting it | Add `available: false` |
-| Put a pair in the season (home page story) | `season: true` (the first four by `order` are shown in the story) |
+| Add a pair | Copy any pair folder, rename it (the folder name becomes the URL), edit `data.yaml`, add its photos (below) or run `npm run posters -- <folder>` |
+| Add or change a colourway | Add a line under `variants:` (`frame` and `lens` must be names from `src/lib/palette.ts`) |
+| Show a badge on a card | `badge: nuevo`, `temporada` or `mas-vendido` |
+| Choose the featured pair on the home page | `featured: true` on that pair |
+| Put a pair in the season grid | `season: true` (the first four by `order` are shown) |
+| Hide a pair without deleting it | `available: false` |
 | Change the WhatsApp number, hours or Instagram | `src/config/site.ts` |
 | Change any text on the site (ES and EN) | `src/i18n/index.ts` |
 
 Each `data.yaml` is checked when the site builds. A typo (an unknown frame colour, a missing price)
 stops the build with a message naming the file.
 
-## The pictures
+## Photos
 
-- **Pairs**: drawn by `src/three/glasses.ts` from a shape (wayfarer, round, cat-eye, aviator, square,
-  oval), a frame finish and a lens tint. The pictures on catalog cards and in the bag are renders of
-  those same models, saved as `public/products/<pair>/<colourway>.webp` by `npm run posters` (needs
-  Playwright with Chromium: `npm i -D playwright && npx playwright install chromium`).
-  When real product photos exist, save them over those files (4:3, pair centred on a transparent or
-  plain background).
-- **Places** (Condado, Culebra, Rincón, Vieques, San Juan Bay): flat drawings in
-  `src/components/Place.astro` and `src/components/Bay.astro`. They can be replaced with photographs.
+Drop photos into these folders; nothing else needs editing. Any size works, the build makes
+web-sized copies. JPG, PNG, WebP or AVIF.
+
+| Photo | Where |
+|---|---|
+| Home hero (landscape, ≥ 2400 × 1350) | `src/assets/site/hero.jpg` |
+| Home hero for phones (portrait, optional) | `src/assets/site/hero-mobile.jpg` |
+| A colourway, ¾ view on white or light grey (4:3) | `src/content/products/<pair>/<colourway>/main.jpg` |
+| Second view shown when a card is hovered (optional) | `src/content/products/<pair>/<colourway>/front.jpg` |
+| 360° turn: photos taken evenly around the pair, same framing (optional, 24 is ideal) | `src/content/products/<pair>/<colourway>/spin/01.jpg`, `02.jpg`, … |
+| Lifestyle or detail photos of a pair (optional) | `src/content/products/<pair>/gallery/*.jpg` |
+
+`<colourway>` is the variant `id` in `data.yaml`, e.g. `src/content/products/condado/negro-ambar/main.jpg`.
+
+Until a photo exists, the site uses renders of code-drawn models from `public/renders/` (made by
+`npm run posters`, which needs Playwright: `npm i -D playwright && npx playwright install chromium`).
 
 ## Before launch
 
@@ -51,8 +59,9 @@ Everything marked `SAMPLE` is placeholder content to replace:
 - `src/config/site.ts`: the WhatsApp number is a reserved fictional one (787-555-0100), so orders go
   nowhere until it is changed. Add the Instagram profile.
 - `src/content/products/*`: names, prices, sizes and descriptions.
-- `src/i18n/index.ts`: payment methods, delivery times, exchange and warranty terms in the FAQ and
-  the "What they're made of" list.
+- `src/i18n/index.ts`: payment methods, delivery times, exchange and warranty terms in the FAQ,
+  the benefits row and the product page.
+- Photos: hero and product photos (see **Photos**).
 
 ## Run it locally
 
@@ -60,7 +69,7 @@ Everything marked `SAMPLE` is placeholder content to replace:
 npm install
 npm run dev        # http://localhost:4321/Aztrals-/
 npm run build      # outputs dist/
-npm run posters    # re-render every pair's pictures (or: npm run posters -- condado)
+npm run posters    # re-render the stand-in pictures and 360° frames (or: npm run posters -- condado)
 ```
 
 ## Publishing

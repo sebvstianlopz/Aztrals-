@@ -8,70 +8,57 @@ const d = t(lang);
 const home = path(lang, 'home');
 const year = new Date().getFullYear();
 ---
-<footer class="site-footer inverse wrap" id="contacto">
-  <p class="name" aria-hidden="true">Aztrals</p>
-  <div class="grid row">
-    <ul role="list" class="places">
-      <li><a href={waLink(d.wa.hi)}>WhatsApp {site.phoneDisplay}</a></li>
-      {site.social.instagram && <li><a href={site.social.instagram}>Instagram</a></li>}
-      <li><span>{site.city}, {site.country}</span></li>
-    </ul>
-    <div class="cols">
-      <div>
-        <p class="soft-inv">{d.footer.shop}</p>
-        <ul role="list">
-          <li><a href={`${home}#temporada`}>{d.footer.links.season}</a></li>
-          <li><a href={path(lang, 'shop')}>{d.footer.links.shop}</a></li>
-          <li><a href="#bolsa" data-bag-open>{d.footer.links.bag}</a></li>
-        </ul>
-      </div>
-      <div>
-        <p class="soft-inv">{d.footer.help}</p>
-        <ul role="list">
-          <li><a href={`${home}#preguntas`}>{d.footer.links.delivery}</a></li>
-          <li><a href={`${home}#preguntas`}>{d.footer.links.returns}</a></li>
-          <li><a href={`${home}#preguntas`}>{d.footer.links.faq}</a></li>
-        </ul>
-      </div>
-      <div>
-        <p class="soft-inv">{d.footer.lang}</p>
-        <ul role="list">
-          <li><a href={alternate} lang={lang === 'es' ? 'en' : 'es'}>{d.switchTo}</a></li>
-          <li><span class="soft-inv">{site.hours[lang]}</span></li>
-        </ul>
-      </div>
+<footer class="site-footer on-black">
+  <div class="wrap top">
+    <div class="brand">
+      <a class="logo" href={home}>Aztrals</a>
+      <p>{d.footer.about}</p>
+    </div>
+    <div class="col">
+      <p class="caps head">{d.footer.shop}</p>
+      <ul role="list">
+        <li><a href={`${home}#temporada`}>{d.footer.links.season}</a></li>
+        <li><a href={path(lang, 'shop')}>{d.footer.links.shop}</a></li>
+        <li><a href="#bolsa" data-bag-open>{d.footer.links.bag}</a></li>
+      </ul>
+    </div>
+    <div class="col">
+      <p class="caps head">{d.footer.help}</p>
+      <ul role="list">
+        <li><a href={`${home}#ayuda`}>{d.footer.links.delivery}</a></li>
+        <li><a href={`${home}#ayuda`}>{d.footer.links.returns}</a></li>
+        <li><a href={`${home}#ayuda`}>{d.footer.links.faq}</a></li>
+      </ul>
+    </div>
+    <div class="col">
+      <p class="caps head">{d.footer.contact}</p>
+      <ul role="list">
+        <li><a href={waLink(d.wa.hi)} target="_blank" rel="noopener">WhatsApp {site.phoneDisplay}</a></li>
+        {site.social.instagram && <li><a href={site.social.instagram}>Instagram</a></li>}
+        <li><span>{site.city}, {site.country}</span></li>
+        <li><span class="soft">{site.hours[lang]}</span></li>
+      </ul>
     </div>
   </div>
-  <div class="legal">
+  <div class="wrap bottom">
     <p>{d.footer.legal(year)} {d.footer.sample}</p>
-    <a href="#main">{d.footer.top}</a>
+    <p class="caps"><a href={alternate} lang={lang === 'es' ? 'en' : 'es'}>{d.switchTo}</a> · <a href="#main">{d.footer.top}</a></p>
   </div>
 </footer>
 
 <style>
-  .site-footer {
-    background: var(--ink); color: var(--ground);
-    padding-top: clamp(120px, 12vw, 180px); padding-bottom: calc(24px + env(safe-area-inset-bottom));
-    min-height: 90svh; display: flex; flex-direction: column;
-  }
-  .name {
-    font-size: var(--step-name); font-weight: 500; letter-spacing: -0.055em; line-height: 0.8;
-    text-transform: uppercase; white-space: nowrap; margin-left: -0.04em;
-  }
-  .row { margin-top: 72px; row-gap: 48px; }
-  .places { grid-column: 1 / span 5; font-size: var(--step-lead); line-height: 1.2; letter-spacing: -0.02em; display: grid; gap: 6px; align-content: start; }
-  .places a { color: var(--inverse-accent); text-decoration: none; transition: color var(--fast) var(--ease); }
-  .places a:hover { color: var(--ground); }
-  .cols { grid-column: 7 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); font-size: var(--step-small); }
-  .cols ul { display: grid; gap: 6px; margin-top: 10px; }
-  .cols a { text-decoration: none; transition: color var(--fast) var(--ease); }
-  .cols a:hover { color: var(--inverse-accent); }
-  .soft-inv { color: #a6adb8; }
-  .legal { margin-top: auto; padding-top: 96px; display: flex; justify-content: space-between; gap: 24px; font-size: var(--step-small); color: #a6adb8; }
-  .legal a { color: inherit; }
-  @media (max-width: 760px) {
-    .places { grid-column: 1 / -1; }
-    .cols { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 32px; }
-    .legal { flex-direction: column; }
+  .site-footer { background: var(--black); color: var(--on-black); font-size: var(--t-small); }
+  .top { display: grid; grid-template-columns: 2fr 1fr 1fr 1.4fr; gap: 40px var(--gap); padding-block: clamp(56px, 7vw, 96px) 48px; }
+  .logo { font-family: var(--serif); font-size: 1.75rem; letter-spacing: 0.32em; text-transform: uppercase; text-decoration: none; }
+  .brand p { margin-top: 16px; max-width: 32ch; color: var(--on-black-soft); }
+  .head { color: var(--on-black-soft); margin-bottom: 16px; }
+  .col ul { display: grid; gap: 8px; }
+  .col a, .bottom a { text-decoration: none; transition: opacity var(--fast) var(--ease); }
+  .col a:hover, .bottom a:hover { opacity: 0.6; }
+  .soft { color: var(--on-black-soft); }
+  .bottom { display: flex; justify-content: space-between; gap: 16px 32px; flex-wrap: wrap; padding-block: 24px calc(24px + env(safe-area-inset-bottom)); border-top: 1px solid #262626; color: var(--on-black-soft); }
+  @media (max-width: 900px) {
+    .top { grid-template-columns: 1fr 1fr; }
+    .brand { grid-column: 1 / -1; }
   }
 </style>

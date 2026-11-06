@@ -1,0 +1,28 @@
+---
+import Icon from '../Icon.astro';
+import { t } from '../../i18n';
+import type { Lang } from '../../config/site';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const icons = ['sun', 'truck', 'return', 'card'] as const;
+---
+<section class="benefits wrap" aria-label={lang === 'es' ? 'Por qué Aztrals' : 'Why Aztrals'}>
+  <ul role="list" class="row" data-reveal>
+    {d.benefits.map(([title, text], i) => (
+      <li>
+        <Icon name={icons[i]} class="icon" />
+        <p class="caps">{title}</p>
+        <p class="text grey">{text}</p>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px var(--gap); margin: 0; padding-block: clamp(40px, 5vw, 64px); border-block: 1px solid var(--line); }
+  li { display: grid; justify-items: center; text-align: center; gap: 8px; padding-inline: 8px; }
+  .row :global(.icon) { width: 28px; height: 28px; margin-bottom: 6px; }
+  .text { font-size: var(--t-small); max-width: 28ch; }
+  @media (max-width: 900px) { .row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>

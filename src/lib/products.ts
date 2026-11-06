@@ -1,6 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { frames, lenses, type FrameId, type LensId, type Text } from './palette';
-import { asset, path } from '../i18n';
+import { path } from '../i18n';
+import { pictures, type Pictures } from './media';
 import type { Lang } from '../config/site';
 
 export type Product = CollectionEntry<'products'>;
@@ -10,8 +11,6 @@ export async function getProducts(): Promise<Product[]> {
   const all = await getCollection('products', (p) => p.data.available);
   return all.sort((a, b) => a.data.order - b.data.order || a.data.name.localeCompare(b.data.name));
 }
-
-export const poster = (slug: string, variant: string) => asset(`products/${slug}/${variant}.webp`);
 
 /** "Negro, lente ámbar" · "Black, amber lens" */
 export const variantName = (v: { frame: FrameId; lens: LensId }, lang: Lang) => {
@@ -30,22 +29,34 @@ export interface ClientProduct {
   shape: Product['data']['shape'];
   season: boolean;
   url: Text;
-  variants: { id: string; frame: FrameId; lens: LensId; name: Text; poster: string; field: string }[];
+  badge?: string;
+  variants: { id: string; frame: FrameId; lens: LensId; name: Text; poster: string; field: string; pics: Pictures }[];
 }
 
-export const toClient = (p: Product): ClientProduct => ({
+export const toClient = async (p: Product): Promise<ClientProduct> => ({
   slug: p.id,
   name: p.data.name,
   price: p.data.price,
   shape: p.data.shape,
   season: p.data.season,
+  badge: p.data.badge,
   url: { es: path('es', 'shop', p.id), en: path('en', 'shop', p.id) },
-  variants: p.data.variants.map((v) => ({
-    id: v.id,
-    frame: v.frame,
-    lens: v.lens,
-    name: { es: variantName(v, 'es'), en: variantName(v, 'en') },
-    poster: poster(p.id, v.id),
-    field: lenses[v.lens].field,
-  })),
+  variants: await Promise.all(
+    p.data.variants.map(async (v) => {
+      const pics = await pictures(p.id, v.id);
+      return {
+        id: v.id,
+        frame: v.frame,
+        lens: v.lens,
+        name: { es: variantName(v, 'es'), en: variantName(v, 'en') },
+        poster: pics.main,
+        field: lenses[v.lens].field,
+        pics,
+      };
+    }),
+  ),
 });
+
+/** Client data for every pair, cached for the build. */
+let cache: Promise<ClientProduct[]> | null = null;
+export const clientCatalog = () => (cache ??= getProducts().then((all) => Promise.all(all.map(toClient))));

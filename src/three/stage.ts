@@ -189,6 +189,16 @@ export class Stage {
     c.addEventListener('keydown', key);
   }
 
+  /** Sets the resting turn of the pair and draws it at once (used to render spin frames). */
+  pose(yaw: number, pitch = this.opts.pitch) {
+    this.opts.yaw = yaw;
+    this.opts.pitch = pitch;
+    this.turn.rotation.set(pitch, yaw, 0);
+    this.holder.position.y = 0;
+    this.holder.rotation.z = 0;
+    this.render();
+  }
+
   /** Turn the pair by hand, e.g. from a button. */
   nudge(yaw: number) {
     this.dragYaw += yaw;

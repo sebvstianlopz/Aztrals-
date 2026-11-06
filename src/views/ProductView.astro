@@ -1,9 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
 import ProductTile from '../components/ProductTile.astro';
-import { t, path, asset } from '../i18n';
+import Spin from '../components/Spin.astro';
+import Icon from '../components/Icon.astro';
+import { t, path } from '../i18n';
 import { site, type Lang } from '../config/site';
-import { getProducts, money, poster, variantName, type Product } from '../lib/products';
+import { clientCatalog, getProducts, money, type Product } from '../lib/products';
+import { gallery } from '../lib/media';
 import { frames, lenses, shapeNames } from '../lib/palette';
 import { singleMessage, waLink } from '../lib/whatsapp';
 
@@ -11,160 +14,220 @@ interface Props { lang: Lang; product: Product }
 const { lang, product: p } = Astro.props;
 const d = t(lang);
 const data = p.data;
-const v0 = data.variants[0];
+const clients = await clientCatalog();
+const c = clients.find((x) => x.slug === p.id)!;
 const url = new URL(path(lang, 'shop', p.id), Astro.site).href;
-const others = (await getProducts()).filter((x) => x.id !== p.id);
-// Related: same season first, then the nearest prices.
-const related = others.sort((a, b) => Number(b.data.season === data.season) - Number(a.data.season === data.season) || Math.abs(a.data.price - data.price) - Math.abs(b.data.price - data.price)).slice(0, 3);
-const variants = data.variants.map((v) => ({
-  id: v.id,
-  name: variantName(v, lang),
-  poster: poster(p.id, v.id),
-  field: lenses[v.lens].field,
-  wa: waLink(singleMessage(data.name, variantName(v, lang), data.price, `${url}?v=${v.id}`, lang)),
-  spec: { shape: data.shape, frame: v.frame, lens: v.lens },
+const photos = await gallery(p.id);
+const all = await getProducts();
+const related = all
+  .filter((x) => x.id !== p.id)
+  .sort((a, b) => Number(b.data.season === data.season) - Number(a.data.season === data.season) || Math.abs(a.data.price - data.price) - Math.abs(b.data.price - data.price))
+  .slice(0, 4);
+const variants = c.variants.map((v) => ({
+  ...v,
+  label: v.name[lang],
+  wa: waLink(singleMessage(data.name, v.name[lang], data.price, `${url}?v=${v.id}`, lang)),
 }));
+const v0 = variants[0];
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Product',
   name: `${site.name} ${data.name}`,
   description: data.description[lang],
   brand: { '@type': 'Brand', name: site.name },
-  image: data.variants.map((v) => new URL(asset(`products/${p.id}/${v.id}.webp`), Astro.site).href),
+  image: variants.map((v) => new URL(v.pics.main, Astro.site).href),
   offers: { '@type': 'Offer', price: data.price, priceCurrency: 'USD', availability: 'https://schema.org/InStock', url },
 };
 ---
-<Base
-  lang={lang}
-  title={`${data.name} · ${shapeNames[data.shape][lang]} · Aztrals`}
-  description={`${data.description[lang]} ${money(data.price, lang)}.`}
-  alternate={path(lang === 'es' ? 'en' : 'es', 'shop', p.id)}
-  image={`products/${p.id}/${v0.id}.webp`}
-  jsonLd={jsonLd}
->
-  <article class="product wrap grid" style={`--field:${variants[0].field}`}>
+<Base lang={lang} title={`${data.name} · ${shapeNames[data.shape][lang]} · Aztrals`} description={`${data.description[lang]} ${money(data.price, lang)}.`} alternate={path(lang === 'es' ? 'en' : 'es', 'shop', p.id)} image={v0.pics.main} jsonLd={jsonLd}>
+  <nav class="crumbs wrap caps grey" aria-label="Breadcrumb">
+    <a href={path(lang, 'shop')}>{d.product.back}</a> <span aria-hidden="true">/</span> <span aria-current="page">{data.name}</span>
+  </nav>
+  <article class="product wrap" data-slug={p.id}>
     <div class="viewer">
-      <div class="box">
-        <img class="poster" src={variants[0].poster} alt={`${data.name}, ${variants[0].name}`} width="1200" height="900" fetchpriority="high" />
-        <canvas class="stage" tabindex="0" aria-label={d.product.turn} data-variants={JSON.stringify(variants.map((v) => ({ id: v.id, spec: v.spec })))}></canvas>
+      <div class="stage">
+        <Spin frames={v0.pics.spin} alt={`${data.name}, ${v0.label}`} label={d.product.view360} hint={d.featured.turn} eager />
+        <img class="still" alt="" hidden />
       </div>
-      <div class="turns">
-        <p class="small soft">{d.product.turn}</p>
-        <span class="turn-buttons">
-          <button type="button" class="btn quiet" data-turn="-1" aria-label={d.product.turnLeft}>←</button>
-          <button type="button" class="btn quiet" data-turn="1" aria-label={d.product.turnRight}>→</button>
-        </span>
-      </div>
+      {photos.length > 0 && (
+        <div class="gallery" role="group" aria-label={lang === 'es' ? 'Fotos' : 'Photos'}>
+          <button type="button" class="g360 caps" aria-pressed="true">360°</button>
+          {photos.map((g, i) => (
+            <button type="button" class="gthumb" aria-pressed="false" data-large={g.large} aria-label={`${lang === 'es' ? 'Foto' : 'Photo'} ${i + 1}`}>
+              <img src={g.thumb} alt="" width="120" height="120" loading="lazy" />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
 
-    <div class="info" data-reveal>
-      <a class="link small back" href={path(lang, 'shop')}>← {d.product.back}</a>
+    <div class="info">
       <h1 class="name">{data.name}</h1>
-      <p class="place soft">{data.place[lang]}</p>
+      <p class="place">{data.place[lang]}</p>
       <p class="price num">{money(data.price, lang)}</p>
-      <p class="desc">{data.description[lang]}</p>
 
       <fieldset class="variants">
-        <legend class="small soft">{d.product.variant}: <span class="vname">{variants[0].name}</span></legend>
+        <legend class="caps">{d.product.variant}: <span class="vname grey">{v0.label}</span></legend>
         <div class="vlist">
-          {data.variants.map((v, i) => (
-            <label class="v" title={variants[i].name}>
-              <input type="radio" name="variant" value={v.id} checked={i === 0} data-poster={variants[i].poster} data-field={variants[i].field} data-wa={variants[i].wa} data-name={variants[i].name} />
-              <span class="sw" style={`--f:${frames[v.frame].hex};--l:${lenses[v.lens].hex}`}></span>
-              <span class="visually-hidden">{variants[i].name}</span>
+          {variants.map((v, i) => (
+            <label class="v" title={v.label}>
+              <input type="radio" name="variant" value={v.id} checked={i === 0} data-frames={JSON.stringify(v.pics.spin)} data-wa={v.wa} data-name={v.label} />
+              <span class="swatch" style={`--f:${frames[v.frame].hex};--l:${lenses[v.lens].hex}`}></span>
+              <span class="visually-hidden">{v.label}</span>
             </label>
           ))}
         </div>
       </fieldset>
 
       <div class="buy">
-        <label class="qty">
-          <span class="small soft">{d.product.qty}</span>
-          <span class="stepper">
-            <button type="button" data-step="-1" aria-label={d.bag.less}>−</button>
-            <input id="qty" type="number" inputmode="numeric" min="1" max="20" value="1" />
-            <button type="button" data-step="1" aria-label={d.bag.more}>+</button>
-          </span>
-        </label>
-        <button type="button" class="btn add" data-add={`${p.id}|${v0.id}`} data-qty="#qty" data-added={d.product.added}>{d.product.add}</button>
-        <a class="link wa" href={variants[0].wa} target="_blank" rel="noopener">{d.product.buyNow}</a>
+        <div class="stepper" role="group" aria-label={d.product.qty}>
+          <button type="button" data-step="-1" aria-label={d.bag.less}>−</button>
+          <input id="qty" type="number" inputmode="numeric" min="1" max="20" value="1" aria-label={d.product.qty} />
+          <button type="button" data-step="1" aria-label={d.bag.more}>+</button>
+        </div>
+        <button type="button" class="btn add" data-add={`${p.id}|${v0.id}`} data-qty="#qty" data-added={d.product.added}><span>{d.product.add}</span><Icon name="bag" /></button>
       </div>
+      <a class="link-caps wa" href={v0.wa} target="_blank" rel="noopener">{d.product.buyNow}</a>
+      <p class="ship">{d.product.shipNote}</p>
 
-      <dl class="specs">
-        <div><dt>{d.product.shape}</dt><dd>{shapeNames[data.shape][lang]}</dd></div>
-        <div><dt>{d.product.lens}</dt><dd>{data.polarized ? d.product.polarized : d.product.uv}, {d.product.material[data.lensMaterial]}</dd></div>
-        <div><dt>{d.product.size}</dt><dd class="num">{d.product.sizeText(...data.size)}</dd></div>
-        <div><dt>{d.product.fit}</dt><dd>{d.product.fitName[data.fit]}</dd></div>
-        <div><dt>{d.product.included}</dt><dd>{d.product.includedText}</dd></div>
-      </dl>
-      <p class="small soft">{d.product.delivery}</p>
+      <div class="acc">
+        <details open>
+          <summary class="caps">{d.product.acc.details}<Icon name="plus" class="plus" /></summary>
+          <div class="body">
+            <p>{data.description[lang]}</p>
+            <dl>
+              <div><dt>{d.product.shape}</dt><dd>{shapeNames[data.shape][lang]}</dd></div>
+              <div><dt>{d.product.lens}</dt><dd>{data.polarized ? d.product.polarized : d.product.uv}, {d.product.material[data.lensMaterial]}</dd></div>
+              <div><dt>{d.product.included}</dt><dd>{d.product.includedText}</dd></div>
+            </dl>
+          </div>
+        </details>
+        <details>
+          <summary class="caps">{d.product.acc.size}<Icon name="plus" class="plus" /></summary>
+          <div class="body">
+            <dl>
+              <div><dt>{d.product.size}</dt><dd class="num">{d.product.sizeText(...data.size)}</dd></div>
+              <div><dt>{d.product.fit}</dt><dd>{d.product.fitName[data.fit]}</dd></div>
+            </dl>
+            <p class="grey">{d.product.sizeHelp}</p>
+          </div>
+        </details>
+        <details>
+          <summary class="caps">{d.product.acc.delivery}<Icon name="plus" class="plus" /></summary>
+          <div class="body"><p>{d.product.delivery}</p></div>
+        </details>
+      </div>
     </div>
   </article>
 
-  <section class="related wrap" aria-labelledby="related-title">
-    <h2 id="related-title" class="rtitle">{d.product.related}</h2>
+  <section class="related section wrap" aria-labelledby="related-title">
+    <div class="heading"><h2 id="related-title">{d.product.related}</h2></div>
     <ul role="list" class="tiles">
-      {related.map((r) => <ProductTile lang={lang} product={r} />)}
+      {related.map((r) => <ProductTile lang={lang} product={clients.find((x) => x.slug === r.id)!} data={r.data} />)}
     </ul>
   </section>
 </Base>
 
 <style>
-  .product { padding-top: calc(var(--header) + 8px); padding-bottom: var(--section); row-gap: 32px; align-items: start; }
-  .viewer { grid-column: 1 / span 7; position: sticky; top: 16px; }
-  .box { position: relative; background: var(--field); height: min(82svh, 760px); min-height: 380px; transition: background-color 600ms var(--ease); overflow: hidden; }
-  .poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transform: scale(1.1); }
-  :global(.live) .poster { display: none; }
-  .stage { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .turns { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 12px; }
-  .turn-buttons { display: flex; gap: 6px; }
-  .turn-buttons .btn { min-height: 44px; width: 52px; padding: 0; font-size: var(--step-body); }
-  .info { grid-column: 9 / -1; display: grid; gap: 14px; padding-top: clamp(16px, 4vw, 48px); }
-  .back { justify-self: start; text-decoration: none; }
-  .name { font-size: var(--step-head); letter-spacing: -0.035em; line-height: 0.95; margin-top: 12px; }
-  .place { font-size: var(--step-body); }
-  .price { font-size: var(--step-lead); font-weight: 500; }
-  .desc { max-width: 46ch; }
-  .variants { border: 0; padding: 0; margin: 10px 0 0; }
-  .variants legend { padding: 0; margin-bottom: 10px; }
-  .vname { color: var(--ink); }
-  .vlist { display: flex; gap: 10px; }
-  .v { cursor: pointer; }
+  .crumbs { padding-top: 24px; display: flex; gap: 10px; }
+  .crumbs a { text-decoration: none; }
+  .crumbs a:hover { color: var(--ink); }
+  .product { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 96px); padding-top: 24px; align-items: start; }
+  .viewer { position: sticky; top: calc(var(--header) + 24px); }
+  .stage { position: relative; }
+  .still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: var(--white); }
+  .gallery { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  .gallery button { width: 72px; height: 72px; padding: 0; border: 1px solid var(--line); background: var(--soft); transition: border-color var(--fast) var(--ease); }
+  .gallery button[aria-pressed='true'] { border-color: var(--ink); }
+  .gallery img { width: 100%; height: 100%; object-fit: cover; }
+  .info { display: grid; gap: 16px; padding-top: clamp(8px, 3vw, 40px); max-width: 460px; }
+  .name { font-family: var(--sans); font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.2; }
+  .place { color: var(--grey); letter-spacing: 0.04em; }
+  .price { font-size: 1.375rem; letter-spacing: 0.06em; }
+  .variants { border: 0; padding: 0; margin: 4px 0 0; }
+  .variants legend { padding: 0; margin-bottom: 12px; }
+  .vname { text-transform: none; letter-spacing: 0.02em; font-weight: 400; }
+  .vlist { display: flex; gap: 6px; }
+  .v { cursor: pointer; padding: 3px; border: 1px solid transparent; transition: border-color var(--fast) var(--ease); }
+  .v:hover { border-color: var(--line); }
+  .v:has(input:checked) { border-color: var(--ink); }
+  .v:has(input:focus-visible) { outline: 1px solid var(--ink); outline-offset: 2px; }
   .v input { position: absolute; opacity: 0; pointer-events: none; }
-  .sw { display: block; width: 44px; height: 44px; border-radius: 50%; background: var(--l); border: 11px solid var(--f); transition: transform var(--fast) var(--ease); }
-  .v:hover .sw { transform: scale(1.08); }
-  .v input:checked + .sw { outline: 2px solid var(--ink); outline-offset: 3px; }
-  .v input:focus-visible + .sw { outline: 2px solid var(--accent); outline-offset: 3px; }
-  .buy { display: flex; flex-wrap: wrap; align-items: end; gap: 14px 16px; margin-top: 10px; }
-  .qty { display: grid; gap: 4px; }
-  .stepper { display: flex; }
-  .stepper button { width: 44px; height: 52px; border: 0; background: var(--surface); font-size: var(--step-body); transition: background-color var(--fast) var(--ease); }
-  .stepper button:hover { background: #dcd9d1; }
-  .stepper input { width: 52px; height: 52px; border: 0; background: var(--surface); text-align: center; -moz-appearance: textfield; appearance: textfield; font-variant-numeric: tabular-nums; }
+  .buy { display: flex; gap: 12px; margin-top: 8px; }
+  .stepper { display: flex; border: 1px solid var(--line); }
+  .stepper button { width: 40px; border: 0; background: var(--white); font-size: 1.125rem; transition: background-color var(--fast) var(--ease); }
+  .stepper button:hover { background: var(--soft); }
+  .stepper input { width: 40px; border: 0; text-align: center; -moz-appearance: textfield; appearance: textfield; font-variant-numeric: tabular-nums; }
   .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; }
-  .add { flex: 1 1 200px; }
-  .wa { flex-basis: 100%; }
-  .specs { display: grid; gap: 10px; margin-top: 18px; }
-  .specs div { display: grid; grid-template-columns: 9em 1fr; gap: 12px; }
-  .specs dt { color: var(--soft); }
-  .related { padding-bottom: var(--section); }
-  .rtitle { font-size: var(--step-head); letter-spacing: -0.03em; margin-bottom: 40px; }
-  .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px var(--gap); padding: 0; }
-  @media (max-width: 900px) {
-    .viewer, .info { grid-column: 1 / -1; }
-    .viewer { position: relative; top: 0; margin-inline: calc(-1 * var(--margin)); }
-    .turns { padding-inline: var(--margin); }
-    .box { height: 64svh; }
-    .info { padding-top: 0; }
-    .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 12px; }
-    .tiles :global(.tile:nth-child(3)) { display: none; }
-    .specs div { grid-template-columns: 7.5em 1fr; }
+  .add { flex: 1; justify-content: space-between; }
+  .wa { justify-self: start; }
+  .ship { font-size: var(--t-small); }
+  .acc { margin-top: 12px; border-top: 1px solid var(--line); }
+  .acc details { border-bottom: 1px solid var(--line); }
+  .acc summary { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; cursor: pointer; list-style: none; color: var(--grey); font-weight: 400; transition: color var(--fast) var(--ease); }
+  .acc summary::-webkit-details-marker { display: none; }
+  .acc summary:hover, .acc details[open] summary { color: var(--ink); }
+  .acc :global(.plus) { width: 16px; height: 16px; transition: transform 400ms var(--ease); }
+  .acc details[open] :global(.plus) { transform: rotate(45deg); }
+  .body { display: grid; gap: 14px; padding-bottom: 20px; font-size: var(--t-small); }
+  dl { display: grid; gap: 8px; }
+  dl div { display: grid; grid-template-columns: 8em 1fr; gap: 12px; }
+  dt { color: var(--grey); }
+  .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px var(--gap); margin: 0; }
+  @media (max-width: 1000px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 860px) {
+    .product { grid-template-columns: 1fr; }
+    .viewer { position: relative; top: 0; }
+    .info { max-width: none; }
   }
 </style>
 
 <script>
   import { initSwatches } from '../scripts/swatches';
-  import { initViewer } from '../scripts/viewer';
-  initSwatches();
-  initViewer();
+  initSwatches(document.querySelector('.related')!);
+
+  const product = document.querySelector<HTMLElement>('.product');
+  if (product) {
+    const spin = product.querySelector<HTMLElement>('.spin');
+    const still = product.querySelector<HTMLImageElement>('.still')!;
+    const add = product.querySelector<HTMLButtonElement>('.add')!;
+    const wa = product.querySelector<HTMLAnchorElement>('.wa')!;
+    const vname = product.querySelector<HTMLElement>('.vname')!;
+    const radios = product.querySelectorAll<HTMLInputElement>('input[name="variant"]');
+    const choose = (input: HTMLInputElement, push = true) => {
+      input.checked = true;
+      add.dataset.add = `${product.dataset.slug}|${input.value}`;
+      wa.href = input.dataset.wa || wa.href;
+      vname.textContent = input.dataset.name || '';
+      spin?.dispatchEvent(new CustomEvent('spin:set', { detail: { frames: JSON.parse(input.dataset.frames || '[]'), alt: input.dataset.name } }));
+      if (push) {
+        const u = new URL(location.href);
+        u.searchParams.set('v', input.value);
+        history.replaceState(null, '', u);
+      }
+    };
+    radios.forEach((r) => r.addEventListener('change', () => choose(r)));
+    const wanted = new URL(location.href).searchParams.get('v');
+    const start = Array.from(radios).find((r) => r.value === wanted);
+    if (start && start !== radios[0]) choose(start, false);
+
+    const qty = product.querySelector<HTMLInputElement>('#qty')!;
+    product.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((b) =>
+      b.addEventListener('click', () => {
+        qty.value = String(Math.max(1, Math.min(20, (Number(qty.value) || 1) + Number(b.dataset.step))));
+      }),
+    );
+
+    // Gallery: photos replace the 360° view until "360°" is chosen again.
+    const gbuttons = product.querySelectorAll<HTMLButtonElement>('.gallery button');
+    gbuttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        gbuttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        if (b.dataset.large) {
+          still.src = b.dataset.large;
+          still.hidden = false;
+        } else still.hidden = true;
+      }),
+    );
+  }
 </script>

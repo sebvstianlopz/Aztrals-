@@ -1,6 +1,7 @@
 # SAMPLE
 name: Cabo Rojo
 order: 15
+badge: nuevo
 shape: cateye
 price: 136
 size: [52, 18, 140]

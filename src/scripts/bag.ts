@@ -109,7 +109,7 @@ function render() {
 
 function syncCount() {
   const n = count();
-  document.querySelectorAll<HTMLElement>('[data-bag-count]').forEach((el) => (el.textContent = n ? String(n) : ''));
+  document.querySelectorAll<HTMLElement>('[data-bag-count]').forEach((el) => (el.textContent = String(n)));
   document.documentElement.classList.toggle('has-bag', n > 0);
 }
 
