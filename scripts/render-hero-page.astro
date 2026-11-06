@@ -1,0 +1,54 @@
+---
+// Dev-only page (see astro.config.mjs): renders the home hero's frame sequence: the season's four
+// pairs, each turning slowly, then going edge-on and handing over to the next.
+// scripts/render-hero.mjs saves the frames to public/hero/frames/.
+import { getProducts } from '../src/lib/products';
+import { HERO_FRAMES } from '../src/lib/hero';
+const season = (await getProducts()).filter((p) => p.data.season).slice(0, 4);
+const pairs = season.map((p) => ({ shape: p.data.shape, frame: p.data.variants[0].frame, lens: p.data.variants[0].lens }));
+---
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8" /><title>Render hero</title>
+    <style>body{margin:0;background:#fff}canvas{width:1200px;height:900px;display:block}</style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <script type="application/json" id="pairs" set:html={JSON.stringify({ pairs, frames: HERO_FRAMES })} />
+    <script>
+      import { Stage } from '../src/three/stage';
+      import { spec, type FrameId, type LensId, type Shape } from '../src/lib/palette';
+      const { pairs, frames } = JSON.parse(document.getElementById('pairs')!.textContent!) as {
+        pairs: { shape: Shape; frame: FrameId; lens: LensId }[];
+        frames: number;
+      };
+      const stage = new Stage(document.getElementById('c') as HTMLCanvasElement, { idle: false, capture: true, yaw: 0, pitch: 0.12, fill: 0.6 });
+      const save = (window as any).saveFrame as (n: number, data: string) => Promise<void>;
+      const per = frames / pairs.length;
+      // Fast through edge-on at each end of a pair's segment, slow through the front in the middle.
+      const turn = (t: number) => {
+        const u = 2 * t - 1;
+        return 0.5 + 0.5 * (0.35 * u + 0.65 * u * u * u);
+      };
+      (async () => {
+        let n = 0;
+        for (let k = 0; k < pairs.length; k++) {
+          stage.setPair(spec(pairs[k].shape, pairs[k].frame, pairs[k].lens));
+          // The first pair starts already facing us; the last one ends facing us.
+          const a = k === 0 ? 0.2 : 0;
+          const b = k === pairs.length - 1 ? 0.8 : 1;
+          for (let i = 0; i < per; i++) {
+            const t = a + (b - a) * (i / (per - 1));
+            // Alternate the direction so that each handover happens in the same edge-on pose.
+            const dir = k % 2 === 0 ? 1 : -1;
+            const yaw = dir * (-Math.PI / 2 + Math.PI * turn(t));
+            const pitch = 0.1 + 0.06 * Math.sin(Math.PI * t);
+            stage.pose(yaw, pitch);
+            await save(++n, stage.snapshot('image/webp', 0.82));
+          }
+        }
+        document.title = 'done';
+      })();
+    </script>
+  </body>
+</html>
