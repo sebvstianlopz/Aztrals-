@@ -17,6 +17,7 @@ const pairs = season.map((p) => ({ shape: p.data.shape, frame: p.data.variants[0
     <canvas id="c" width="1200" height="900"></canvas>
     <script type="application/json" id="pairs" set:html={JSON.stringify({ pairs, frames: HERO_FRAMES })} />
     <script>
+      import '@fontsource/unifrakturmaguntia/latin-400.css';
       import { PileScene } from '../src/three/stack';
       import { spec, type FrameId, type LensId, type Shape } from '../src/lib/palette';
       const { pairs, frames } = JSON.parse(document.getElementById('pairs')!.textContent!) as {
@@ -27,6 +28,7 @@ const pairs = season.map((p) => ({ shape: p.data.shape, frame: p.data.variants[0
       const save = (window as any).saveFrame as (n: number, data: string) => Promise<void>;
       const only = new URLSearchParams(location.search).get('at');
       (async () => {
+        await document.fonts.load('400 92px "UnifrakturMaguntia"');
         if (only) {
           // Preview a few points: ?at=0,0.1,0.2
           for (const [i, p] of only.split(',').map(Number).entries()) {

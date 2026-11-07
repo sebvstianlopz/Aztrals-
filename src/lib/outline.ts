@@ -24,6 +24,8 @@ const recipes: Record<Shape, Recipe> = {
   aviator: { a: 0.57, b: 0.48, n: 2.05, flatTop: true, drop: 0.38 },
   square: { a: 0.55, b: 0.45, n: 5 },
   oval: { a: 0.58, b: 0.36, n: 2.3 },
+  // Sport shields are one wide lens (built in three/glasses.ts); this stands in for flat drawings.
+  shield: { a: 0.62, b: 0.36, n: 2.6, trap: 0.1, flatTop: true },
 };
 
 const sp = (v: number, e: number) => Math.sign(v) * Math.abs(v) ** e;

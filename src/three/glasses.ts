@@ -103,6 +103,7 @@ export interface Pair {
 }
 
 export function buildPair(spec: PairSpec): Pair {
+  if (spec.shape === 'shield') return buildShield(spec);
   const { shape, frame, lens } = spec;
   const metal = frame.kind === 'metal';
   const fMat = frameMaterial(frame);
@@ -218,16 +219,12 @@ export function buildPair(spec: PairSpec): Pair {
     }
   }
 
-  // Centre the pair on its own front.
-  front.position.z = 0;
-  group.traverse((o) => {
-    if ((o as THREE.Mesh).isMesh) {
-      o.castShadow = false;
-      o.receiveShadow = false;
-    }
-  });
   const width = 2 * (cx + b.maxX + rimW);
+  return finishPair(group, geos, arms, width);
+}
 
+/** What every pair shares once built: folding temples, fading, cleaning up. */
+function finishPair(group: THREE.Group, geos: THREE.BufferGeometry[], arms: { arm: THREE.Group; side: number; y: number }[], width: number): Pair {
   // Remember each material's own opacity, so fading can scale it.
   const mats = new Set<THREE.Material>();
   group.traverse((o) => {
@@ -260,11 +257,189 @@ export function buildPair(spec: PairSpec): Pair {
       group.traverse((o) => {
         const m = (o as THREE.Mesh).material as THREE.Material | undefined;
         if (m) {
-          const map = (m as THREE.MeshPhysicalMaterial).map;
-          map?.dispose();
+          const mm = m as THREE.MeshPhysicalMaterial;
+          mm.map?.dispose();
+          mm.emissiveMap?.dispose();
           m.dispose();
         }
       });
     },
   };
+}
+
+// ——— Sport shield ———————————————————————————————————————————————————————————————
+// One wide lens across both eyes with a cut-out for the nose, held by a brow bar along the top
+// and a bridge around the nose; wraps further round the face than the other shapes.
+
+const SHIELD_WRAP = 0.15;
+const swrap = (geo: THREE.BufferGeometry, dz = 0) => {
+  const p = geo.attributes.position as THREE.BufferAttribute;
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i);
+    p.setZ(i, p.getZ(i) - SHIELD_WRAP * x * x + dz);
+  }
+  p.needsUpdate = true;
+};
+const swrapZ = (x: number) => -SHIELD_WRAP * x * x;
+
+/** Height of the lens's top edge at x. */
+const shieldTop = (x: number) => 0.27 - 0.025 * (x / 1.3) ** 2;
+
+/** The right half of the lens, from the top of the centre line round the eye to the nose. */
+function shieldHalf(): Pt[] {
+  const pts: Pt[] = [];
+  for (let i = 0; i <= 12; i++) {
+    const x = (1.3 * i) / 12;
+    pts.push([x, shieldTop(x)]);
+  }
+  // The rest of the edge as one smooth curve through these points.
+  const knots: Pt[] = [
+    [1.3, shieldTop(1.3)], [1.36, 0.2], [1.39, 0.08], [1.37, -0.06], [1.31, -0.2], [1.21, -0.33], [1.07, -0.43],
+    [0.9, -0.5], [0.72, -0.54], [0.55, -0.53], [0.42, -0.48], [0.34, -0.39],
+    ...SHIELD_NOTCH.slice().reverse(),
+  ];
+  const curve = new THREE.SplineCurve(knots.map(([x, y]) => new THREE.Vector2(x, y)));
+  for (const p of curve.getSpacedPoints(90).slice(1)) pts.push([p.x, p.y]);
+  return pts;
+}
+
+/** The nose cut-out on the right half, from the top of the nose downwards. */
+const SHIELD_NOTCH: Pt[] = [[0, 0.04], [0.06, 0.03], [0.13, -0.01], [0.21, -0.1], [0.27, -0.24], [0.32, -0.36]];
+
+/** One half of the lens as rings around a point inside it; uv spans the whole shield. */
+function shieldLensHalf(side: 1 | -1) {
+  const half = shieldHalf();
+  const centre: Pt = [0.72, -0.12];
+  const rings = 10;
+  const pts = side === 1 ? half.slice().reverse() : half.map(([x, y]) => [-x, y] as Pt);
+  const c: Pt = [side * centre[0], centre[1]];
+  const W = 1.4;
+  const minY = -0.56;
+  const maxY = 0.28;
+  const pos: number[] = [];
+  const uv: number[] = [];
+  const idx: number[] = [];
+  const put = (x: number, y: number) => {
+    pos.push(x, y, 0);
+    uv.push((x + W) / (2 * W), (y - minY) / (maxY - minY));
+  };
+  put(c[0], c[1]);
+  const n = pts.length;
+  for (let k = 1; k <= rings; k++) {
+    const f = k / rings;
+    for (const [x, y] of pts) put(c[0] + (x - c[0]) * f, c[1] + (y - c[1]) * f);
+  }
+  for (let i = 0; i < n - 1; i++) idx.push(0, 1 + i, 2 + i);
+  for (let k = 1; k < rings; k++) {
+    const a0 = 1 + (k - 1) * n;
+    const a1 = 1 + k * n;
+    for (let i = 0; i < n - 1; i++) idx.push(a0 + i, a1 + i, a1 + i + 1, a0 + i, a1 + i + 1, a0 + i + 1);
+  }
+  // Close the ring across the centre line.
+  idx.push(0, n, 1);
+  for (let k = 1; k < rings; k++) {
+    const a0 = 1 + (k - 1) * n;
+    const a1 = 1 + k * n;
+    idx.push(a0 + n - 1, a1 + n - 1, a1, a0 + n - 1, a1, a0);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx);
+  swrap(g);
+  g.computeVertexNormals();
+  return g;
+}
+
+/** Offsets an open polyline sideways by d (positive = to the left of travel). */
+function offsetOpen(pts: Pt[], d: number): Pt[] {
+  return pts.map((p, i) => {
+    const a = pts[Math.max(0, i - 1)];
+    const b = pts[Math.min(pts.length - 1, i + 1)];
+    let tx = b[0] - a[0];
+    let ty = b[1] - a[1];
+    const len = Math.hypot(tx, ty) || 1;
+    tx /= len;
+    ty /= len;
+    return [p[0] - ty * d, p[1] + tx * d] as Pt;
+  });
+}
+
+function buildShield(spec: PairSpec): Pair {
+  const { frame, lens } = spec;
+  const fMat = frameMaterial(frame);
+  const lMat = lensMaterial(lens);
+  const padMat = new THREE.MeshPhysicalMaterial({ color: '#1d1d20', roughness: 0.65, clearcoat: 0.2 });
+  const group = new THREE.Group();
+  const front = new THREE.Group();
+  group.add(front);
+  const geos: THREE.BufferGeometry[] = [];
+  const add = (g: THREE.BufferGeometry, m: THREE.Material, parent: THREE.Object3D = front) => {
+    geos.push(g);
+    const mesh = new THREE.Mesh(g, m);
+    parent.add(mesh);
+    return mesh;
+  };
+
+  // The lens, in two halves that meet on the centre line.
+  add(shieldLensHalf(1), lMat);
+  add(shieldLensHalf(-1), lMat);
+
+  // Brow bar along the top, thickening into an end piece at each side.
+  const END = 1.44;
+  const top: Pt[] = [];
+  const bottom: Pt[] = [];
+  for (let i = 0; i <= 40; i++) {
+    const x = -1.34 + (2.68 * i) / 40;
+    const dip = 0.012 * Math.exp(-((x / 0.18) ** 2)); // a slight dip over the nose
+    top.push([x, shieldTop(x) + 0.05 - dip]);
+    bottom.push([x, shieldTop(x) - 0.02]);
+  }
+  const brow: Pt[] = [
+    [-END, 0.15], [-END + 0.03, 0.25], ...top, [END - 0.03, 0.25], [END, 0.15], [END - 0.03, 0.05], [1.34, 0.05],
+    ...bottom.slice().reverse(), [-1.34, 0.05], [-END + 0.03, 0.05],
+  ];
+  // Extrusion normals are kept (not recomputed) so the bevels stay rounded rather than faceted.
+  const browGeo = new THREE.ExtrudeGeometry(toShape(brow), { depth: 0.05, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.032, bevelSegments: 8, curveSegments: 1 });
+  browGeo.translate(0, 0, -0.03);
+  swrap(browGeo);
+  add(browGeo, fMat);
+
+  // Bridge: a band round the nose cut-out, in front of the lens.
+  const notch: Pt[] = [...SHIELD_NOTCH.slice(1).reverse().map(([x, y]) => [-x, y] as Pt), ...SHIELD_NOTCH];
+  const inner = offsetOpen(notch, 0.012);
+  const outer = offsetOpen(notch, -0.07);
+  const bridgeGeo = new THREE.ExtrudeGeometry(toShape([...outer, ...inner.slice().reverse()]), { depth: 0.05, bevelEnabled: true, bevelThickness: 0.025, bevelSize: 0.018, bevelSegments: 5, curveSegments: 1 });
+  swrap(bridgeGeo);
+  add(bridgeGeo, fMat);
+
+  // Rubber nose pads behind the bridge.
+  for (const side of [1, -1]) {
+    const pad = add(new THREE.CapsuleGeometry(0.035, 0.16, 6, 12), padMat);
+    pad.position.set(side * 0.27, -0.3, swrapZ(0.27) - 0.06);
+    pad.rotation.set(0.2, 0, side * 0.35);
+  }
+
+  // Temples from the end pieces.
+  const arms: { arm: THREE.Group; side: number; y: number }[] = [];
+  const hy = 0.15;
+  for (const side of [1, -1]) {
+    const hx = side * (END - 0.02);
+    const arm = new THREE.Group();
+    arm.position.set(hx, hy, swrapZ(hx) - 0.03);
+    arm.rotation.y = side * 0.07;
+    group.add(arm);
+    arms.push({ arm, side, y: hy });
+    const L = 1.5;
+    const path = [
+      new THREE.Vector3(0, 0, -0.02),
+      new THREE.Vector3(0, -0.01, -L * 0.45),
+      new THREE.Vector3(0, -0.03, -L * 0.82),
+      new THREE.Vector3(0, -0.12, -L * 0.96),
+      new THREE.Vector3(0, -0.26, -L * 1.05),
+    ];
+    add(tube(path, 0.06, 0.45), fMat, arm);
+  }
+
+  return finishPair(group, geos, arms, 2 * END + 0.05);
 }

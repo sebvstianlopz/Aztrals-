@@ -34,7 +34,7 @@ const es = {
     titleAccent: 'Sol',
     scroll: 'Desliza para ver la temporada',
   },
-  seasonGrid: { kicker: 'Sal y Sol 2026', title: 'La temporada', caption: 'Cuatro pares con nombre de cuatro costas de la isla.' },
+  seasonGrid: { kicker: 'Sal y Sol 2026', title: 'La temporada', caption: 'Cuatro pares hechos para la luz de la isla.' },
   featured: { kicker: 'Par de la temporada', details: 'Ver detalles', turn: 'Arrastra para girar' },
   collection: { kicker: 'Siempre en catálogo', title: 'Colección completa', caption: 'Los clásicos que se quedan todo el año.', all: 'Ver el catálogo' },
   benefits: [
@@ -150,7 +150,7 @@ const en: Dict = {
     titleAccent: 'Sol',
     scroll: 'Scroll to see the season',
   },
-  seasonGrid: { kicker: 'Sal y Sol 2026', title: 'The season', caption: 'Four pairs named after four coasts of the island.' },
+  seasonGrid: { kicker: 'Sal y Sol 2026', title: 'The season', caption: 'Four pairs made for the light of the island.' },
   featured: { kicker: 'Pair of the season', details: 'View details', turn: 'Drag to turn' },
   collection: { kicker: 'Always in the shop', title: 'The full collection', caption: 'The classics that stay all year.', all: 'View the shop' },
   benefits: [

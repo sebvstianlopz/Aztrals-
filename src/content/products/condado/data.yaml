@@ -1,6 +1,6 @@
 # SAMPLE: name, price, size and copy are placeholders until the real catalog is ready.
 name: Condado
-season: true
+season: false
 badge: mas-vendido
 featured: true
 order: 1

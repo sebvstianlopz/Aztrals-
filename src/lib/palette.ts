@@ -11,6 +11,10 @@ export interface Lens {
   fade?: string;
   /** Mirrored coating. */
   mirror?: boolean;
+  /** Rainbow mirror (sport shields): colours run from the centre outwards. */
+  rainbow?: boolean;
+  /** Word printed on the lens, e.g. the brand. */
+  logo?: string;
   /** Pale field the pair is shown on, sampled from the lens. */
   field: string;
 }
@@ -32,6 +36,7 @@ export const lenses = {
   marron: { name: { es: 'Marrón', en: 'Brown' }, hex: '#4a2f1d', fade: '#8a6142', field: '#e8e0d8' },
   'espejo-azul': { name: { es: 'Espejo azul', en: 'Blue mirror' }, hex: '#2f6db0', mirror: true, field: '#dde4ec' },
   'espejo-oro': { name: { es: 'Espejo oro', en: 'Gold mirror' }, hex: '#c2913a', mirror: true, field: '#ede5d6' },
+  arcoiris: { name: { es: 'Espejo arcoíris', en: 'Rainbow mirror' }, hex: '#e8577f', mirror: true, rainbow: true, logo: 'aztrals', field: '#f6e4ec' },
 } satisfies Record<string, Lens>;
 
 export const frames = {
@@ -41,6 +46,7 @@ export const frames = {
   bosque: { name: { es: 'Verde bosque', en: 'Forest green' }, kind: 'acetate', hex: '#2c3b31', matte: true },
   coral: { name: { es: 'Rojo coral', en: 'Coral red' }, kind: 'acetate', hex: '#8f2f27' },
   arena: { name: { es: 'Arena', en: 'Sand' }, kind: 'acetate', hex: '#b9a184', matte: true },
+  rosa: { name: { es: 'Rosa', en: 'Pink' }, kind: 'acetate', hex: '#e95b8e' },
   oro: { name: { es: 'Oro', en: 'Gold' }, kind: 'metal', hex: '#c9a35b' },
   plata: { name: { es: 'Plata', en: 'Silver' }, kind: 'metal', hex: '#c6cacf' },
   grafito: { name: { es: 'Grafito', en: 'Graphite' }, kind: 'metal', hex: '#55585e' },
@@ -49,7 +55,7 @@ export const frames = {
 export type LensId = keyof typeof lenses;
 export type FrameId = keyof typeof frames;
 
-export const shapes = ['wayfarer', 'round', 'cateye', 'aviator', 'square', 'oval'] as const;
+export const shapes = ['wayfarer', 'round', 'cateye', 'aviator', 'square', 'oval', 'shield'] as const;
 export type Shape = (typeof shapes)[number];
 
 export const shapeNames: Record<Shape, Text> = {
@@ -59,6 +65,7 @@ export const shapeNames: Record<Shape, Text> = {
   aviator: { es: 'Aviador', en: 'Aviator' },
   square: { es: 'Cuadrado', en: 'Square' },
   oval: { es: 'Ovalado', en: 'Oval' },
+  shield: { es: 'Deportivo', en: 'Sport shield' },
 };
 
 /** What the 3D model needs to draw one pair in one colourway. */

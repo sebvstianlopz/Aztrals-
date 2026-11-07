@@ -22,7 +22,7 @@ const rest = items.filter((i) => !season.includes(i));
 const featured = items.find((i) => i.product.data.featured) ?? season[0] ?? items[0];
 // One card per season pair, over its quarter of the hero's scroll.
 const icons = ['✦', '◯', '◐', '◇'];
-const stepColour: Record<string, string> = { ambar: '#c98a3c', verde: '#3f8a6a', rosa: '#d88a80', 'espejo-azul': '#2f6db0' };
+const stepColour: Record<string, string> = { ambar: '#c98a3c', verde: '#3f8a6a', rosa: '#d88a80', 'espejo-azul': '#2f6db0', arcoiris: '#ec5f8c' };
 const steps = season.map(({ product }, i, all) => {
   const v = product.data.variants[0];
   const n = all.length;

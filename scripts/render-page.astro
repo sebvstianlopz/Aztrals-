@@ -14,6 +14,7 @@ const items = await Promise.all((await getProducts()).map(toClient));
     <canvas id="c"></canvas>
     <script type="application/json" id="items" set:html={JSON.stringify(items)} />
     <script>
+      import '@fontsource/unifrakturmaguntia/latin-400.css';
       import { Stage } from '../src/three/stage';
       import { spec } from '../src/lib/palette';
       import type { ClientProduct } from '../src/lib/products';
@@ -25,6 +26,7 @@ const items = await Promise.all((await getProducts()).map(toClient));
       const save = (window as any).saveRender as (key: string, data: string) => Promise<void>;
       const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
       (async () => {
+        await document.fonts.load('400 92px "UnifrakturMaguntia"');
         for (const p of items) {
           if (only && p.slug !== only) continue;
           for (const v of p.variants) {

@@ -1,0 +1,17 @@
+# SAMPLE: name, price, size and copy are placeholders; the shape and colours follow the real pair.
+name: Aztrals Sport
+season: true
+badge: nuevo
+order: 0
+shape: shield
+price: 95
+size: [135, 18, 130]
+fit: ancho
+place:
+  es: Para el sol de frente, del malecón a la montaña.
+  en: For the sun straight ahead, from the seafront to the mountains.
+description:
+  es: Escudo deportivo de una sola pieza con montura rosa brillante y lente espejo arcoíris polarizado. Envuelve la cara, corta el reflejo y lleva el nombre de la casa sobre el lente.
+  en: A one-piece sport shield with a glossy pink frame and a polarized rainbow mirror lens. It wraps the face, cuts the glare and carries the house name on the lens.
+variants:
+  - { id: rosa-arcoiris, frame: rosa, lens: arcoiris }
