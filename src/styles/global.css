@@ -412,6 +412,22 @@ button {
   transition: none !important;
 }
 
+/* The typing caret in the hero: a thin Pink bar that blinks while it waits. */
+.type-caret {
+  display: inline-block;
+  width: 0.06em;
+  height: 0.82em;
+  margin-left: 0.04em;
+  vertical-align: -0.04em;
+  background: var(--pink);
+  animation: caret-blink 1s steps(1) infinite;
+}
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
 /* Smooth scrolling (Lenis, desktop only) takes over from the browser's smooth anchors. */
 html.lenis,
 html.lenis body {
