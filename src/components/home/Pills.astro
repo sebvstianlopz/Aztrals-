@@ -1,5 +1,7 @@
 ---
+import { getImage } from 'astro:assets';
 import { t, path } from '../../i18n';
+import { sitePhoto } from '../../lib/products';
 import type { Lang } from '../../config/site';
 
 interface Props {
@@ -8,81 +10,147 @@ interface Props {
 const { lang } = Astro.props;
 const d = t(lang).pills;
 const [a, b, c] = d.words;
+// "Tú" carries a small round crop of the hero model's face: the campaign's model becomes "you".
+const hero = sitePhoto('hero');
+const face = hero ? await getImage({ src: hero, width: 260, format: 'webp' }) : undefined;
 ---
 <section class="pills section wrap" aria-label={d.words.join(', ')} data-pills>
   <ul class="pills__row">
-    <li class="pill pill--stone" data-pill>{a}</li>
-    <li class="pill pill--sun" data-pill>{b}</li>
+    <li class="pill pill--bone" data-pill><span class="pill__dot" aria-hidden="true"></span>{a}</li>
+    <li class="pill pill--olive" data-pill>{b}</li>
     <li class="pill-li" data-pill>
-      <a class="pill pill--ink" href={path(lang, 'shop')} aria-label={d.go}>
-        <svg viewBox="0 0 120 48" aria-hidden="true"><path d="M4 24h104M86 6l22 18-22 18" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <a class="pill pill--go" href={path(lang, 'shop')} aria-label={d.go}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </a>
     </li>
-    <li class="pill pill--pale" data-pill>{c}</li>
+    <li class="pill pill--pale" data-pill>
+      {
+        face ? (
+          <span class="pill__face" aria-hidden="true">
+            <img src={face.src} alt="" loading="lazy" decoding="async" />
+          </span>
+        ) : (
+          <span class="pill__dot" aria-hidden="true" />
+        )
+      }
+      {c}
+    </li>
   </ul>
 </section>
 
 <style>
   .pills {
     overflow-x: clip;
+    --ph: clamp(56px, 5.6vw, 84px);
   }
   .pills__row {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: clamp(8px, 1.2vw, 16px);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
   }
   .pill,
   .pill-li {
-    display: grid;
-    place-items: center;
-    height: clamp(96px, 12vw, 184px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4em;
+    height: var(--ph);
+    padding: 0 1.1em;
     border-radius: 999px;
-    font-size: var(--step-h2);
-    font-weight: 420;
-    letter-spacing: -0.045em;
-    font-variation-settings: 'wdth' 104;
+    font-size: clamp(1.5rem, 2.6vw, 2.4rem);
+    font-weight: 400;
+    letter-spacing: -0.035em;
+    font-variation-settings: 'wdth' 102;
     line-height: 1;
   }
-  .pill-li .pill {
-    width: 100%;
-    height: 100%;
+  .pill-li {
+    padding: 0;
   }
-  .pill--stone {
-    background: var(--bone-2);
+  .pill--bone {
+    background: var(--bone-c);
+    color: var(--smoky);
   }
-  .pill--sun {
+  .pill--olive {
     background: var(--olive);
     color: var(--floral);
   }
-  .pill--ink {
-    background: var(--ink);
-    color: var(--bone);
+  .pill--pale {
+    background: var(--bone-c);
+    color: var(--olive);
+    padding-left: 8px;
+  }
+  /* The small "sun" before Sol (and the fallback when there is no hero photo). */
+  .pill__dot {
+    width: 0.32em;
+    height: 0.32em;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .pill__face {
+    --d: calc(var(--ph) - 16px);
+    position: relative;
+    flex: none;
+    width: var(--d);
+    height: var(--d);
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--bone-3);
+  }
+  .pill__face img {
+    position: absolute;
+    /* frames her face and glasses from the 1086 × 1448 hero photo */
+    width: calc(var(--d) * 2.36);
+    max-width: none;
+    left: calc(var(--d) * -0.683);
+    top: calc(var(--d) * -1.217);
+  }
+  .pill--go {
+    width: var(--ph);
+    height: var(--ph);
+    padding: 0;
+    background: var(--smoky);
+    color: var(--floral);
     transition:
       transform 160ms var(--ease-out),
       background-color 200ms ease;
   }
-  .pill--ink:active {
-    transform: scale(0.97);
-  }
-  .pill--ink svg {
-    width: 34%;
+  .pill--go svg {
+    width: 40%;
     transition: transform 240ms var(--ease-out);
   }
+  .pill--go:active {
+    transform: scale(0.96);
+  }
+  @media (max-width: 480px) {
+    .pills {
+      --ph: 48px;
+    }
+    .pills__row {
+      gap: 6px;
+    }
+    .pill,
+    .pill-li {
+      font-size: 1.25rem;
+      padding: 0 0.75em;
+    }
+    .pill-li,
+    .pill--go {
+      padding: 0;
+    }
+    .pill--pale {
+      padding-left: 6px;
+    }
+    .pill__face {
+      --d: calc(var(--ph) - 12px);
+    }
+  }
   @media (hover: hover) and (pointer: fine) {
-    .pill--ink:hover {
+    .pill--go:hover {
       background: color-mix(in srgb, var(--smoky) 82%, var(--olive));
     }
-    .pill--ink:hover svg {
-      transform: translateX(8%);
-    }
-  }
-  .pill--pale {
-    background: var(--bone-2);
-    color: var(--ink-2);
-  }
-  @media (max-width: 640px) {
-    .pills__row {
-      grid-template-columns: 1fr 1fr;
+    .pill--go:hover svg {
+      transform: rotate(-45deg);
     }
   }
 </style>

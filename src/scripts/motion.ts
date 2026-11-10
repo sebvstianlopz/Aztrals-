@@ -88,10 +88,10 @@ function start() {
       // ---------- pill row: the words slide together as it scrolls in ----------
       const pills = gsap.utils.toArray<HTMLElement>('[data-pill]');
       if (pills.length) {
-        const offsets = [-60, -30, 30, 60];
+        const offsets = [-32, -16, 16, 32];
         gsap
           .timeline({ scrollTrigger: { trigger: '[data-pills]', start: 'top 95%', end: 'top 45%', scrub: 0.6 } })
-          .from(pills, { xPercent: (i) => offsets[i % 4], scale: 0.9, autoAlpha: 0.2, ease: 'none', stagger: 0.04 });
+          .from(pills, { x: (i) => offsets[i % 4], scale: 0.94, autoAlpha: 0.2, ease: 'none', stagger: 0.04 });
       }
 
       // ---------- pictures: settle from a slight zoom as they cross the screen ----------
