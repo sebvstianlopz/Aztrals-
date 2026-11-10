@@ -1,0 +1,180 @@
+---
+import Shot from './Shot.astro';
+import Glasses from './Glasses.astro';
+import { t, path, formatPrice } from '../i18n';
+import { productPhotos, type Product } from '../lib/products';
+import { frameColor, tintColor } from '../lib/swatches';
+import type { Lang } from '../config/site';
+
+interface Props {
+  product: Product;
+  lang: Lang;
+  /** Picture proportions for this tile. */
+  ratio?: string;
+  add?: boolean;
+  sizes?: string;
+  class?: string;
+}
+const { product, lang, ratio = '1 / 1', add = false, sizes = '(min-width: 900px) 25vw, 50vw', class: cls } = Astro.props;
+const d = t(lang);
+const p = product.data;
+const first = p.colorways[0];
+const photo = productPhotos(product.id, first.id)[0];
+const url = path(lang, 'shop', product.id);
+---
+<article
+  class:list={['tile', cls]}
+  data-tile
+  data-new={p.isNew ? '' : undefined}
+  data-sport={p.sport ? '' : undefined}
+  data-polarized={p.lens.polarized ? '' : undefined}
+>
+  <a class="tile__media" href={url} tabindex="-1" aria-hidden="true">
+    <Shot photo={photo} alt={`${p.name}, ${first.name[lang]}`} ratio={ratio} tone="stone" sizes={sizes}>
+      <Glasses class="tile__draw" shape={p.shape} frame={first.frame} tint={first.tint} mirror={p.lens.mirror} />
+    </Shot>
+  </a>
+  <div class="tile__meta">
+    <h3 class="tile__name"><a href={url}>{p.name}</a></h3>
+    <span class="price">{formatPrice(p.price, lang)}</span>
+  </div>
+  <div class="tile__foot">
+    <span class="tile__dots small muted">
+      <span class="dots" aria-hidden="true">
+        {p.colorways.map((c) => <i style={`--f:${frameColor[c.frame]};--t:${tintColor[c.tint]}`} />)}
+      </span>
+      <span class="tile__count">{d.card.colors(p.colorways.length)}</span>
+    </span>
+    {
+      add && (
+        <button class="tile__add" type="button" data-add={product.id} data-colorway={first.id} data-added={d.card.added}>
+          <span data-label>{d.card.add}</span>
+          <span class="sr-only">
+            {' '}
+            {p.name}, {first.name[lang]}
+          </span>
+        </button>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .tile {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+    gap: 12px;
+    align-content: start;
+  }
+  .tile__media {
+    display: block;
+    border-radius: var(--radius-tile);
+    overflow: hidden;
+  }
+  .tile__media :global(.shot) {
+    transition: transform 700ms var(--ease-out);
+  }
+  .tile__media :global(.shot__draw svg),
+  .tile__media :global(.shot__img) {
+    transition: transform 700ms var(--ease-out);
+  }
+  .tile__draw {
+    width: 72%;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .tile:hover .tile__media :global(.shot__draw svg),
+    .tile:hover .tile__media :global(.shot__img) {
+      transform: scale(1.05);
+    }
+  }
+  .tile__meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 2px 12px;
+  }
+  .tile__meta .price {
+    white-space: nowrap;
+  }
+  .tile__name {
+    font-size: 1.1875rem;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+    min-width: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+  .tile__name a {
+    text-decoration: none;
+  }
+  .tile__name a:focus-visible {
+    outline: none;
+  }
+  .tile:has(.tile__name a:focus-visible) .tile__media {
+    outline: 2px solid var(--sun);
+    outline-offset: 3px;
+  }
+  .tile__foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: -6px;
+  }
+  .tile__dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dots {
+    display: inline-flex;
+  }
+  .dots i {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--t);
+    border: 3px solid var(--f);
+    margin-right: 4px;
+  }
+  @media (max-width: 480px) {
+    .tile__count {
+      display: none;
+    }
+  }
+  .tile__add {
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: 999px;
+    background: var(--bone-2);
+    font-size: var(--step-small);
+    font-weight: 560;
+    transition:
+      transform 160ms var(--ease-out),
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+  .tile__add:active {
+    transform: scale(0.96);
+  }
+  .tile__add[data-state='added'] {
+    background: var(--ink);
+    color: var(--bone);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .tile__add:hover {
+      background: var(--bone-3);
+    }
+    .tile__add[data-state='added']:hover {
+      background: var(--ink);
+    }
+  }
+</style>

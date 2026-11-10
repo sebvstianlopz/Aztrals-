@@ -1,0 +1,22 @@
+# SAMPLE product
+name: Piñones
+price: 110
+shopifyHandle: pinones
+releasedAt: 2026-03-15
+shape: ovalada
+order: 7
+tagline:
+  es: Redondas para la tarde.
+  en: Round ones for the afternoon.
+description:
+  es: Ovaladas de marco fino para la tarde de kiosco y bicicleta junto al mar.
+  en: Thin-framed ovals for kiosk-and-bike afternoons by the sea.
+lens:
+  polarized: false
+  material: { es: Policarbonato, en: Polycarbonate }
+frame:
+  material: { es: Metal ligero, en: Light metal }
+  weightGrams: 22
+colorways:
+  - { id: arena-ambar, name: { es: Arena / Ámbar, en: Sand / Amber }, frame: arena, tint: ambar }
+  - { id: plata-humo, name: { es: Plata / Humo, en: Silver / Smoke }, frame: plata, tint: humo }

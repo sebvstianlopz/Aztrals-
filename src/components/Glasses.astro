@@ -1,0 +1,52 @@
+---
+// A flat, front-on drawing of a model in one colourway. It stands in for the product photo
+// until real photos are dropped into the product's folder (see README).
+import { frameColor, tintColor, type Frame, type Tint } from '../lib/swatches';
+
+interface Props {
+  shape: 'escudo' | 'envolvente' | 'rectangular' | 'ovalada';
+  frame: Frame;
+  tint: Tint;
+  mirror?: boolean;
+  class?: string;
+}
+const { shape, frame, tint, mirror = false, class: cls } = Astro.props;
+const f = frameColor[frame];
+const l = tintColor[tint];
+const glint = mirror ? 0.34 : 0.16;
+
+// Lens outlines for the left eye (viewBox 480 × 190); the right eye mirrors them.
+const lensL: Record<string, string> = {
+  envolvente: 'M44 70 C68 50 132 46 206 56 C220 58 226 68 224 84 C219 124 198 146 150 148 C98 150 58 132 46 104 Z',
+  rectangular: 'M54 58 H206 Q222 58 222 74 V120 Q222 146 196 146 H82 Q54 146 54 118 Z',
+  ovalada: 'M146 46 C200 46 228 76 228 102 C228 132 196 150 146 150 C92 150 60 128 60 98 C60 70 94 46 146 46 Z',
+};
+const shield =
+  'M36 66 C36 44 84 38 240 38 C396 38 444 44 444 66 L440 104 C434 146 384 158 332 156 C292 154 264 136 240 116 C216 136 188 154 148 156 C96 158 46 146 40 104 Z';
+---
+<svg class={cls} viewBox="0 0 480 190" aria-hidden="true" focusable="false">
+  {
+    shape === 'escudo' ? (
+      <g>
+        <rect x="8" y="46" width="34" height="12" rx="6" fill={f} />
+        <rect x="438" y="46" width="34" height="12" rx="6" fill={f} />
+        <path d={shield} fill={f} transform="translate(240 97) scale(1.04 1.08) translate(-240 -97)" />
+        <path d={shield} fill={l} />
+        <path d="M70 52 C150 46 250 45 330 47 C250 52 160 60 92 74 Z" fill="#fff" opacity={glint} />
+        <rect x="200" y="34" width="80" height="14" rx="7" fill={f} />
+      </g>
+    ) : (
+      <g>
+        <rect x="6" y="58" width="44" height="12" rx="6" fill={f} />
+        <rect x="430" y="58" width="44" height="12" rx="6" fill={f} />
+        <path d={lensL[shape]} fill={f} transform="translate(140 98) scale(1.1) translate(-140 -98)" />
+        <path d={lensL[shape]} fill={f} transform="translate(480 0) scale(-1 1) translate(140 98) scale(1.1) translate(-140 -98)" />
+        <path d="M218 74 C228 62 252 62 262 74 L262 86 C252 76 228 76 218 86 Z" fill={f} />
+        <path d={lensL[shape]} fill={l} />
+        <path d={lensL[shape]} fill={l} transform="translate(480 0) scale(-1 1)" />
+        <path d="M78 66 C120 58 160 58 196 62 C150 66 116 76 90 92 Z" fill="#fff" opacity={glint} />
+        <path d="M78 66 C120 58 160 58 196 62 C150 66 116 76 90 92 Z" fill="#fff" opacity={glint} transform="translate(480 0) scale(-1 1)" />
+      </g>
+    )
+  }
+</svg>

@@ -1,0 +1,192 @@
+---
+import Shot from '../Shot.astro';
+import Silhouette from '../Silhouette.astro';
+import Glasses from '../Glasses.astro';
+import { t, path, formatPrice } from '../../i18n';
+import { sitePhoto, productPhotos, type Product } from '../../lib/products';
+import { tintColor } from '../../lib/swatches';
+import type { Lang } from '../../config/site';
+
+interface Props {
+  lang: Lang;
+  release: Product;
+}
+const { lang, release } = Astro.props;
+const d = t(lang);
+const r = release.data;
+const cw = r.colorways[0];
+const heroPhoto = sitePhoto('hero');
+const thumb = productPhotos(release.id, cw.id)[0];
+const url = path(lang, 'shop', release.id);
+// "Ve más allá del sol" → two lines, broken before the last two words.
+const words = d.hero.title.split(' ');
+const line1 = words.slice(0, -2).join(' ');
+const line2 = words.slice(-2).join(' ');
+---
+<section class="hero" data-hero>
+  <div class="hero__stage">
+    <p class="hero__word condensed" aria-hidden="true" data-hero-word>Aztrals</p>
+    <div class="hero__figure" data-hero-figure>
+      <Shot photo={heroPhoto} alt={`${r.name}, ${cw.name[lang]}`} ratio="3 / 4" tone="none" fit="contain" loading="eager" sizes="(min-width: 900px) 46vw, 92vw">
+        <Silhouette class="hero__sil" lens={tintColor[cw.tint]} />
+      </Shot>
+    </div>
+  </div>
+  <div class="hero__copy wrap">
+    <h1 class="display hero__title" data-reveal>
+      <span>{line1}</span>
+      <span>{line2}</span>
+    </h1>
+    <div class="hero__side" data-reveal>
+      <p class="hero__text">{d.hero.text}</p>
+      <a class="btn btn--sun" href={url}>{d.hero.cta(r.name)} <span class="arrow" aria-hidden="true">→</span></a>
+      <a class="hero__release" href="#destacado">
+        <span class="hero__thumb">
+          <Shot photo={thumb} alt="" ratio="16 / 10" tone="stone" sizes="160px" widths={[320]}>
+            <Glasses shape={r.shape} frame={cw.frame} tint={cw.tint} mirror={r.lens.mirror} class="hero__thumb-draw" />
+          </Shot>
+        </span>
+        <span class="hero__release-text">
+          <span class="small muted">{d.hero.latest}</span>
+          <span class="hero__release-name">{r.name}</span>
+          <span class="price small">{formatPrice(r.price, lang)}</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: max(640px, 100svh);
+    max-height: 1100px;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .hero__stage {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  .hero__word {
+    position: absolute;
+    inset: auto 0 0;
+    margin: 0;
+    font-size: var(--step-word);
+    line-height: 0.74;
+    text-align: center;
+    white-space: nowrap;
+    letter-spacing: 0.005em;
+    color: var(--bone-3);
+    transform: translateY(8%);
+    user-select: none;
+  }
+  .hero__figure {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: min(46vw, 78svh);
+    translate: -50% 0;
+    transform-origin: 50% 100%;
+  }
+  .hero__sil {
+    width: 100%;
+    height: 100%;
+  }
+  .hero__copy {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+    gap: 32px;
+    align-items: start;
+    padding-top: clamp(120px, 15vh, 168px);
+  }
+  .hero__title span {
+    display: block;
+  }
+  .hero__side {
+    display: grid;
+    gap: 22px;
+    justify-items: start;
+    padding-top: 10px;
+  }
+  .hero__text {
+    font-size: 1.0625rem;
+    line-height: 1.5;
+  }
+  .hero__release {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 10px;
+    border-radius: var(--radius-tile);
+    background: var(--bone-2);
+    text-decoration: none;
+    transition: transform 160ms var(--ease-out), background-color 200ms ease;
+  }
+  .hero__release:active {
+    transform: scale(0.98);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hero__release:hover {
+      background: var(--bone-3);
+    }
+  }
+  .hero__thumb {
+    display: block;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .hero__thumb-draw {
+    width: 82%;
+  }
+  .hero__release-text {
+    display: grid;
+    gap: 2px;
+  }
+  .hero__release-name {
+    font-size: 1.1875rem;
+    font-weight: 520;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      max-height: none;
+      display: flex;
+      flex-direction: column;
+    }
+    .hero__copy {
+      display: contents;
+    }
+    .hero__title {
+      order: 1;
+      padding: 108px var(--gutter) 0;
+    }
+    .hero__stage {
+      order: 2;
+      position: relative;
+      inset: auto;
+      z-index: 0;
+      margin-top: 8px;
+    }
+    .hero__word {
+      bottom: 16%;
+      font-size: 30vw;
+    }
+    .hero__figure {
+      position: relative;
+      left: auto;
+      translate: none;
+      width: min(88vw, 500px);
+      margin: 0 auto;
+    }
+    .hero__side {
+      order: 3;
+      padding: 28px var(--gutter) 8px;
+    }
+  }
+</style>

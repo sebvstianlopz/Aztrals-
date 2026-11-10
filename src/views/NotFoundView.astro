@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import { t, path } from '../i18n';
+import type { Lang } from '../config/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const d = t(lang).notFound;
+---
+<Base lang={lang} title={`${d.title} · Aztrals`} description={d.text} alternate={path(lang === 'es' ? 'en' : 'es', 'home')} noindex>
+  <section class="nf wrap">
+    <h1 class="display">{d.title}</h1>
+    <p class="lede">{d.text}</p>
+    <a class="btn btn--ink" href={path(lang, 'shop')}>{d.cta} <span class="arrow" aria-hidden="true">→</span></a>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    display: grid;
+    gap: 24px;
+    justify-items: start;
+    min-height: 80svh;
+    align-content: center;
+    padding-block: 160px 96px;
+  }
+</style>

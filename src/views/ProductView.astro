@@ -1,0 +1,228 @@
+---
+import Base from '../layouts/Base.astro';
+import Shot from '../components/Shot.astro';
+import Glasses from '../components/Glasses.astro';
+import ProductTile from '../components/ProductTile.astro';
+import { t, path, formatPrice } from '../i18n';
+import { getProducts, productPhotos, type Product } from '../lib/products';
+import { frameColor, tintColor } from '../lib/swatches';
+import { site, shopUrl, type Lang } from '../config/site';
+
+interface Props {
+  lang: Lang;
+  product: Product;
+}
+const { lang, product } = Astro.props;
+const d = t(lang);
+const p = product.data;
+const other = lang === 'es' ? 'en' : 'es';
+const group = `pdp-${product.id}`;
+const related = (await getProducts()).filter((x) => x.id !== product.id).slice(0, 4);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: `${site.name} ${p.name}`,
+  description: p.description[lang],
+  brand: { '@type': 'Brand', name: site.name },
+  offers: {
+    '@type': 'Offer',
+    price: p.price,
+    priceCurrency: site.currency,
+    availability: 'https://schema.org/InStock',
+    url: shopUrl(`/products/${p.shopifyHandle}`),
+  },
+};
+---
+<Base
+  lang={lang}
+  title={`${p.name} · ${site.name}`}
+  description={`${p.tagline[lang]} ${p.description[lang]}`}
+  alternate={path(other, 'shop', product.id)}
+  jsonLd={jsonLd}
+>
+  <article class="pdp wrap" data-cw-scope>
+    <div class="pdp__media">
+      {
+        p.colorways.map((c, i) => {
+          const photos = productPhotos(product.id, c.id);
+          return (
+            <div class="pdp__layer" data-cw={c.id} data-active={i === 0 ? '' : undefined}>
+              {photos.length ? (
+                photos.map((ph, n) => (
+                  <Shot photo={ph} alt={`${p.name}, ${c.name[lang]}`} ratio="1 / 1" tone="stone" loading={i === 0 && n === 0 ? 'eager' : 'lazy'} sizes="(min-width: 900px) 55vw, 100vw" />
+                ))
+              ) : (
+                <Shot alt={`${p.name}, ${c.name[lang]}`} ratio="1 / 1" tone="stone">
+                  <Glasses class="pdp__draw" shape={p.shape} frame={c.frame} tint={c.tint} mirror={p.lens.mirror} />
+                </Shot>
+              )}
+            </div>
+          );
+        })
+      }
+    </div>
+    <div class="pdp__info">
+      <a class="link small pdp__back" href={path(lang, 'shop')}><span aria-hidden="true">←</span> {d.product.back}</a>
+      <h1 class="display pdp__name" data-reveal>{p.name}</h1>
+      <p class="pdp__tagline" data-reveal>{p.tagline[lang]}</p>
+      <p class="pdp__price price" data-reveal>{formatPrice(p.price, lang)}</p>
+      <fieldset class="pdp__colors">
+        <legend class="small muted">{d.product.color}: <span class="pdp__cw" data-cw-name>{p.colorways[0].name[lang]}</span></legend>
+        <div class="swatches">
+          {
+            p.colorways.map((c, i) => (
+              <label class="swatch" title={c.name[lang]}>
+                <input type="radio" name={group} value={c.id} checked={i === 0} data-cw-input data-name={c.name[lang]} aria-label={c.name[lang]} />
+                <span class="disc" aria-hidden="true"><i style={`background:${frameColor[c.frame]}`} /><i style={`background:${tintColor[c.tint]}`} /></span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+      <div class="pdp__buy">
+        <button class="btn btn--sun" type="button" data-add={product.id} data-colorway={p.colorways[0].id} data-colorway-from={group} data-added={d.spotlight.added}>
+          <span data-label>{d.spotlight.add}</span>
+        </button>
+        <a class="btn btn--quiet" href={shopUrl(`/products/${p.shopifyHandle}`)} rel="noopener">{d.product.buyStore}</a>
+      </div>
+      <p class="pdp__desc">{p.description[lang]}</p>
+      <dl class="pdp__specs">
+        <div><dt>{d.product.lens}</dt><dd>{p.lens.material[lang]}</dd></div>
+        <div><dt>{d.product.frame}</dt><dd>{p.frame.material[lang]}</dd></div>
+        {p.frame.weightGrams && <div><dt>{d.product.weight}</dt><dd>{d.product.grams(p.frame.weightGrams)}</dd></div>}
+        {p.lens.uv400 && <div><dt>{d.product.protection}</dt><dd>{d.product.uv}</dd></div>}
+      </dl>
+      <ul class="pdp__terms small muted">
+        {d.terms.map((term) => <li>{term}</li>)}
+      </ul>
+    </div>
+  </article>
+
+  <section class="related section wrap" aria-labelledby="related-title">
+    <h2 id="related-title" class="h2" data-reveal>{d.product.related}</h2>
+    <div class="related__grid" data-stagger>
+      {related.map((r) => <ProductTile product={r} lang={lang} add />)}
+    </div>
+  </section>
+  <div class="related__after"></div>
+</Base>
+
+<style>
+  .pdp {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.85fr);
+    gap: clamp(28px, 4vw, 72px);
+    align-items: start;
+    padding-top: clamp(96px, 9vw, 120px);
+  }
+  .pdp__media {
+    position: sticky;
+    top: 88px;
+    display: grid;
+  }
+  .pdp__layer {
+    grid-area: 1 / 1;
+    display: grid;
+    gap: 12px;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 280ms ease,
+      visibility 0s 280ms;
+  }
+  .pdp__layer[data-active] {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 280ms ease;
+  }
+  .pdp__layer :global(.shot) {
+    border-radius: var(--radius-tile);
+  }
+  .pdp__draw {
+    width: 76%;
+  }
+  .pdp__info {
+    display: grid;
+    gap: 18px;
+    justify-items: start;
+    padding-bottom: 24px;
+  }
+  .pdp__back {
+    margin-bottom: 8px;
+    text-decoration: none;
+  }
+  .pdp__tagline {
+    font-size: 1.375rem;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  .pdp__price {
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
+  }
+  .pdp__colors {
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .pdp__colors legend {
+    padding: 0;
+    margin-bottom: 10px;
+  }
+  .pdp__cw {
+    color: var(--ink);
+  }
+  .pdp__buy {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 6px 0 12px;
+  }
+  .pdp__buy .btn[data-state='added'] {
+    background: var(--ink);
+    color: var(--bone);
+  }
+  .pdp__desc {
+    max-width: 48ch;
+  }
+  .pdp__specs {
+    display: grid;
+    gap: 2px;
+    width: 100%;
+  }
+  .pdp__specs div {
+    display: grid;
+    grid-template-columns: 7.5em 1fr;
+    gap: 16px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: var(--bone-2);
+  }
+  .pdp__specs dt {
+    color: var(--ink-2);
+  }
+  .pdp__terms {
+    display: grid;
+    gap: 4px;
+  }
+  .related__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px clamp(14px, 1.8vw, 24px);
+    margin-top: 40px;
+  }
+  .related__after {
+    height: var(--section);
+  }
+  @media (max-width: 900px) {
+    .pdp {
+      grid-template-columns: 1fr;
+    }
+    .pdp__media {
+      position: static;
+    }
+    .related__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

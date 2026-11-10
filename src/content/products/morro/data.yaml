@@ -1,0 +1,22 @@
+# SAMPLE product
+name: Morro
+price: 120
+shopifyHandle: morro
+releasedAt: 2026-05-10
+shape: rectangular
+order: 5
+tagline:
+  es: El clásico de todos los días.
+  en: The everyday classic.
+description:
+  es: Rectangular de puente alto, cómoda para usar desde temprano hasta la puesta de sol.
+  en: A high-bridge rectangle, comfortable from early morning to sunset.
+lens:
+  polarized: true
+  material: { es: Policarbonato polarizado, en: Polarized polycarbonate }
+frame:
+  material: { es: Acetato, en: Acetate }
+  weightGrams: 30
+colorways:
+  - { id: negro-verde, name: { es: Negro / Verde, en: Black / Green }, frame: negro, tint: verde }
+  - { id: carey-ambar, name: { es: Carey / Ámbar, en: Tortoise / Amber }, frame: carey, tint: ambar }

@@ -1,0 +1,219 @@
+---
+import { t, path } from '../i18n';
+import type { Lang } from '../config/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const d = t(lang).bag;
+---
+<div class="bag" data-bag hidden data-checkout={d.checkout} data-checkout-store={d.checkoutStore}>
+  <div class="bag__scrim" data-bag-close></div>
+  <aside class="bag__panel" role="dialog" aria-modal="true" aria-labelledby="bag-title">
+    <div class="bag__head">
+      <h2 id="bag-title" class="h3">{d.title}</h2>
+      <button class="bag__x" type="button" data-bag-close aria-label={d.close}>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+      </button>
+    </div>
+    <div class="bag__empty" data-bag-empty>
+      <p>{d.empty}</p>
+      <a class="btn btn--ink" href={path(lang, 'shop')}>{d.keep}</a>
+    </div>
+    <ul class="bag__list" data-bag-list></ul>
+    <div class="bag__foot" data-bag-foot hidden>
+      <p class="bag__sub"><span>{d.subtotal}</span><span class="price" data-bag-subtotal></span></p>
+      <p class="small muted">{d.note}</p>
+      <p class="small muted" data-bag-partial hidden>{d.partial}</p>
+      <a class="btn btn--sun bag__go" data-bag-checkout href="#" rel="noopener"><span>{d.checkout}</span><span class="arrow" aria-hidden="true">→</span></a>
+    </div>
+    <template data-bag-line>
+      <li class="line">
+        <span class="line__disc" aria-hidden="true"><i data-f></i><i data-t></i></span>
+        <div class="line__info">
+          <a class="line__name" data-name href="#"></a>
+          <span class="small muted" data-color></span>
+          <a class="small line__buy" data-buy href="#" rel="noopener">{d.buyOne}</a>
+        </div>
+        <span class="price line__price" data-price></span>
+        <div class="line__qty" role="group" aria-label={d.qty}>
+          <button type="button" data-less aria-label={d.less}>−</button>
+          <span data-q aria-live="polite"></span>
+          <button type="button" data-more aria-label={d.more}>+</button>
+        </div>
+        <button type="button" class="small line__remove" data-remove>{d.remove}</button>
+      </li>
+    </template>
+  </aside>
+</div>
+
+<style>
+  .bag {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+  }
+  .bag__scrim {
+    position: absolute;
+    inset: 0;
+    background: rgb(11 11 11 / 0.42);
+    opacity: 0;
+    transition: opacity 220ms ease;
+  }
+  .bag__panel {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: min(440px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: max(20px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+    background: var(--bone);
+    color: var(--ink);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transform: translateX(100%);
+    transition: transform 240ms var(--ease-drawer);
+    box-shadow: -24px 0 60px rgb(0 0 0 / 0.18); /* taste-skill-ignore: the drawer is a real dialog floating over the page */
+  }
+  .bag[data-open='true'] .bag__scrim {
+    opacity: 1;
+  }
+  .bag[data-open='true'] .bag__panel {
+    transform: translateX(0);
+    transition-duration: 380ms;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bag__panel {
+      transition: none;
+    }
+  }
+  .bag__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .bag__x {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-right: -10px;
+    border-radius: 50%;
+    transition: transform 160ms var(--ease-out), background-color 200ms ease;
+  }
+  .bag__x:active {
+    transform: scale(0.94);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .bag__x:hover {
+      background: var(--bone-2);
+    }
+  }
+  .bag__empty {
+    display: grid;
+    gap: 20px;
+    justify-items: start;
+    padding-top: 12px;
+  }
+  .bag__empty[hidden] {
+    display: none;
+  }
+  .bag__list {
+    display: grid;
+    gap: 10px;
+  }
+  .line {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'disc info price'
+      'disc qty remove';
+    gap: 10px 14px;
+    padding: 16px;
+    border-radius: var(--radius-tile);
+    background: var(--bone-2);
+  }
+  .line__disc {
+    grid-area: disc;
+    display: flex;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    overflow: hidden;
+    transform: rotate(-45deg);
+  }
+  .line__disc i {
+    flex: 1;
+  }
+  .line__info {
+    grid-area: info;
+    display: grid;
+    min-width: 0;
+  }
+  .line__name {
+    font-weight: 560;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .line__buy {
+    justify-self: start;
+    margin-top: 2px;
+  }
+  .line__price {
+    grid-area: price;
+    text-align: right;
+  }
+  .line__qty {
+    grid-area: qty;
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    border-radius: 999px;
+    background: var(--bone);
+  }
+  .line__qty button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    transition: transform 160ms var(--ease-out);
+  }
+  .line__qty button:active {
+    transform: scale(0.9);
+  }
+  .line__qty span {
+    min-width: 1.5em;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .line__remove {
+    grid-area: remove;
+    justify-self: end;
+    align-self: center;
+    min-height: 40px;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    color: var(--ink-2);
+  }
+  .bag__foot {
+    display: grid;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+  .bag__foot[hidden] {
+    display: none;
+  }
+  .bag__sub {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.375rem;
+    font-weight: 500;
+  }
+  .bag__go {
+    width: 100%;
+    margin-top: 6px;
+  }
+</style>

@@ -1,0 +1,25 @@
+# SAMPLE product
+name: Yunque
+price: 145
+shopifyHandle: yunque
+releasedAt: 2026-10-01
+isNew: true
+shape: envolvente
+sport: true
+order: 3
+tagline:
+  es: Para el sendero y la cuesta.
+  en: For the trail and the climb.
+description:
+  es: Envolvente deportiva con ventilación en la lente para que no se empañe en la subida. Agarre de goma en sienes y puente.
+  en: A sport wrap with vented lenses so they don't fog on the climb. Rubber grip at the temples and bridge.
+lens:
+  polarized: false
+  mirror: true
+  material: { es: Policarbonato con espejo, en: Mirrored polycarbonate }
+frame:
+  material: { es: Nylon TR90 con goma, en: TR90 nylon with rubber grips }
+  weightGrams: 26
+colorways:
+  - { id: oliva-ambar, name: { es: Oliva / Ámbar, en: Olive / Amber }, frame: oliva, tint: ambar }
+  - { id: negro-oceano, name: { es: Negro / Océano, en: Black / Ocean }, frame: negro, tint: oceano }

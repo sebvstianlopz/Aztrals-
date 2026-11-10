@@ -1,0 +1,23 @@
+# SAMPLE product
+name: Culebra
+price: 125
+shopifyHandle: culebra
+releasedAt: 2026-09-20
+isNew: true
+shape: ovalada
+order: 4
+tagline:
+  es: Ovaladas, ligeras, de isla.
+  en: Oval, light, island-made for slow days.
+description:
+  es: Forma ovalada y suave para días lentos de ferry y arena blanca. Lente con degradado rosa que calienta el color del mar.
+  en: A soft oval shape for slow ferry-and-white-sand days. A rose lens that warms the colour of the sea.
+lens:
+  polarized: true
+  material: { es: Policarbonato polarizado, en: Polarized polycarbonate }
+frame:
+  material: { es: Acetato, en: Acetate }
+  weightGrams: 24
+colorways:
+  - { id: hueso-rosa, name: { es: Hueso / Rosa, en: Bone / Rose }, frame: hueso, tint: rosa }
+  - { id: carey-humo, name: { es: Carey / Humo, en: Tortoise / Smoke }, frame: carey, tint: humo }

@@ -1,0 +1,55 @@
+---
+import { t, path } from '../../i18n';
+import type { Lang } from '../../config/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const d = t(lang).close;
+const words = d.title.split(' ');
+---
+<section class="close wrap" aria-labelledby="close-title">
+  <h2 id="close-title" class="close__title condensed" data-reveal>
+    <span>{words.slice(0, 3).join(' ')}</span>
+    <span>{words.slice(3).join(' ')}</span>
+  </h2>
+  <div class="close__side" data-reveal>
+    <p class="lede">{d.text}</p>
+    <a class="btn btn--bone" href={path(lang, 'shop')}>{d.cta} <span class="arrow" aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<style>
+  .close {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+    gap: 32px 48px;
+    align-items: end;
+    margin-top: var(--section);
+    padding-top: clamp(96px, 10vw, 152px);
+    padding-bottom: 24px;
+    background: var(--night);
+    color: var(--on-night);
+  }
+  .close__title {
+    font-size: clamp(2.75rem, 10vw, 11rem);
+    line-height: 0.93;
+    letter-spacing: 0.005em;
+    color: var(--sun);
+  }
+  .close__title span {
+    display: block;
+  }
+  .close__side {
+    display: grid;
+    gap: 22px;
+    justify-items: start;
+    padding-bottom: 12px;
+  }
+  @media (max-width: 800px) {
+    .close {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

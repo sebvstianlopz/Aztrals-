@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/home/Hero.astro';
+import Releases from '../components/home/Releases.astro';
+import Spotlight from '../components/home/Spotlight.astro';
+import Pills from '../components/home/Pills.astro';
+import Moments from '../components/home/Moments.astro';
+import Collection from '../components/Collection.astro';
+import Close from '../components/home/Close.astro';
+import { t, path } from '../i18n';
+import { getProducts, getSpotlight } from '../lib/products';
+import { site, type Lang } from '../config/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const d = t(lang);
+const products = await getProducts();
+const spotlight = await getSpotlight();
+const releases = products
+  .filter((p) => p.data.isNew)
+  .sort((a, b) => b.data.releasedAt.getTime() - a.data.releasedAt.getTime())
+  .slice(0, 4);
+const other = lang === 'es' ? 'en' : 'es';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Store',
+  name: site.name,
+  url: new URL(path(lang, 'home'), Astro.site).href,
+  address: { '@type': 'PostalAddress', addressRegion: 'PR', addressCountry: 'US' },
+};
+---
+<Base lang={lang} title={d.meta.homeTitle} description={d.meta.homeDescription} alternate={path(other, 'home')} jsonLd={jsonLd}>
+  <Hero lang={lang} release={spotlight} />
+  <Releases lang={lang} products={releases} />
+  <Spotlight lang={lang} product={spotlight} />
+  <Pills lang={lang} />
+  <Moments lang={lang} products={products} />
+  <div class="section">
+    <Collection lang={lang} products={products} id="coleccion" heading={{ tag: 'h2', text: d.collection.title, lede: d.collection.text }} />
+  </div>
+  <Close lang={lang} />
+</Base>

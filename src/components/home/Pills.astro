@@ -1,0 +1,88 @@
+---
+import { t, path } from '../../i18n';
+import type { Lang } from '../../config/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const d = t(lang).pills;
+const [a, b, c] = d.words;
+---
+<section class="pills section wrap" aria-label={d.words.join(', ')} data-pills>
+  <ul class="pills__row">
+    <li class="pill pill--stone" data-pill>{a}</li>
+    <li class="pill pill--sun" data-pill>{b}</li>
+    <li class="pill-li" data-pill>
+      <a class="pill pill--ink" href={path(lang, 'shop')} aria-label={d.go}>
+        <svg viewBox="0 0 120 48" aria-hidden="true"><path d="M4 24h104M86 6l22 18-22 18" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </a>
+    </li>
+    <li class="pill pill--pale" data-pill>{c}</li>
+  </ul>
+</section>
+
+<style>
+  .pills {
+    overflow-x: clip;
+  }
+  .pills__row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(8px, 1.2vw, 16px);
+  }
+  .pill,
+  .pill-li {
+    display: grid;
+    place-items: center;
+    height: clamp(96px, 12vw, 184px);
+    border-radius: 999px;
+    font-size: var(--step-h2);
+    font-weight: 420;
+    letter-spacing: -0.045em;
+    font-variation-settings: 'wdth' 104;
+    line-height: 1;
+  }
+  .pill-li .pill {
+    width: 100%;
+    height: 100%;
+  }
+  .pill--stone {
+    background: var(--bone-2);
+  }
+  .pill--sun {
+    background: var(--sun);
+    color: var(--on-sun);
+  }
+  .pill--ink {
+    background: var(--ink);
+    color: var(--bone);
+    transition:
+      transform 160ms var(--ease-out),
+      background-color 200ms ease;
+  }
+  .pill--ink:active {
+    transform: scale(0.97);
+  }
+  .pill--ink svg {
+    width: 34%;
+    transition: transform 240ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pill--ink:hover {
+      background: #2a2826;
+    }
+    .pill--ink:hover svg {
+      transform: translateX(8%);
+    }
+  }
+  .pill--pale {
+    background: var(--bone-2);
+    color: var(--ink-2);
+  }
+  @media (max-width: 640px) {
+    .pills__row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,207 @@
+---
+import Shot from '../Shot.astro';
+import Glasses from '../Glasses.astro';
+import { t, path, formatPrice } from '../../i18n';
+import { productPhotos, type Product } from '../../lib/products';
+import { frameColor, tintColor } from '../../lib/swatches';
+import type { Lang } from '../../config/site';
+
+interface Props {
+  lang: Lang;
+  product: Product;
+}
+const { lang, product } = Astro.props;
+const d = t(lang);
+const p = product.data;
+const group = `spot-${product.id}`;
+---
+<section class="spot" id="destacado" aria-labelledby="spot-title" data-spot>
+  <div class="spot__pin wrap" data-spot-pin>
+    <div class="spot__stage" data-spot-stage>
+      <div class="spot__sun" aria-hidden="true" data-spot-sun></div>
+      {
+        p.colorways.map((c, i) => {
+          const photos = productPhotos(product.id, c.id).slice(0, 3);
+          return (
+            <div class="spot__layer" data-cw={c.id} data-active={i === 0 ? '' : undefined}>
+              {photos.length ? (
+                photos.map((ph, n) => (
+                  <div class="spot__angle" data-angle={n}>
+                    <Shot photo={ph} alt={n === 0 ? `${p.name}, ${c.name[lang]}` : ''} ratio="16 / 10" tone="none" fit="contain" sizes="(min-width: 900px) 56vw, 100vw" />
+                  </div>
+                ))
+              ) : (
+                <div class="spot__angle" data-angle="0" data-drawn>
+                  <Shot alt={`${p.name}, ${c.name[lang]}`} ratio="16 / 10" tone="none">
+                    <Glasses class="spot__draw" shape={p.shape} frame={c.frame} tint={c.tint} mirror={p.lens.mirror} />
+                  </Shot>
+                </div>
+              )}
+            </div>
+          );
+        })
+      }
+    </div>
+    <div class="spot__copy" data-reveal>
+      <h2 id="spot-title" class="spot__name condensed">{p.name}</h2>
+      <p class="spot__tagline">{p.tagline[lang]}</p>
+      <p class="spot__desc">{p.description[lang]}</p>
+      <dl class="spot__facts small">
+        <div><dt>{d.product.lens}</dt><dd>{p.lens.material[lang]}</dd></div>
+        <div><dt>{d.product.frame}</dt><dd>{p.frame.material[lang]}{p.frame.weightGrams && `, ${d.product.grams(p.frame.weightGrams)}`}</dd></div>
+        <div><dt>{d.product.protection}</dt><dd>UV400</dd></div>
+      </dl>
+      <fieldset class="spot__colors">
+        <legend class="small">{d.spotlight.color}: <span data-cw-name>{p.colorways[0].name[lang]}</span></legend>
+        <div class="swatches">
+          {
+            p.colorways.map((c, i) => (
+              <label class="swatch" title={c.name[lang]}>
+                <input type="radio" name={group} value={c.id} checked={i === 0} data-cw-input data-name={c.name[lang]} aria-label={c.name[lang]} />
+                <span class="disc" aria-hidden="true"><i style={`background:${frameColor[c.frame]}`} /><i style={`background:${tintColor[c.tint]}`} /></span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+      <div class="spot__buy">
+        <span class="spot__price price">{formatPrice(p.price, lang)}</span>
+        <button class="btn btn--sun" type="button" data-add={product.id} data-colorway={p.colorways[0].id} data-colorway-from={group} data-added={d.spotlight.added}>
+          <span data-label>{d.spotlight.add}</span>
+        </button>
+        <a class="link spot__more" href={path(lang, 'shop', product.id)}>{d.spotlight.details}</a>
+      </div>
+    </div>
+  </div>
+  <ul class="spot__terms wrap small">
+    {d.terms.map((term) => <li>{term}</li>)}
+  </ul>
+</section>
+
+<style>
+  .spot {
+    margin-top: var(--section);
+    background: var(--night);
+    color: var(--on-night);
+  }
+  .spot__pin {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.9fr);
+    gap: clamp(24px, 4vw, 72px);
+    align-items: center;
+    min-height: 100svh;
+    padding-block: clamp(88px, 10vw, 128px) 48px;
+  }
+  .spot__stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 12;
+    perspective: 1200px;
+  }
+  .spot__sun {
+    position: absolute;
+    width: 74%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--bone-3);
+  }
+  .spot__layer {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 320ms ease,
+      visibility 0s 320ms;
+  }
+  .spot__layer[data-active] {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 320ms ease;
+  }
+  .spot__angle {
+    grid-area: 1 / 1;
+    width: 100%;
+  }
+  .spot__angle:not([data-angle='0']) {
+    opacity: 0;
+  }
+  .spot__draw {
+    width: 96%;
+  }
+  .spot__name {
+    font-size: clamp(4.5rem, 10vw, 10rem);
+    line-height: 0.82;
+    margin-bottom: 20px;
+  }
+  .spot__tagline {
+    font-size: 1.375rem;
+    font-weight: 420;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 14px;
+  }
+  .spot__desc {
+    max-width: 44ch;
+    color: var(--on-night);
+  }
+  .spot__facts {
+    display: grid;
+    gap: 6px;
+    margin: 24px 0;
+  }
+  .spot__facts div {
+    display: grid;
+    grid-template-columns: 7.5em 1fr;
+    gap: 12px;
+  }
+  .spot__facts dt {
+    color: var(--on-night-2);
+  }
+  .spot__colors {
+    border: 0;
+    padding: 0;
+    margin: 0 0 24px;
+    display: grid;
+    gap: 10px;
+    color: var(--on-night);
+  }
+  .spot__colors legend {
+    padding: 0;
+    margin-bottom: 10px;
+    color: var(--on-night-2);
+  }
+  .spot__colors legend span {
+    color: var(--on-night);
+  }
+  .spot__buy {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 22px;
+  }
+  .spot__price {
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
+  }
+  .spot__buy .btn[data-state='added'] {
+    background: var(--bone);
+  }
+  .spot__terms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 40px;
+    padding-bottom: 56px;
+    color: var(--on-night-2);
+  }
+  @media (max-width: 900px) {
+    .spot__pin {
+      grid-template-columns: 1fr;
+      min-height: 0;
+      padding-top: 72px;
+    }
+  }
+</style>

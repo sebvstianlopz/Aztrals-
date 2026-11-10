@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import Collection from '../components/Collection.astro';
+import { t, path } from '../i18n';
+import { getProducts } from '../lib/products';
+import type { Lang } from '../config/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const d = t(lang);
+const products = await getProducts();
+const other = lang === 'es' ? 'en' : 'es';
+---
+<Base lang={lang} title={d.meta.shopTitle} description={d.meta.shopDescription} alternate={path(other, 'shop')}>
+  <div class="shop">
+    <Collection lang={lang} products={products} id="tienda" heading={{ tag: 'h1', text: d.shop.title, lede: d.shop.text }} />
+  </div>
+</Base>
+
+<style>
+  .shop {
+    padding-top: clamp(128px, 14vw, 184px);
+    padding-bottom: var(--section);
+  }
+</style>
