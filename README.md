@@ -50,16 +50,18 @@ Skiper UI's free licence asks for attribution; the credit line is in the footer.
 
 ## Colours
 
-Black and white carry the page; Grey, Purple and Pink are for details. The tokens are at the top
+Black and white carry the page: a black page with white text, and white feature sections
+(the release spotlight, the closing call, the footer) with black text. Grey, Purple and Pink are
+for details. Picture backgrounds stay light so the glasses read clearly. The tokens are at the top
 of `src/styles/global.css`.
 
 | Colour | Used for |
 |---|---|
-| White `#FFFFFF` | Page background, intro screen, text and buttons on dark sections |
-| Black `#000000` | All main text, dark sections, primary buttons |
-| Grey `#9E9E9E` | Light tints for tiles, chips and picture backgrounds; the AZTRALS name over the model; secondary text (darkened for contrast) |
-| Purple `#673AB7` | The spotlight disc, the Momentos changing words, button hover, the "added" state, focus ring |
-| Pink `#FF4081` | The bag counter, text selection, hovers on dark sections, the closing "AQUÍ", link underlines on hover, the favicon |
+| Black `#000000` | Page background, intro screen, text and buttons inside the white sections |
+| White `#FFFFFF` | All main text on the page, primary buttons, the white feature sections |
+| Grey `#9E9E9E` | Dark tints for chips, the release tile and bag lines; the AZTRALS name over the model; secondary text |
+| Purple `#673AB7` | The spotlight disc, hover on white buttons, the "added" state, focus ring inside white sections |
+| Pink `#FF4081` | The bag counter, text selection, the Momentos changing words, hovers inside white sections, the closing "AQUÍ", link underlines on hover, the focus ring on the page, the favicon |
 
 ## Motion
 

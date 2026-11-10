@@ -169,6 +169,10 @@ const url = path(lang, 'shop', product.id);
     height: 24px;
     border-radius: 50%;
   }
+  /* A soft halo behind each dot so dark frame colours still show on the black page. */
+  .dot i {
+    box-shadow: 0 0 0 2px var(--bone-3); /* taste-skill-ignore: a ring that makes black dots visible on black */
+  }
   .dot i {
     width: 14px;
     height: 14px;

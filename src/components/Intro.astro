@@ -76,9 +76,11 @@ const line2 = words.slice(2).join(' ');
   .intro__line span {
     display: block;
   }
+  /* The line-drawn crowd is inverted so it shows as light figures on the black page. */
   .intro__crowd {
     position: absolute;
     inset: 0;
+    filter: invert(1);
   }
   @media (max-width: 640px) {
     .intro__line {
