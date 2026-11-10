@@ -1,0 +1,27 @@
+# SAMPLE product: replace name, price, text and colourways with the real ones.
+name: Rincón
+price: 165
+shopifyHandle: rincon
+releasedAt: 2026-11-01
+isNew: true
+spotlight: true
+shape: escudo
+sport: true
+order: 1
+tagline:
+  es: Una sola lente, de sien a sien.
+  en: One lens, temple to temple.
+description:
+  es: Escudo envolvente para sesiones largas bajo el sol de mediodía. Lente polarizada con espejo, marco ligero que no se mueve en el agua ni en la carrera.
+  en: A wraparound shield for long sessions under the midday sun. Polarized mirror lens and a light frame that stays put in the water and on the run.
+lens:
+  polarized: true
+  mirror: true
+  material: { es: Policarbonato polarizado con espejo, en: Polarized mirrored polycarbonate }
+frame:
+  material: { es: Nylon TR90, en: TR90 nylon }
+  weightGrams: 28
+colorways:
+  - { id: negro-sol, name: { es: Negro / Sol, en: Black / Sun }, frame: negro, tint: sol }
+  - { id: hueso-humo, name: { es: Hueso / Humo, en: Bone / Smoke }, frame: hueso, tint: humo }
+  - { id: plata-oceano, name: { es: Plata / Océano, en: Silver / Ocean }, frame: plata, tint: oceano }

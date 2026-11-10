@@ -1,0 +1,77 @@
+---
+import { t, path } from '../i18n';
+import { site, shopUrl, type Lang } from '../config/site';
+
+interface Props {
+  lang: Lang;
+  alternate: string;
+}
+const { lang, alternate } = Astro.props;
+const d = t(lang);
+const year = new Date().getFullYear();
+---
+<footer class="foot wrap" data-inert-with-bag>
+  <div class="foot__top">
+    <p class="foot__line">{d.footer.line}</p>
+    <ul class="foot__links">
+      <li><a href={path(lang, 'shop')}>{d.nav.shop}</a></li>
+      <li><a href={`${path(lang, 'home')}#lanzamientos`}>{d.nav.releases}</a></li>
+      <li><a href={shopUrl()} rel="noopener">{d.footer.store}</a></li>
+      {site.social.instagram && <li><a href={site.social.instagram} rel="noopener">{d.footer.instagram}</a></li>}
+      <li><a href={alternate} hreflang={lang === 'es' ? 'en' : 'es'} lang={lang === 'es' ? 'en' : 'es'}>{d.switchTo}</a></li>
+    </ul>
+  </div>
+  <p class="foot__word condensed" aria-hidden="true">Aztrals</p>
+  <p class="foot__legal small">© {year} Aztrals · {site.place[lang]}. {d.footer.rights}</p>
+</footer>
+
+<style>
+  .foot {
+    background: var(--night);
+    color: var(--on-night);
+    padding-top: 56px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    overflow: hidden;
+  }
+  .foot__top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 24px 48px;
+  }
+  .foot__line {
+    max-width: 26ch;
+    font-size: 1.1875rem;
+  }
+  .foot__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 28px;
+  }
+  .foot__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 0.3em;
+    transition: text-decoration-color 200ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .foot__links a:hover {
+      text-decoration-color: currentColor;
+    }
+  }
+  .foot__word {
+    margin: clamp(32px, 6vw, 72px) 0 12px;
+    font-size: var(--step-word);
+    color: var(--night-3);
+    text-align: center;
+    white-space: nowrap;
+    letter-spacing: 0.005em;
+    line-height: 0.74;
+  }
+  .foot__legal {
+    color: var(--on-night-2);
+  }
+</style>

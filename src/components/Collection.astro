@@ -1,0 +1,117 @@
+---
+import ProductTile from './ProductTile.astro';
+import { t } from '../i18n';
+import type { Product } from '../lib/products';
+import type { Lang } from '../config/site';
+
+interface Props {
+  lang: Lang;
+  products: Product[];
+  /** Heading level and text; the shop page passes its own h1. */
+  heading: { tag: 'h1' | 'h2'; text: string; lede: string };
+  id?: string;
+}
+const { lang, products, heading, id } = Astro.props;
+const d = t(lang).collection;
+const H = heading.tag;
+const filters = [
+  ['all', d.filters.all],
+  ['new', d.filters.new],
+  ['sport', d.filters.sport],
+  ['polarized', d.filters.polarized],
+] as const;
+---
+<section class="coll wrap" id={id} aria-labelledby={`${id ?? 'coll'}-title`} data-filter-scope>
+  <div class="coll__head">
+    <H id={`${id ?? 'coll'}-title`} class:list={[heading.tag === 'h1' ? 'display' : 'h2']} data-reveal>{heading.text}</H>
+    <p class="lede" data-reveal>{heading.lede}</p>
+  </div>
+  <div class="coll__bar">
+    <div class="coll__filters" role="group" aria-label={d.filterLabel}>
+      {
+        filters.map(([key, label], i) => (
+          <button type="button" class="chip" data-filter={key} aria-pressed={i === 0 ? 'true' : 'false'}>
+            {label}
+          </button>
+        ))
+      }
+    </div>
+    <p class="small muted" aria-live="polite" data-filter-count data-one={d.count(1)} data-many={d.count(2).replace('2', '{n}')}>
+      {d.count(products.length)}
+    </p>
+  </div>
+  <div class="coll__grid" data-stagger>
+    {products.map((p) => <ProductTile product={p} lang={lang} add sizes="(min-width: 1100px) 24vw, (min-width: 700px) 32vw, 50vw" />)}
+  </div>
+  <p class="coll__none muted" data-filter-none hidden>{d.none}</p>
+</section>
+
+<style>
+  .coll__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 24px 48px;
+    align-items: end;
+    margin-bottom: 36px;
+  }
+  .coll__bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px 24px;
+    margin-bottom: 28px;
+  }
+  .coll__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    min-height: 44px;
+    padding: 0 20px;
+    border-radius: 999px;
+    background: var(--bone-2);
+    font-size: var(--step-small);
+    font-weight: 540;
+    transition:
+      transform 160ms var(--ease-out),
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+  .chip:active {
+    transform: scale(0.96);
+  }
+  .chip[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--bone);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .chip[aria-pressed='false']:hover {
+      background: var(--bone-3);
+    }
+  }
+  .coll__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(32px, 4vw, 56px) clamp(14px, 1.8vw, 24px);
+  }
+  .coll__grid :global([data-tile][hidden]) {
+    display: none;
+  }
+  @media (max-width: 1100px) {
+    .coll__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 900px) {
+    .coll__head {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 700px) {
+    .coll__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

@@ -1,0 +1,127 @@
+---
+import { t, path } from '../i18n';
+import type { Lang } from '../config/site';
+
+interface Props {
+  lang: Lang;
+  alternate: string;
+}
+const { lang, alternate } = Astro.props;
+const d = t(lang);
+const home = path(lang, 'home');
+const openOne = d.bag.open(1);
+const openMany = d.bag.open(2).replace('2', '{n}');
+---
+<header class="bar wrap" data-inert-with-bag>
+  <nav class="bar__side" aria-label="Principal">
+    <a class="hide-sm" href={`${home}#lanzamientos`}>{d.nav.releases}</a>
+    <a class="hide-sm" href={`${home}#momentos`}>{d.nav.moments}</a>
+    <a href={path(lang, 'shop')}>{d.nav.shop}</a>
+  </nav>
+  <a class="bar__mark condensed" href={home} aria-label={d.nav.home}>Aztrals</a>
+  <div class="bar__side bar__side--end">
+    <a class="show-sm" href={path(lang, 'shop')}>{d.nav.shop}</a>
+    <a class="hide-sm" href={alternate} hreflang={lang === 'es' ? 'en' : 'es'} lang={lang === 'es' ? 'en' : 'es'}>
+      <span aria-hidden="true">{d.switchShort}</span><span class="sr-only">{d.switchTo}</span>
+    </a>
+    <button class="bar__bag" type="button" data-bag-open data-label-one={openOne} data-label-many={openMany} aria-label={d.bag.open(0)}>
+      {d.nav.bag}<span class="bar__count" data-bag-count>0</span>
+    </button>
+  </div>
+</header>
+
+<style>
+  .bar {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding-top: max(10px, env(safe-area-inset-top));
+    min-height: 72px;
+    font-size: var(--step-small);
+    font-weight: 500;
+  }
+  .bar__side {
+    display: flex;
+    align-items: center;
+    gap: clamp(14px, 2.4vw, 36px);
+  }
+  .bar__side--end {
+    justify-content: flex-end;
+  }
+  .bar a,
+  .bar__bag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: none;
+  }
+  .bar__side a {
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 0.3em;
+    transition: text-decoration-color 200ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .bar__side a:hover {
+      text-decoration-color: currentColor;
+    }
+  }
+  .bar__mark {
+    font-size: 2rem;
+    line-height: 1;
+    letter-spacing: 0.01em;
+  }
+  .bar__bag {
+    gap: 8px;
+    transition: transform 160ms var(--ease-out);
+  }
+  .bar__bag:active {
+    transform: scale(0.97);
+  }
+  .bar__count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--bone);
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .show-sm {
+    display: none !important;
+  }
+  :global(.on-dark) .bar {
+    color: var(--on-night);
+  }
+  :global(.on-dark) .bar__count {
+    background: var(--sun);
+    color: var(--on-sun);
+  }
+  @media (max-width: 720px) {
+    .hide-sm {
+      display: none !important;
+    }
+    .show-sm {
+      display: inline-flex !important;
+    }
+    .bar {
+      grid-template-columns: auto 1fr;
+    }
+    .bar__mark {
+      order: -1;
+      font-size: 1.6rem;
+    }
+    .bar__side {
+      justify-content: flex-end;
+    }
+    .bar__side:first-child {
+      display: none;
+    }
+  }
+</style>

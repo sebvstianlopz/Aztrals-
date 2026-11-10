@@ -1,0 +1,24 @@
+---
+// A flat bust wearing sunglasses. Stands in for portrait photography until the real photos
+// are dropped into src/assets/photos/ (see README).
+interface Props {
+  /** Body colour. */
+  body?: string;
+  /** Lens colour. */
+  lens?: string;
+  /** Mirror horizontally. */
+  flip?: boolean;
+  class?: string;
+}
+const { body = '#121110', lens = '#f0541e', flip = false, class: cls } = Astro.props;
+---
+<svg class={cls} viewBox="0 0 600 800" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">
+  <g transform={flip ? 'translate(600 0) scale(-1 1)' : undefined}>
+    <path
+      d="M20 800 C40 646 160 600 240 586 L250 520 C204 492 182 434 180 362 C178 250 222 168 300 168 C378 168 422 250 420 362 C418 434 396 492 350 520 L360 586 C440 600 560 646 580 800 Z"
+      fill={body}
+    />
+    <path d="M150 312 C150 296 210 290 300 290 C390 290 450 296 450 312 L446 338 C440 368 400 376 362 374 C334 372 314 360 300 348 C286 360 266 372 238 374 C200 376 160 368 154 338 Z" fill={lens} />
+    <path d="M176 302 C230 298 290 297 340 298 C290 304 230 312 190 326 Z" fill="#fff" opacity="0.22" />
+  </g>
+</svg>

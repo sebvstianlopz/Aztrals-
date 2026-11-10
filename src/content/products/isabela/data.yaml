@@ -1,0 +1,24 @@
+# SAMPLE product
+name: Isabela
+price: 140
+shopifyHandle: isabela
+releasedAt: 2026-04-02
+shape: envolvente
+sport: true
+order: 6
+tagline:
+  es: Para remar y para correr.
+  en: For paddling and running.
+description:
+  es: Envolvente de base ancha con lente polarizada, pensada para el reflejo fuerte del agua de la costa oeste.
+  en: A wide-base wrap with a polarized lens, made for the hard glare off west-coast water.
+lens:
+  polarized: true
+  mirror: true
+  material: { es: Policarbonato polarizado con espejo, en: Polarized mirrored polycarbonate }
+frame:
+  material: { es: Nylon TR90, en: TR90 nylon }
+  weightGrams: 27
+colorways:
+  - { id: plata-oceano, name: { es: Plata / Océano, en: Silver / Ocean }, frame: plata, tint: oceano }
+  - { id: negro-sol, name: { es: Negro / Sol, en: Black / Sun }, frame: negro, tint: sol }

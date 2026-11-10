@@ -1,0 +1,74 @@
+---
+import ProductTile from '../ProductTile.astro';
+import { t, path } from '../../i18n';
+import type { Product } from '../../lib/products';
+import type { Lang } from '../../config/site';
+
+interface Props {
+  lang: Lang;
+  products: Product[];
+}
+const { lang, products } = Astro.props;
+const d = t(lang);
+// Mixed sizes, ORION-style: one large, the rest stepping down. Ratios repeat if there are more.
+const ratios = ['4 / 5', '1 / 1', '5 / 6', '1 / 1', '4 / 5', '1 / 1'];
+const sizes = ['(min-width: 900px) 34vw, 92vw', '(min-width: 900px) 20vw, 46vw', '(min-width: 900px) 26vw, 46vw', '(min-width: 900px) 18vw, 46vw'];
+---
+<section class="releases section wrap" id="lanzamientos" aria-labelledby="releases-title">
+  <div class="releases__head">
+    <h2 id="releases-title" class="h2" data-reveal>{d.releases.title}</h2>
+    <div class="releases__aside" data-reveal>
+      <p class="lede">{d.releases.text}</p>
+      <a class="link" href={path(lang, 'shop')}>{d.releases.all} <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+  <div class="releases__row" data-stagger>
+    {products.map((p, i) => <ProductTile product={p} lang={lang} ratio={ratios[i % ratios.length]} sizes={sizes[i % sizes.length]} class={`rel rel--${i % 4}`} add />)}
+  </div>
+</section>
+
+<style>
+  .releases__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 24px 48px;
+    align-items: end;
+    margin-bottom: clamp(40px, 5vw, 72px);
+  }
+  .releases__aside {
+    display: grid;
+    gap: 12px;
+    justify-items: start;
+  }
+  .releases__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 0.95fr);
+    gap: clamp(16px, 2vw, 28px);
+    align-items: start;
+  }
+  /* The small tiles sit lower so the row reads as a line-up, not a grid. */
+  .releases__row :global(.rel--1) {
+    margin-top: clamp(40px, 9vw, 140px);
+  }
+  .releases__row :global(.rel--3) {
+    margin-top: clamp(20px, 4vw, 64px);
+  }
+  @media (max-width: 900px) {
+    .releases__head {
+      grid-template-columns: 1fr;
+    }
+    .releases__row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .releases__row :global(.rel--0) {
+      grid-column: 1 / -1;
+    }
+    .releases__row :global(.rel--1),
+    .releases__row :global(.rel--3) {
+      margin-top: 0;
+    }
+    .releases__row :global(.rel--2) {
+      margin-top: 48px;
+    }
+  }
+</style>

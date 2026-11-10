@@ -1,0 +1,24 @@
+# SAMPLE product
+name: Condado
+price: 135
+shopifyHandle: condado
+releasedAt: 2026-10-15
+isNew: true
+shape: rectangular
+order: 2
+tagline:
+  es: Líneas rectas para la avenida.
+  en: Straight lines for the avenue.
+description:
+  es: Rectangular y de perfil bajo, para la ciudad y la playa el mismo día. Lente polarizada que corta el reflejo del agua y del asfalto.
+  en: Rectangular and low-profile, for the city and the beach on the same day. A polarized lens that cuts glare off water and asphalt.
+lens:
+  polarized: true
+  material: { es: Policarbonato polarizado, en: Polarized polycarbonate }
+frame:
+  material: { es: Acetato, en: Acetate }
+  weightGrams: 31
+colorways:
+  - { id: negro-humo, name: { es: Negro / Humo, en: Black / Smoke }, frame: negro, tint: humo }
+  - { id: carey-ambar, name: { es: Carey / Ámbar, en: Tortoise / Amber }, frame: carey, tint: ambar }
+  - { id: arena-verde, name: { es: Arena / Verde, en: Sand / Green }, frame: arena, tint: verde }
