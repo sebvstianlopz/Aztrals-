@@ -9,15 +9,27 @@ const { lang } = Astro.props;
 const d = t(lang).close;
 const words = d.title.split(' ');
 const lines = [words.slice(0, 3).join(' '), words.slice(3).join(' ')];
+// The last word of the line ("AQUÍ" / "HERE") lands in Pink: the page's final detail.
+const parts = lines.map((line, i) => {
+  if (i < lines.length - 1) return { head: line, last: '' };
+  const w = line.split(' ');
+  return { head: w.slice(0, -1).join(' ') + ' ', last: w[w.length - 1] };
+});
 ---
 <section class="close wrap on-dark" aria-labelledby="close-title">
   <h2 id="close-title" class="close__title condensed" data-close-title>
     {
-      lines.map((line) => (
+      parts.map(({ head, last }) => (
         <span class="close__line">
           <span class="close__in">
-            <span class="close__base">{line}</span>
-            <span class="close__fill" aria-hidden="true">{line}</span>
+            <span class="close__base">
+              {head}
+              {last && <span class="close__accent">{last}</span>}
+            </span>
+            <span class="close__fill" aria-hidden="true">
+              {head}
+              {last && <span class="close__accent">{last}</span>}
+            </span>
           </span>
         </span>
       ))
@@ -62,14 +74,19 @@ const lines = [words.slice(0, 3).join(' '), words.slice(3).join(' ')];
     display: none;
     position: absolute;
     inset: 0;
-    color: var(--bone-c);
+    color: var(--white);
     clip-path: inset(0 100% 0 0);
   }
   :global(.motion) .close__fill {
     display: block;
   }
-  :global(.motion) .close__base {
-    color: var(--olive);
+  .close__accent {
+    color: var(--pink);
+  }
+  /* Before it develops, the whole line (accent included) is Grey. */
+  :global(.motion) .close__base,
+  :global(.motion) .close__base .close__accent {
+    color: var(--grey);
   }
   .close__side {
     display: grid;

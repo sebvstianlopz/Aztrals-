@@ -11,9 +11,13 @@ const CROWD_SRC =
  * which stops its render loop. With reduced motion the crowd stands still.
  */
 export default function CrowdIntro() {
-  const [live, setLive] = useState(true);
+  // Starts off and switches on only when the intro is actually showing (once per session), so the
+  // crowd image isn't downloaded on every page view.
+  const [live, setLive] = useState(false);
 
   useEffect(() => {
+    if (!document.documentElement.classList.contains("intro-on")) return;
+    setLive(true);
     const done = () => setLive(false);
     window.addEventListener("aztrals:intro-done", done, { once: true });
 
