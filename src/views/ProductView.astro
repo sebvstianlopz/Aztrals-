@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Shot from '../components/Shot.astro';
 import Glasses from '../components/Glasses.astro';
+import TryOn from '../components/TryOn.astro';
 import ProductTile from '../components/ProductTile.astro';
 import { t, path, formatPrice } from '../i18n';
 import { getProducts, productPhotos, type Product } from '../lib/products';
@@ -83,6 +84,7 @@ const jsonLd = {
         <button class="btn btn--sun" type="button" data-add={product.id} data-colorway={p.colorways[0].id} data-colorway-from={group} data-added={d.spotlight.added}>
           <span data-label>{d.spotlight.add}</span>
         </button>
+        <button class="btn btn--quiet" type="button" data-tryon-open={product.id}>{d.tryon.open}</button>
         <a class="btn btn--quiet" href={shopUrl(`/products/${p.shopifyHandle}`)} rel="noopener">{d.product.buyStore}</a>
       </div>
       <p class="pdp__desc">{p.description[lang]}</p>
@@ -97,6 +99,7 @@ const jsonLd = {
       </ul>
     </div>
   </article>
+  <TryOn lang={lang} product={product} />
 
   <section class="related section wrap" aria-labelledby="related-title">
     <h2 id="related-title" class="h2" data-split>{d.product.related}</h2>

@@ -15,9 +15,18 @@ const byNumber = (a: string, b: string) => a.localeCompare(b, undefined, { numer
 export function productPhotos(slug: string, colorwayId: string): ImageMetadata[] {
   const prefix = `/src/content/products/${slug}/${colorwayId}-`;
   return Object.keys(productFiles)
-    .filter((k) => k.startsWith(prefix))
+    .filter((k) => k.startsWith(prefix) && !k.includes('-tryon.'))
     .sort(byNumber)
     .map((k) => productFiles[k].default);
+}
+
+/**
+ * The straight-on cut-out used by the camera try-on: src/content/products/<slug>/<colorway id>-tryon.png
+ * (transparent PNG, front view, lens centres at about 29% and 71% of the width).
+ */
+export function tryOnPhoto(slug: string, colorwayId: string): ImageMetadata | undefined {
+  const key = Object.keys(productFiles).find((k) => k.startsWith(`/src/content/products/${slug}/${colorwayId}-tryon.`));
+  return key ? productFiles[key].default : undefined;
 }
 
 export function sitePhoto(name: string): ImageMetadata | undefined {

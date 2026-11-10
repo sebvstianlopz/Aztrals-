@@ -110,6 +110,33 @@ Every picture slot shows a drawing until its photo exists. To replace them:
 - **Site photos**: the hero photo is in place (`src/assets/photos/hero.webp`); the four
   "Momentos" pictures go in the same folder (names in the README there).
 
+## Camera try-on ("Pruébatelas")
+
+Each product page and the Rincón section have a **Pruébatelas / Try them on** button. It opens
+a full-screen mirror: the front camera finds the face and the chosen glasses follow it, sized to
+the eyes and tilted with the head. Visitors can switch colours, take a photo (saved or shared
+from their phone), add the pair to the bag, or upload a selfie if they have no camera or
+refuse it.
+
+- **Privacy:** the face tracking (Google MediaPipe Face Landmarker) runs inside the visitor's
+  browser. No video or photo leaves their device, and the screen says so.
+- **Speed:** the tracker (up to about 19 MB with the model, less once compressed) downloads only when someone opens the
+  try-on. The model lives in `public/tryon/face_landmarker.task`; `npm run dev` and
+  `npm run build` copy the engine files into `public/tryon/wasm/` from the installed package.
+- **Glasses images:** until real ones exist, the try-on uses the same drawings as the site. For
+  a realistic result, add one picture per colourway in the model's folder named
+  `<colourway id>-tryon.png`, for example `src/content/products/rincon/negro-sol-tryon.png`:
+  - a straight-on front view, flat, like an ID photo of the glasses, with the arms hidden behind
+    the frame
+  - a transparent background, cropped tight to the frame from hinge to hinge
+  - at least 1200 px wide, with the lenses' real tint and transparency
+  These pictures are used only by the try-on; they don't appear in the galleries.
+- **True-to-size frames:** add the frame's real front width in millimetres to the model's
+  `data.yaml`, for example `frame: { material: …, widthMm: 142 }`. The try-on then sizes the
+  photo from it. Without it, the glasses are sized from the lens spacing.
+- **Limits:** the glasses are a flat picture, so they look right from the front and less so
+  with the head turned far to the side. Low light makes tracking less steady.
+
 ## Run it locally
 
 ```sh

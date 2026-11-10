@@ -39,6 +39,8 @@ const products = defineCollection({
     frame: z.object({
       material: text,
       weightGrams: z.number().positive().optional(),
+      // Full front width of the frame in millimetres (hinge to hinge). Sizes the camera try-on.
+      widthMm: z.number().min(100).max(180).optional(),
     }),
     colorways: z
       .array(
