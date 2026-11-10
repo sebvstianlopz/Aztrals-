@@ -28,8 +28,8 @@ const line2 = words.slice(-2).join(' ');
     <p class="hero__word condensed" aria-hidden="true" data-hero-word>Aztrals</p>
     {
       heroPhoto ? (
-        <div class="hero__figure hero__panel" data-hero-figure data-photo>
-          <Shot photo={heroPhoto} alt={d.hero.photoAlt} ratio="3 / 4" tone="none" loading="eager" sizes="(min-width: 901px) 50vw, 100vw" />
+        <div class="hero__figure hero__cutout" data-hero-figure>
+          <Shot photo={heroPhoto} alt={d.hero.photoAlt} ratio="3 / 4" tone="none" fit="contain" loading="eager" sizes="(min-width: 901px) 50vw, 100vw" />
         </div>
       ) : (
         <div class="hero__figure" data-hero-figure>
@@ -161,35 +161,18 @@ const line2 = words.slice(-2).join(' ');
     line-height: 1.1;
   }
 
-  /* ---------- with the hero photo: a full-height panel on the right ---------- */
-  .hero--photo {
-    --h: min(max(640px, 100svh), 1100px);
-    --panel: min(46vw, calc(var(--h) * 0.75));
-    height: var(--h);
-    min-height: 0;
+  /* ---------- with the hero photo: a cut-out standing in front of the wordmark ---------- */
+  .hero__cutout {
+    width: min(50vw, 84svh);
+    /* The photo is cropped at the arm, shoulders and waist; dissolve those edges into the page
+       so no hard crop line shows. An alpha mask, not a visible colour gradient. */
+    /* taste-skill-ignore */ mask-image: linear-gradient(to right, transparent 0, #000 13%, #000 82%, transparent 100%), linear-gradient(to bottom, #000 82%, transparent 100%);
+    /* taste-skill-ignore */ -webkit-mask-image: linear-gradient(to right, transparent 0, #000 13%, #000 82%, transparent 100%), linear-gradient(to bottom, #000 82%, transparent 100%);
+    mask-composite: intersect;
+    -webkit-mask-composite: source-in;
   }
-  .hero__panel {
-    inset: 0 0 0 auto;
-    left: auto;
-    width: var(--panel);
-    translate: none;
-    overflow: hidden;
-  }
-  .hero__panel :global(.shot) {
-    height: 100%;
-    aspect-ratio: auto;
-  }
-  .hero__panel :global(.shot__img) {
-    object-position: 50% 30%;
-  }
-  .hero--photo .hero__copy {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 40px;
-    padding-right: calc(var(--panel) + clamp(24px, 4vw, 64px));
-  }
-  .hero--photo .hero__side {
-    max-width: 360px;
-    padding-top: 0;
+  .hero--photo .hero__word {
+    color: var(--bone-3);
   }
 
   @media (max-width: 900px) {
@@ -239,22 +222,15 @@ const line2 = words.slice(-2).join(' ');
       order: 3;
     }
     .hero--photo .hero__stage {
-      padding-bottom: 12vw;
-      margin-top: 32px;
+      margin-top: 24px;
     }
     .hero--photo .hero__word {
-      bottom: 0;
+      bottom: 12%;
     }
-    .hero__panel {
-      position: relative;
-      inset: auto;
-      width: 100%;
-      max-width: none;
-      aspect-ratio: 3 / 4;
-      max-height: 88svh;
-    }
-    .hero--photo .hero__side {
-      max-width: none;
+    .hero__cutout {
+      width: min(100vw, 560px);
+      /* the photo has empty backdrop above her head; pull it up under the buy block */
+      margin-top: -22vw;
     }
   }
 </style>
