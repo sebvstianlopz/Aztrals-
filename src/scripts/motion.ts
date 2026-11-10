@@ -44,7 +44,7 @@ function start() {
         hero(wide);
         visor();
         spotlight(wide);
-        moments();
+        moments(wide);
       } catch (err) {
         // Never leave content hidden because one effect failed.
         root.classList.remove('motion');
