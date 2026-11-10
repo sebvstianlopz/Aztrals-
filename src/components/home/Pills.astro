@@ -51,8 +51,8 @@ const [a, b, c] = d.words;
     background: var(--bone-2);
   }
   .pill--sun {
-    background: var(--sun);
-    color: var(--on-sun);
+    background: var(--olive);
+    color: var(--floral);
   }
   .pill--ink {
     background: var(--ink);
@@ -70,7 +70,7 @@ const [a, b, c] = d.words;
   }
   @media (hover: hover) and (pointer: fine) {
     .pill--ink:hover {
-      background: #2a2826;
+      background: color-mix(in srgb, var(--smoky) 82%, var(--olive));
     }
     .pill--ink:hover svg {
       transform: translateX(8%);

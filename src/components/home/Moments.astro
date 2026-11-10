@@ -14,10 +14,10 @@ const { lang, products } = Astro.props;
 const d = t(lang).moments;
 // Which model each moment shows. SAMPLE: match these to the real photos.
 const plan = [
-  { key: 'playa', model: 'culebra', tone: 'sand', body: '#2b2620', flip: false },
-  { key: 'surf', model: 'rincon', tone: 'night', body: '#3a3733', flip: true },
-  { key: 'ciudad', model: 'condado', tone: 'stone', body: '#151413', flip: true },
-  { key: 'entreno', model: 'yunque', tone: 'sand', body: '#1d1b18', flip: false },
+  { key: 'playa', model: 'culebra', tone: 'sand', body: '#11120d', flip: false },
+  { key: 'surf', model: 'rincon', tone: 'night', body: '#565449', flip: true },
+  { key: 'ciudad', model: 'condado', tone: 'stone', body: '#11120d', flip: true },
+  { key: 'entreno', model: 'yunque', tone: 'sand', body: '#11120d', flip: false },
 ] as const;
 const items = plan
   .map((m) => ({ ...m, product: products.find((p) => p.id === m.model) }))
