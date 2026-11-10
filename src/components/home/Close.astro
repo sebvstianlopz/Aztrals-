@@ -9,7 +9,7 @@ const { lang } = Astro.props;
 const d = t(lang).close;
 const words = d.title.split(' ');
 ---
-<section class="close wrap" aria-labelledby="close-title">
+<section class="close wrap on-dark" aria-labelledby="close-title">
   <h2 id="close-title" class="close__title condensed" data-reveal>
     <span>{words.slice(0, 3).join(' ')}</span>
     <span>{words.slice(3).join(' ')}</span>

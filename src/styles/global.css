@@ -1,18 +1,33 @@
-/* Aztrals design tokens and base. Every component references these tokens only. */
+/* Aztrals design tokens and base. Every component references these tokens only.
+
+   The brand palette (four colours; everything else is mixed from them):
+     Smoky Black  #11120D  text, dark sections, the primary button
+     Olive Drab   #565449  secondary text, quiet details, focus ring
+     Bone         #D8CFBC  tiles, pills, surfaces, the wordmark, actions on dark
+     Floral White #FFFBF4  the page ground, text on dark */
 :root {
-  --bone: #f1eee9;
-  --bone-2: #e6e2db;
-  --bone-3: #d9d3c9;
-  --sand: #cfc4b3;
-  --ink: #0e0e0e;
-  --ink-2: #4a4743;
-  --night: #0b0b0b;
-  --night-2: #181716;
-  --night-3: #242220;
-  --on-night: #f1eee9;
-  --on-night-2: #aaa59d;
-  --sun: #f0541e;
-  --on-sun: #0e0e0e;
+  --smoky: #11120d;
+  --olive: #565449;
+  --bone-c: #d8cfbc;
+  --floral: #fffbf4;
+
+  /* roles */
+  --bone: var(--floral); /* page ground */
+  --bone-2: var(--bone-c); /* surfaces: tiles, chips, pills, quiet buttons */
+  --bone-3: color-mix(in srgb, var(--bone-c) 80%, var(--olive)); /* surface hover / pressed */
+  --sand: color-mix(in srgb, var(--bone-c) 72%, var(--olive)); /* a deeper surface for picture slots */
+  --ink: var(--smoky);
+  --ink-2: var(--olive);
+  --night: var(--smoky);
+  --night-2: color-mix(in srgb, var(--smoky) 86%, var(--olive));
+  --night-3: color-mix(in srgb, var(--smoky) 62%, var(--olive));
+  --on-night: var(--floral);
+  --on-night-2: var(--bone-c);
+  /* the primary action: Smoky Black on light grounds, Bone on dark ones (see .on-dark) */
+  --sun: var(--smoky);
+  --on-sun: var(--floral);
+  --sun-hover: color-mix(in srgb, var(--smoky) 82%, var(--olive));
+  --focus: var(--olive);
 
   --font: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
 
@@ -104,13 +119,21 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--sun);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
 }
 
 ::selection {
-  background: var(--sun);
-  color: var(--on-sun);
+  background: var(--bone-c);
+  color: var(--smoky);
+}
+
+/* Dark sections (release spotlight, closing call, footer): the primary action turns Bone. */
+.on-dark {
+  --sun: var(--bone-c);
+  --on-sun: var(--smoky);
+  --sun-hover: var(--floral);
+  --focus: var(--bone-c);
 }
 
 .display {
@@ -226,10 +249,10 @@ button {
 }
 @media (hover: hover) and (pointer: fine) {
   .btn--sun:hover {
-    background: #ff6a33;
+    background: var(--sun-hover);
   }
   .btn--ink:hover {
-    background: #2a2826;
+    background: color-mix(in srgb, var(--smoky) 82%, var(--olive));
   }
   .btn--bone:hover,
   .btn--quiet:hover {
@@ -319,7 +342,7 @@ button {
   transform: rotate(-45deg) scale(1.08);
 }
 .swatch:has(input:focus-visible) {
-  outline: 2px solid var(--sun);
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
 
