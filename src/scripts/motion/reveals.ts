@@ -15,6 +15,4 @@ export function reveals() {
   };
   enter('[data-reveal]', 0.08);
   enter('[data-stagger] > *', 0.07);
-  // Interim: the elements later phases animate in their own way still need to appear.
-  enter('[data-foot-word], [data-close-title]', 0.07);
 }

@@ -16,6 +16,7 @@ import { moments } from './motion/moments';
 import { releases } from './motion/releases';
 import { smooth } from './motion/smooth';
 import { collection } from './motion/collection';
+import { close } from './motion/close';
 
 const root = document.documentElement;
 
@@ -52,6 +53,7 @@ function start() {
         spotlight(wide);
         moments(wide);
         collection();
+        close();
       } catch (err) {
         // Never leave content hidden because one effect failed.
         root.classList.remove('motion');
