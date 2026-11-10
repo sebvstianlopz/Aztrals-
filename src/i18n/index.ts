@@ -50,7 +50,7 @@ const es = {
     details: 'Ver detalles',
   },
   terms: ['Envío a todo Puerto Rico', 'Cambios dentro de 30 días', 'Pago seguro en Shopify'],
-  pills: { words: ['Sol', 'Mar', 'Tú'], go: 'Ir a la tienda' },
+  pills: { words: ['Sol', 'Mar'], go: 'Ir a la tienda' },
   moments: {
     title: 'Hechas para cada momento',
     text: 'De la primera ola en Rincón al tapón de la tarde en San Juan: una gafa para cada parte del día.',
@@ -154,7 +154,7 @@ const en: Dict = {
     details: 'See details',
   },
   terms: ['Shipping across Puerto Rico', 'Exchanges within 30 days', 'Secure checkout on Shopify'],
-  pills: { words: ['Sun', 'Sea', 'You'], go: 'Go to the shop' },
+  pills: { words: ['Sun', 'Sea'], go: 'Go to the shop' },
   moments: {
     title: 'Made for every moment',
     text: 'From the first wave in Rincón to afternoon traffic in San Juan: a pair for every part of the day.',
