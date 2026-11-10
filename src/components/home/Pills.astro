@@ -1,4 +1,5 @@
 ---
+// A single centred link to the shop between the release spotlight and "Momentos".
 import { t, path } from '../../i18n';
 import type { Lang } from '../../config/site';
 
@@ -6,104 +7,16 @@ interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
-const d = t(lang).pills;
-const [a, b] = d.words;
+const d = t(lang);
 ---
-<section class="pills section wrap" aria-label={d.words.join(', ')} data-pills>
-  <ul class="pills__row">
-    <li class="pill pill--bone" data-pill><span class="pill__dot" aria-hidden="true"></span>{a}</li>
-    <li class="pill pill--olive" data-pill>{b}</li>
-    <li class="pill-li" data-pill>
-      <a class="pill pill--go" href={path(lang, 'shop')} aria-label={d.go}>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>
-      </a>
-    </li>
-  </ul>
-</section>
+<div class="to-shop wrap" data-reveal>
+  <a class="btn btn--ink" href={path(lang, 'shop')}>{d.close.cta} <span class="arrow" aria-hidden="true">→</span></a>
+</div>
 
 <style>
-  .pills {
-    overflow-x: clip;
-    --ph: clamp(56px, 5.6vw, 84px);
-  }
-  .pills__row {
+  .to-shop {
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
-    gap: 10px;
-  }
-  .pill,
-  .pill-li {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4em;
-    height: var(--ph);
-    padding: 0 1.1em;
-    border-radius: 999px;
-    font-size: clamp(1.5rem, 2.6vw, 2.4rem);
-    font-weight: 400;
-    letter-spacing: -0.035em;
-    font-variation-settings: 'wdth' 102;
-    line-height: 1;
-  }
-  .pill-li {
-    padding: 0;
-  }
-  .pill--bone {
-    background: var(--bone-c);
-    color: var(--smoky);
-  }
-  .pill--olive {
-    background: var(--olive);
-    color: var(--floral);
-  }
-  /* The small "sun" before Sol. */
-  .pill__dot {
-    width: 0.32em;
-    height: 0.32em;
-    border-radius: 50%;
-    background: currentColor;
-  }
-  .pill--go {
-    width: var(--ph);
-    height: var(--ph);
-    padding: 0;
-    background: var(--smoky);
-    color: var(--floral);
-    transition:
-      transform 160ms var(--ease-out),
-      background-color 200ms ease;
-  }
-  .pill--go svg {
-    width: 40%;
-    transition: transform 240ms var(--ease-out);
-  }
-  .pill--go:active {
-    transform: scale(0.96);
-  }
-  @media (max-width: 480px) {
-    .pills {
-      --ph: 48px;
-    }
-    .pills__row {
-      gap: 6px;
-    }
-    .pill,
-    .pill-li {
-      font-size: 1.25rem;
-      padding: 0 0.75em;
-    }
-    .pill-li,
-    .pill--go {
-      padding: 0;
-    }
-    @media (hover: hover) and (pointer: fine) {
-    .pill--go:hover {
-      background: color-mix(in srgb, var(--smoky) 82%, var(--olive));
-    }
-    .pill--go:hover svg {
-      transform: rotate(-45deg);
-    }
+    padding-top: clamp(64px, 7vw, 112px);
   }
 </style>

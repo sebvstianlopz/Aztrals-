@@ -85,15 +85,6 @@ function start() {
         if (angle2.length) tl.to(angle2, { opacity: 1, duration: 0.2 }, 0.65);
       }
 
-      // ---------- pill row: the words slide together as it scrolls in ----------
-      const pills = gsap.utils.toArray<HTMLElement>('[data-pill]');
-      if (pills.length) {
-        const offsets = [-28, 0, 28];
-        gsap
-          .timeline({ scrollTrigger: { trigger: '[data-pills]', start: 'top 95%', end: 'top 45%', scrub: 0.6 } })
-          .from(pills, { x: (i) => offsets[i % offsets.length], scale: 0.94, autoAlpha: 0.2, ease: 'none', stagger: 0.04 });
-      }
-
       // ---------- pictures: settle from a slight zoom as they cross the screen ----------
       gsap.utils.toArray<HTMLElement>('.moment .shot__draw, .moment picture').forEach((el) => {
         gsap.fromTo(
