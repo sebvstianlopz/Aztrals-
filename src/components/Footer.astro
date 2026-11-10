@@ -23,6 +23,7 @@ const year = new Date().getFullYear();
   </div>
   <p class="foot__word condensed" aria-hidden="true">Aztrals</p>
   <p class="foot__legal small">© {year} Aztrals · {site.place[lang]}. {d.footer.rights}</p>
+  {site.showIntro && <p class="foot__legal small">{d.footer.credits}</p>}
 </footer>
 
 <style>

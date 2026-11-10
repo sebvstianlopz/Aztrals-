@@ -22,6 +22,7 @@ const es = {
   switchTo: 'English',
   switchShort: 'EN',
   skip: 'Saltar al contenido',
+  intro: { enter: 'Entrar', label: 'Bienvenida a Aztrals' },
   nav: { releases: 'Lanzamientos', moments: 'Momentos', shop: 'Tienda', bag: 'Bolsa', home: 'Aztrals, inicio' },
   meta: {
     homeTitle: 'Aztrals · Gafas de sol en Puerto Rico',
@@ -79,6 +80,7 @@ const es = {
     store: 'Tienda en línea',
     instagram: 'Instagram',
     rights: 'Todos los derechos reservados.',
+    credits: 'Intro: Skiper UI · Ilustraciones: Open Peeps',
   },
   shop: {
     title: 'Tienda',
@@ -124,6 +126,7 @@ const en: Dict = {
   switchTo: 'Español',
   switchShort: 'ES',
   skip: 'Skip to content',
+  intro: { enter: 'Enter', label: 'Welcome to Aztrals' },
   nav: { releases: 'New releases', moments: 'Moments', shop: 'Shop', bag: 'Bag', home: 'Aztrals, home' },
   meta: {
     homeTitle: 'Aztrals · Sunglasses from Puerto Rico',
@@ -181,6 +184,7 @@ const en: Dict = {
     store: 'Online store',
     instagram: 'Instagram',
     rights: 'All rights reserved.',
+    credits: 'Intro: Skiper UI · Illustrations: Open Peeps',
   },
   shop: {
     title: 'Shop',

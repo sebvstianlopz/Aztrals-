@@ -1,0 +1,6 @@
+/* Tailwind for React/shadcn components (src/components/ui).
+   Only the theme and utilities are loaded: Tailwind's Preflight reset is left out on purpose,
+   because src/styles/global.css already resets the page and the site's design relies on it. */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);

@@ -1,6 +1,8 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import react from '@astrojs/react';
+import tailwindcss from '@tailwindcss/vite';
 
 // GitHub Pages serves this repo at /Aztrals-/. With a custom domain,
 // build with BASE_PATH=/ and SITE_URL=https://your-domain.
@@ -21,5 +23,9 @@ export default defineConfig({
     sitemap({
       i18n: { defaultLocale: 'es', locales: { es: 'es-PR', en: 'en-US' } },
     }),
+    react(),
   ],
+  vite: {
+    plugins: [tailwindcss()],
+  },
 });

@@ -21,6 +21,7 @@ No server, no database.
 | Add product photos | See "Photos" below |
 | Change any text on the site | `src/i18n/index.ts` (Spanish and English side by side) |
 | Instagram link | `src/config/site.ts` → `social.instagram` |
+| Change the intro line or switch the intro off | `src/config/site.ts` → `introText`, `showIntro` |
 
 Each `data.yaml` is checked when the site builds. A typo (an unknown frame colour, a missing
 price) stops the build with a message naming the file.
@@ -34,6 +35,32 @@ admin open the product, click the variant, and copy the number at the end of the
 
 Until a colourway has its ID, its bag line links to the product on the store
 (`https://<shopDomain>/products/<shopifyHandle>`), so nothing breaks while you fill them in.
+
+## Intro screen
+
+The first time someone opens the site in a browser session, a full-screen intro shows the line
+"No-one catches the vision like you" over a crowd of Open Peeps walking past (the Skiper UI
+"Crowd Canvas", `src/components/ui/skiper39.tsx`). It lifts after 3.5 s, or straight away on
+click, Enter, Esc or scroll, and the hero plays its entrance as it does. It doesn't repeat while
+the visitor moves between pages. With reduced motion the crowd stands still and the intro fades.
+
+The crowd illustration is loaded from `cdn.21st.dev` (the Skiper UI demo's sprite). To host it
+yourself, download it into `public/` and change `CROWD_SRC` in `src/components/ui/crowd-intro.tsx`.
+Skiper UI's free licence asks for attribution; the credit line is in the footer.
+
+## React, Tailwind and shadcn/ui
+
+The site is Astro, with React (`@astrojs/react`) for interactive components and Tailwind CSS v4
+(`@tailwindcss/vite`). It follows the shadcn/ui structure, so `npx shadcn@latest add <component>`
+works:
+
+- `components.json`: shadcn config. Components go to `src/components/ui` (`@/components/ui`).
+- `@/` points at `src/` (`tsconfig.json`), and `src/lib/utils.ts` has the `cn()` helper.
+- `src/styles/tailwind.css` loads Tailwind's theme and utilities only. Its Preflight reset is left
+  out on purpose: `src/styles/global.css` already resets the page and the design relies on it.
+
+React components only run on the page where they are used, with a `client:` directive
+(see `src/components/Intro.astro`).
 
 ## Photos
 
