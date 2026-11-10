@@ -43,22 +43,13 @@ if (root.classList.contains('motion')) {
         });
         scroll.to(word, { yPercent: 34, ease: 'none' }, 0);
 
-        if (figure.hasAttribute('data-photo')) {
-          // The photo panel stays put (moving it would open a gap at the screen edge): the picture
-          // settles inside it on load, and zooms in slowly as the hero scrolls away.
-          const shot = figure.querySelector<HTMLElement>('.shot');
-          const img = figure.querySelector<HTMLElement>('img');
-          gsap.fromTo(figure, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6, ease: 'power1.out' });
-          if (img) gsap.fromTo(img, { scale: 1.12 }, { scale: 1, duration: 1.8, ease: 'expo.out' });
-          if (shot) scroll.fromTo(shot, { scale: 1 }, { scale: 1.1, ease: 'none' }, 0);
-        } else {
-          gsap.fromTo(
-            figure,
-            { y: 60, autoAlpha: 0, scale: 1.04 },
-            { y: 0, autoAlpha: 1, scale: 1, duration: 1.5, ease: 'expo.out', delay: 0.2 },
-          );
-          scroll.to(figure, { y: wide ? -60 : -24, scale: 0.96, ease: 'none' }, 0);
-        }
+        gsap.fromTo(
+          figure,
+          { y: 60, autoAlpha: 0, scale: 1.04 },
+          { y: 0, autoAlpha: 1, scale: 1, duration: 1.5, ease: 'expo.out', delay: 0.2 },
+        );
+        // The figure sinks a little slower than the page, so its cropped base never lifts into view.
+        scroll.to(figure, { y: wide ? 90 : 30, ease: 'none' }, 0);
       }
 
       // ---------- spotlight: pinned; the sun rises behind the model as it turns ----------
