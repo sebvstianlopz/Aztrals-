@@ -395,6 +395,11 @@ button {
   will-change: transform;
 }
 
+/* While a colour flip runs, the layers switch instantly (the flip itself is the transition). */
+[data-flipping] [data-cw] {
+  transition: none !important;
+}
+
 /* Smooth scrolling (Lenis, desktop only) takes over from the browser's smooth anchors. */
 html.lenis,
 html.lenis body {

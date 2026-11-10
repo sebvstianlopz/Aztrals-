@@ -99,7 +99,7 @@ const es = {
     back: 'Toda la colección',
     grams: (n: number) => `${n} g`,
   },
-  card: { add: 'Añadir', added: 'Añadida', colors: (n: number) => `${n} colores`, newTag: 'Nueva' },
+  card: { add: 'Añadir', added: 'Añadida', colors: (n: number) => `${n} colores`, colorLabel: 'colores', newTag: 'Nueva' },
   bag: {
     title: 'Tu bolsa',
     close: 'Cerrar la bolsa',
@@ -204,7 +204,7 @@ const en: Dict = {
     back: 'The whole collection',
     grams: (n: number) => `${n} g`,
   },
-  card: { add: 'Add', added: 'Added', colors: (n: number) => `${n} colours`, newTag: 'New' },
+  card: { add: 'Add', added: 'Added', colors: (n: number) => `${n} colours`, colorLabel: 'colours', newTag: 'New' },
   bag: {
     title: 'Your bag',
     close: 'Close the bag',
