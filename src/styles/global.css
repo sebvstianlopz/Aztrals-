@@ -1,13 +1,14 @@
 /* Aztrals design tokens and base. Every component references these tokens only.
 
-   The brand palette. Black and white carry the page; the other three are for details.
-     White  #FFFFFF  the page ground, text and buttons on dark
-     Black  #000000  all main text, dark sections, the primary button
-     Grey   #9E9E9E  quiet structure: surfaces (as light tints), secondary text, the hero name
-     Purple #673AB7  details: the spotlight disc, Momentos' changing words, button hover,
-                     the "added" state, focus ring
-     Pink   #FF4081  details: the bag counter, selection, hover on dark, the final "AQUÍ",
-                     link underline on hover */
+   The brand palette. Black and white carry the page (a black page with white text, and white
+   feature sections with black text); the other three are for details.
+     Black  #000000  the page ground, text inside the white sections
+     White  #FFFFFF  all main text on the page, the feature sections, the primary button
+     Grey   #9E9E9E  quiet structure: surfaces (as dark tints), secondary text, the hero name
+     Purple #673AB7  details: the spotlight disc, button hover, the "added" state,
+                     focus ring inside white sections
+     Pink   #FF4081  details: the bag counter, selection, Momentos' changing words, the final
+                     "AQUÍ", link underline on hover, focus ring on the page */
 :root {
   --white: #ffffff;
   --black: #000000;
@@ -16,24 +17,31 @@
   --pink: #ff4081;
 
   /* roles */
-  --bone: var(--white); /* page ground */
-  --bone-2: color-mix(in srgb, var(--grey) 20%, var(--white)); /* surfaces: tiles, chips, quiet buttons */
-  --bone-3: color-mix(in srgb, var(--grey) 35%, var(--white)); /* surface hover / pressed */
-  --sand: color-mix(in srgb, var(--grey) 45%, var(--white)); /* a deeper surface for picture slots */
-  --word: color-mix(in srgb, var(--grey) 42%, var(--white)); /* the giant AZTRALS over the model */
-  --ink: var(--black);
-  --ink-2: color-mix(in srgb, var(--grey) 60%, var(--black)); /* secondary text, ~#5F5F5F */
-  --night: var(--black);
-  --night-2: color-mix(in srgb, var(--black) 88%, var(--grey));
-  --night-3: color-mix(in srgb, var(--black) 78%, var(--grey)); /* the footer wordmark */
-  --on-night: var(--white);
-  --on-night-2: var(--grey);
-  /* the primary action: Black on light grounds, White on dark ones (see .on-dark) */
-  --sun: var(--black);
-  --on-sun: var(--white);
+  --bone: var(--black); /* page ground */
+  --bone-2: color-mix(in srgb, var(--grey) 20%, var(--black)); /* surfaces: chips, tiles' frames, quiet buttons */
+  --bone-3: color-mix(in srgb, var(--grey) 35%, var(--black)); /* surface hover / pressed */
+  --sand: color-mix(in srgb, var(--grey) 45%, var(--black));
+  --word: color-mix(in srgb, var(--grey) 45%, var(--black)); /* the giant AZTRALS over the model */
+  --ink: var(--white);
+  --ink-2: var(--grey); /* secondary text on the page */
+  /* The feature sections (spotlight, visor, closing call, footer) are White with Black text.
+     The names are historical: "night" now means the contrasting section. */
+  --night: var(--white);
+  --night-2: color-mix(in srgb, var(--white) 88%, var(--grey));
+  --night-3: color-mix(in srgb, var(--white) 70%, var(--grey)); /* the footer wordmark */
+  --on-night: var(--black);
+  --on-night-2: color-mix(in srgb, var(--grey) 60%, var(--black)); /* secondary text in them */
+  /* Picture slots stay light whatever the page: the drawings have black frames, and product
+     photos will be light packshots. */
+  --slot: color-mix(in srgb, var(--grey) 20%, var(--white));
+  --slot-2: color-mix(in srgb, var(--grey) 50%, var(--white));
+  --slot-dark: color-mix(in srgb, var(--black) 88%, var(--grey));
+  /* the primary action: White on the page, Black inside the white sections (see .on-dark) */
+  --sun: var(--white);
+  --on-sun: var(--black);
   --sun-hover: var(--purple);
   --on-sun-hover: var(--white);
-  --focus: var(--purple);
+  --focus: var(--pink);
 
   --font: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
 
@@ -51,7 +59,7 @@
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 *,
@@ -137,11 +145,11 @@ button {
 /* Dark sections (release spotlight, closing call, footer): the primary action turns White,
    and hovers and the focus ring turn Pink. */
 .on-dark {
-  --sun: var(--white);
-  --on-sun: var(--black);
+  --sun: var(--black);
+  --on-sun: var(--white);
   --sun-hover: var(--pink);
   --on-sun-hover: var(--black);
-  --focus: var(--pink);
+  --focus: var(--purple);
 }
 
 .display {
