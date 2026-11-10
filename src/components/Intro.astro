@@ -1,0 +1,88 @@
+---
+// The intro screen: shown once per browser session, over the page from the first paint.
+// The line is set in the HTML; the walking crowd is a React island (src/components/ui/crowd-intro.tsx).
+import CrowdIntro from './ui/crowd-intro';
+import { t } from '../i18n';
+import { site, type Lang } from '../config/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const d = t(lang).intro;
+// "No-one catches the vision like you" → two lines, broken after the second word.
+const words = site.introText.split(' ');
+const line1 = words.slice(0, 2).join(' ');
+const line2 = words.slice(2).join(' ');
+---
+<div class="intro" data-intro role="dialog" aria-modal="true" aria-label={d.label}>
+  <div class="intro__copy">
+    <p class="intro__line display">
+      <span>{line1}</span>
+      <span>{line2}</span>
+    </p>
+    <button class="btn btn--ink intro__enter" type="button" data-intro-enter>
+      {d.enter} <span class="arrow" aria-hidden="true">→</span>
+    </button>
+  </div>
+  <div class="intro__crowd" aria-hidden="true">
+    <CrowdIntro client:load />
+  </div>
+</div>
+
+<style>
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    background: var(--bone);
+    color: var(--ink);
+    overflow: hidden;
+    transition: transform 900ms var(--ease-in-out);
+  }
+  :global(html.intro-on) .intro {
+    display: block;
+    /* If the script never runs, the intro still gets out of the way. */
+    animation: intro-fallback 0s 6s forwards;
+  }
+  :global(html.intro-leaving) .intro {
+    transform: translateY(-100%);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .intro {
+      transition: opacity 400ms ease;
+    }
+    :global(html.intro-leaving) .intro {
+      transform: none;
+      opacity: 0;
+    }
+  }
+  @keyframes intro-fallback {
+    to {
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+  .intro__copy {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: 28px;
+    padding: clamp(96px, 14vh, 150px) var(--gutter) 0;
+    text-align: center;
+  }
+  .intro__line span {
+    display: block;
+  }
+  .intro__crowd {
+    position: absolute;
+    inset: 0;
+  }
+  @media (max-width: 640px) {
+    .intro__line {
+      font-size: clamp(2.5rem, 11vw, 3.5rem);
+    }
+  }
+</style>

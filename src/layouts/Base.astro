@@ -1,10 +1,12 @@
 ---
 import '@fontsource-variable/archivo/wdth.css';
 import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
+import '../styles/tailwind.css';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import BagDrawer from '../components/BagDrawer.astro';
+import Intro from '../components/Intro.astro';
 import { t, asset, path } from '../i18n';
 import { site, type Lang } from '../config/site';
 import { getProducts } from '../lib/products';
@@ -75,6 +77,15 @@ const catalog: Catalog = {
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    <script is:inline define:vars={{ showIntro: site.showIntro }}>
+      // The intro screen: once per browser session.
+      try {
+        if (showIntro && !sessionStorage.getItem('aztrals:intro')) {
+          sessionStorage.setItem('aztrals:intro', '1');
+          document.documentElement.classList.add('intro-on');
+        }
+      } catch (e) {}
+    </script>
     <script is:inline>
       try {
         var root = document.documentElement;
@@ -88,6 +99,7 @@ const catalog: Catalog = {
     </script>
   </head>
   <body>
+    {site.showIntro && <Intro lang={lang} />}
     <a class="skip" href="#main" data-inert-with-bag>{d.skip}</a>
     <Header lang={lang} alternate={alternate} />
     <main id="main" data-inert-with-bag>
@@ -97,6 +109,7 @@ const catalog: Catalog = {
     <BagDrawer lang={lang} />
     <script type="application/json" id="catalog" set:html={JSON.stringify(catalog)} />
     <script>
+      import '../scripts/intro';
       import '../scripts/bag';
       import '../scripts/motion';
       import '../scripts/filters';
@@ -105,6 +118,9 @@ const catalog: Catalog = {
 </html>
 
 <style>
+  :global(html.intro-on) body {
+    overflow: hidden;
+  }
   .skip:not(:focus) {
     clip-path: inset(50%);
     width: 1px;

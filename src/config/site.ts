@@ -12,6 +12,10 @@ export const site = {
    * SAMPLE: replace with the real store domain. Checkout and "Buy on the store" links use it.
    */
   shopDomain: 'your-store.myshopify.com',
+  /** The crowd intro screen shown once per visit. Set to false to switch it off. */
+  showIntro: true,
+  /** The line on the intro screen (the same in both languages). */
+  introText: 'No-one catches the vision like you',
   social: {
     // Full profile URL. Empty hides the link. SAMPLE
     instagram: '' as string,

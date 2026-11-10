@@ -8,6 +8,12 @@ const root = document.documentElement;
 
 if (root.classList.contains('motion')) {
   gsap.registerPlugin(ScrollTrigger);
+  // While the intro screen is up, hold every entrance until it lifts, so the hero plays as the
+  // page is revealed instead of behind the intro.
+  if (root.classList.contains('intro-on')) window.addEventListener('aztrals:intro-done', start, { once: true });
+  else start();}
+
+function start() {
   const mm = gsap.matchMedia();
 
   mm.add(
@@ -98,8 +104,4 @@ if (root.classList.contains('motion')) {
       });
     },
   );
-
-  root.classList.add('motion-ready');
-  document.fonts?.ready.then(() => ScrollTrigger.refresh());
-  window.addEventListener('load', () => ScrollTrigger.refresh());
 }
