@@ -1,33 +1,39 @@
 /* Aztrals design tokens and base. Every component references these tokens only.
 
-   The brand palette (four colours; everything else is mixed from them):
-     Smoky Black  #11120D  text, dark sections, the primary button
-     Olive Drab   #565449  secondary text, quiet details, focus ring
-     Bone         #D8CFBC  tiles, pills, surfaces, the wordmark, actions on dark
-     Floral White #FFFBF4  the page ground, text on dark */
+   The brand palette. Black and white carry the page; the other three are for details.
+     White  #FFFFFF  the page ground, text and buttons on dark
+     Black  #000000  all main text, dark sections, the primary button
+     Grey   #9E9E9E  quiet structure: surfaces (as light tints), secondary text, the hero name
+     Purple #673AB7  details: the spotlight disc, Momentos' changing words, button hover,
+                     the "added" state, focus ring
+     Pink   #FF4081  details: the bag counter, selection, hover on dark, the final "AQUÍ",
+                     link underline on hover */
 :root {
-  --smoky: #11120d;
-  --olive: #565449;
-  --bone-c: #d8cfbc;
-  --floral: #fffbf4;
+  --white: #ffffff;
+  --black: #000000;
+  --grey: #9e9e9e;
+  --purple: #673ab7;
+  --pink: #ff4081;
 
   /* roles */
-  --bone: var(--floral); /* page ground */
-  --bone-2: var(--bone-c); /* surfaces: tiles, chips, pills, quiet buttons */
-  --bone-3: color-mix(in srgb, var(--bone-c) 80%, var(--olive)); /* surface hover / pressed */
-  --sand: color-mix(in srgb, var(--bone-c) 72%, var(--olive)); /* a deeper surface for picture slots */
-  --ink: var(--smoky);
-  --ink-2: var(--olive);
-  --night: var(--smoky);
-  --night-2: color-mix(in srgb, var(--smoky) 86%, var(--olive));
-  --night-3: color-mix(in srgb, var(--smoky) 62%, var(--olive));
-  --on-night: var(--floral);
-  --on-night-2: var(--bone-c);
-  /* the primary action: Smoky Black on light grounds, Bone on dark ones (see .on-dark) */
-  --sun: var(--smoky);
-  --on-sun: var(--floral);
-  --sun-hover: color-mix(in srgb, var(--smoky) 82%, var(--olive));
-  --focus: var(--olive);
+  --bone: var(--white); /* page ground */
+  --bone-2: color-mix(in srgb, var(--grey) 20%, var(--white)); /* surfaces: tiles, chips, quiet buttons */
+  --bone-3: color-mix(in srgb, var(--grey) 35%, var(--white)); /* surface hover / pressed */
+  --sand: color-mix(in srgb, var(--grey) 45%, var(--white)); /* a deeper surface for picture slots */
+  --word: color-mix(in srgb, var(--grey) 42%, var(--white)); /* the giant AZTRALS over the model */
+  --ink: var(--black);
+  --ink-2: color-mix(in srgb, var(--grey) 60%, var(--black)); /* secondary text, ~#5F5F5F */
+  --night: var(--black);
+  --night-2: color-mix(in srgb, var(--black) 88%, var(--grey));
+  --night-3: color-mix(in srgb, var(--black) 78%, var(--grey)); /* the footer wordmark */
+  --on-night: var(--white);
+  --on-night-2: var(--grey);
+  /* the primary action: Black on light grounds, White on dark ones (see .on-dark) */
+  --sun: var(--black);
+  --on-sun: var(--white);
+  --sun-hover: var(--purple);
+  --on-sun-hover: var(--white);
+  --focus: var(--purple);
 
   --font: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
 
@@ -124,16 +130,18 @@ button {
 }
 
 ::selection {
-  background: var(--bone-c);
-  color: var(--smoky);
+  background: var(--pink);
+  color: var(--black);
 }
 
-/* Dark sections (release spotlight, closing call, footer): the primary action turns Bone. */
+/* Dark sections (release spotlight, closing call, footer): the primary action turns White,
+   and hovers and the focus ring turn Pink. */
 .on-dark {
-  --sun: var(--bone-c);
-  --on-sun: var(--smoky);
-  --sun-hover: var(--floral);
-  --focus: var(--bone-c);
+  --sun: var(--white);
+  --on-sun: var(--black);
+  --sun-hover: var(--pink);
+  --on-sun-hover: var(--black);
+  --focus: var(--pink);
 }
 
 .display {
@@ -250,9 +258,13 @@ button {
 @media (hover: hover) and (pointer: fine) {
   .btn--sun:hover {
     background: var(--sun-hover);
+    color: var(--on-sun-hover);
   }
   .btn--ink:hover {
-    background: color-mix(in srgb, var(--smoky) 82%, var(--olive));
+    background: var(--purple);
+  }
+  .on-dark .btn--bone:hover {
+    background: var(--pink);
   }
   .btn--bone:hover,
   .btn--quiet:hover {
@@ -398,6 +410,22 @@ button {
 /* While a colour flip runs, the layers switch instantly (the flip itself is the transition). */
 [data-flipping] [data-cw] {
   transition: none !important;
+}
+
+/* The typing caret in the hero: a thin Pink bar that blinks while it waits. */
+.type-caret {
+  display: inline-block;
+  width: 0.06em;
+  height: 0.82em;
+  margin-left: 0.04em;
+  vertical-align: -0.04em;
+  background: var(--pink);
+  animation: caret-blink 1s steps(1) infinite;
+}
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
 }
 
 /* Smooth scrolling (Lenis, desktop only) takes over from the browser's smooth anchors. */

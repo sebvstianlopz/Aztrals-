@@ -48,6 +48,19 @@ The crowd illustration is loaded from `cdn.21st.dev` (the Skiper UI demo's sprit
 yourself, download it into `public/` and change `CROWD_SRC` in `src/components/ui/crowd-intro.tsx`.
 Skiper UI's free licence asks for attribution; the credit line is in the footer.
 
+## Colours
+
+Black and white carry the page; Grey, Purple and Pink are for details. The tokens are at the top
+of `src/styles/global.css`.
+
+| Colour | Used for |
+|---|---|
+| White `#FFFFFF` | Page background, intro screen, text and buttons on dark sections |
+| Black `#000000` | All main text, dark sections, primary buttons |
+| Grey `#9E9E9E` | Light tints for tiles, chips and picture backgrounds; the AZTRALS name over the model; secondary text (darkened for contrast) |
+| Purple `#673AB7` | The spotlight disc, the Momentos changing words, button hover, the "added" state, focus ring |
+| Pink `#FF4081` | The bag counter, text selection, hovers on dark sections, the closing "AQUÍ", link underlines on hover, the favicon |
+
 ## Motion
 
 The page behaves like a pair of sunglasses: light catches the lens, a tint lowers over the view,
@@ -57,13 +70,13 @@ colours change through the lens, and the view clears at the end. Each part has i
 | Where | What moves | Module |
 |---|---|---|
 | Whole site | Smooth scrolling (desktop), headings rise line by line, page-to-page crossfade and tile → product morph | `smooth.ts`, `headings.ts`, `global.css` (view transitions) |
-| Hero | Wordmark assembles letter by letter, light sweeps across the lens, cursor depth, layered scroll exit | `hero.ts`, `glint.ts`, `pointer.ts` |
+| Hero | The full name sits in front of the model and assembles letter by letter, light sweeps across the lens, cursor depth, layered scroll exit (she stays behind the name) | `hero.ts`, `glint.ts`, `pointer.ts` |
 | Lanzamientos | Curtain reveal of the tiles, tiles float at their own speeds | `releases.ts` |
 | Into Rincón | The visor lowers over the page | `visor.ts` |
 | Rincón | Sun rises and glasses turn (pinned), staged copy, colour flip | `spotlight.ts`, `lib/fx.ts` |
 | Momentos | Heading follows the pictures, film-curtain portraits, drifting columns | `moments.ts` |
 | Colección | Ripple entrance, tiles glide when filtering, count rolls | `collection.ts`, `scripts/filters.ts` |
-| Closing + footer | The line develops from Olive to Bone; the wordmark returns | `close.ts` |
+| Closing + footer | The line develops from Grey to White, ending on a Pink "AQUÍ"; the wordmark returns | `close.ts` |
 | Buttons, tiles, bag | Magnetic buttons, tile colour preview and tilt, fly-to-bag, rolling totals | `pointer.ts`, `scripts/tiles.ts`, `scripts/bag.ts`, `lib/fx.ts` |
 
 With reduced motion turned on, everything shows in its final state and nothing slides. Touch

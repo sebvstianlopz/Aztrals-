@@ -57,7 +57,7 @@ const d = t(lang).bag;
   .bag__scrim {
     position: absolute;
     inset: 0;
-    background: color-mix(in srgb, var(--smoky) 45%, transparent);
+    background: color-mix(in srgb, var(--black) 45%, transparent);
     opacity: 0;
     transition: opacity 220ms ease;
   }
@@ -75,7 +75,7 @@ const d = t(lang).bag;
     overscroll-behavior: contain;
     transform: translateX(100%);
     transition: transform 240ms var(--ease-drawer);
-    box-shadow: -24px 0 60px color-mix(in srgb, var(--smoky) 18%, transparent); /* taste-skill-ignore: the drawer is a real dialog floating over the page */
+    box-shadow: -24px 0 60px color-mix(in srgb, var(--black) 18%, transparent); /* taste-skill-ignore: the drawer is a real dialog floating over the page */
   }
   .bag[data-open='true'] .bag__scrim {
     opacity: 1;
