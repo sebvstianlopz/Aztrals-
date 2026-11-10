@@ -41,11 +41,11 @@ const line2 = words.slice(-2).join(' ');
     }
   </div>
   <div class="hero__copy wrap">
-    <h1 class="display hero__title" data-reveal>
+    <h1 class="display hero__title" data-split data-hero-title>
       <span>{line1}</span>
       <span>{line2}</span>
     </h1>
-    <div class="hero__side" data-reveal>
+    <div class="hero__side" data-reveal data-hero-side>
       <p class="hero__text">{d.hero.text}</p>
       <a class="btn btn--sun" href={url}>{d.hero.cta(r.name)} <span class="arrow" aria-hidden="true">→</span></a>
       <a class="hero__release" href="#destacado">

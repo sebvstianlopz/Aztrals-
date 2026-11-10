@@ -10,7 +10,7 @@ const { lang } = Astro.props;
 const d = t(lang);
 ---
 <div class="to-shop wrap" data-reveal>
-  <a class="btn btn--ink" href={path(lang, 'shop')}>{d.close.cta} <span class="arrow" aria-hidden="true">→</span></a>
+  <a class="btn btn--ink" href={path(lang, 'shop')} data-magnetic>{d.close.cta} <span class="arrow" aria-hidden="true">→</span></a>
 </div>
 
 <style>

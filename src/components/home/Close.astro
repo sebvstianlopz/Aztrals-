@@ -8,15 +8,24 @@ interface Props {
 const { lang } = Astro.props;
 const d = t(lang).close;
 const words = d.title.split(' ');
+const lines = [words.slice(0, 3).join(' '), words.slice(3).join(' ')];
 ---
 <section class="close wrap on-dark" aria-labelledby="close-title">
-  <h2 id="close-title" class="close__title condensed" data-reveal>
-    <span>{words.slice(0, 3).join(' ')}</span>
-    <span>{words.slice(3).join(' ')}</span>
+  <h2 id="close-title" class="close__title condensed" data-close-title>
+    {
+      lines.map((line) => (
+        <span class="close__line">
+          <span class="close__in">
+            <span class="close__base">{line}</span>
+            <span class="close__fill" aria-hidden="true">{line}</span>
+          </span>
+        </span>
+      ))
+    }
   </h2>
   <div class="close__side" data-reveal>
     <p class="lede">{d.text}</p>
-    <a class="btn btn--bone" href={path(lang, 'shop')}>{d.cta} <span class="arrow" aria-hidden="true">→</span></a>
+    <a class="btn btn--bone" href={path(lang, 'shop')} data-magnetic>{d.cta} <span class="arrow" aria-hidden="true">→</span></a>
   </div>
 </section>
 
@@ -38,8 +47,29 @@ const words = d.title.split(' ');
     letter-spacing: 0.005em;
     color: var(--sun);
   }
-  .close__title span {
+  /* Each line is a mask for its rise. With motion, the line starts in Olive and a Bone copy
+     on top is uncovered left to right as you scroll: the view "clears". */
+  .close__line {
     display: block;
+    overflow: clip;
+    padding-bottom: 0.06em;
+  }
+  .close__in {
+    position: relative;
+    display: inline-block;
+  }
+  .close__fill {
+    display: none;
+    position: absolute;
+    inset: 0;
+    color: var(--bone-c);
+    clip-path: inset(0 100% 0 0);
+  }
+  :global(.motion) .close__fill {
+    display: block;
+  }
+  :global(.motion) .close__base {
+    color: var(--olive);
   }
   .close__side {
     display: grid;

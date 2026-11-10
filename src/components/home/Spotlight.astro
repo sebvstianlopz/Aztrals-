@@ -15,6 +15,9 @@ const d = t(lang);
 const p = product.data;
 const group = `spot-${product.id}`;
 ---
+<!-- The "visor": a Smoky panel that lowers over the page as the dark section arrives, like
+     putting sunglasses on. Only shown with motion; the dark section slides up in front of it. -->
+<div class="visor" aria-hidden="true" data-visor></div>
 <section class="spot on-dark" id="destacado" aria-labelledby="spot-title" data-spot>
   <div class="spot__pin wrap" data-spot-pin>
     <div class="spot__stage" data-spot-stage>
@@ -42,16 +45,16 @@ const group = `spot-${product.id}`;
         })
       }
     </div>
-    <div class="spot__copy" data-reveal>
-      <h2 id="spot-title" class="spot__name condensed">{p.name}</h2>
-      <p class="spot__tagline">{p.tagline[lang]}</p>
-      <p class="spot__desc">{p.description[lang]}</p>
-      <dl class="spot__facts small">
+    <div class="spot__copy" data-spot-copy>
+      <h2 id="spot-title" class="spot__name condensed" data-spot-name>{p.name}</h2>
+      <p class="spot__tagline" data-spot-line>{p.tagline[lang]}</p>
+      <p class="spot__desc" data-spot-line>{p.description[lang]}</p>
+      <dl class="spot__facts small" data-spot-line>
         <div><dt>{d.product.lens}</dt><dd>{p.lens.material[lang]}</dd></div>
         <div><dt>{d.product.frame}</dt><dd>{p.frame.material[lang]}{p.frame.weightGrams && `, ${d.product.grams(p.frame.weightGrams)}`}</dd></div>
         <div><dt>{d.product.protection}</dt><dd>UV400</dd></div>
       </dl>
-      <fieldset class="spot__colors">
+      <fieldset class="spot__colors" data-spot-line>
         <legend class="small">{d.spotlight.color}: <span data-cw-name>{p.colorways[0].name[lang]}</span></legend>
         <div class="swatches">
           {
@@ -64,22 +67,37 @@ const group = `spot-${product.id}`;
           }
         </div>
       </fieldset>
-      <div class="spot__buy">
+      <div class="spot__buy" data-spot-line>
         <span class="spot__price price">{formatPrice(p.price, lang)}</span>
-        <button class="btn btn--sun" type="button" data-add={product.id} data-colorway={p.colorways[0].id} data-colorway-from={group} data-added={d.spotlight.added}>
+        <button class="btn btn--sun" type="button" data-magnetic data-add={product.id} data-colorway={p.colorways[0].id} data-colorway-from={group} data-added={d.spotlight.added}>
           <span data-label>{d.spotlight.add}</span>
         </button>
         <a class="link spot__more" href={path(lang, 'shop', product.id)}>{d.spotlight.details}</a>
       </div>
     </div>
   </div>
-  <ul class="spot__terms wrap small">
+  <ul class="spot__terms wrap small" data-spot-terms>
     {d.terms.map((term) => <li>{term}</li>)}
   </ul>
 </section>
 
 <style>
+  .visor {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    background: var(--smoky);
+    border-radius: 0 0 50% 50% / 0 0 16vh 16vh;
+    transform: translateY(-101%);
+    pointer-events: none;
+  }
+  :global(.motion) .visor {
+    display: block;
+  }
   .spot {
+    position: relative;
+    z-index: 6;
     margin-top: var(--section);
     background: var(--night);
     color: var(--on-night);

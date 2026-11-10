@@ -52,6 +52,8 @@ const es = {
   terms: ['Envío a todo Puerto Rico', 'Cambios dentro de 30 días', 'Pago seguro en Shopify'],
   moments: {
     title: 'Hechas para cada momento',
+    lead: 'Hechas para',
+    swap: ['cada momento', 'la playa', 'el surf', 'la ciudad', 'el entreno'],
     text: 'De la primera ola en Rincón al tapón de la tarde en San Juan: una gafa para cada parte del día.',
     wearing: 'Lleva',
     items: {
@@ -155,6 +157,8 @@ const en: Dict = {
   terms: ['Shipping across Puerto Rico', 'Exchanges within 30 days', 'Secure checkout on Shopify'],
   moments: {
     title: 'Made for every moment',
+    lead: 'Made for',
+    swap: ['every moment', 'the beach', 'the surf', 'the city', 'training'],
     text: 'From the first wave in Rincón to afternoon traffic in San Juan: a pair for every part of the day.',
     wearing: 'Wearing',
     items: {

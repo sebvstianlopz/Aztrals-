@@ -21,7 +21,7 @@ const year = new Date().getFullYear();
       <li><a href={alternate} hreflang={lang === 'es' ? 'en' : 'es'} lang={lang === 'es' ? 'en' : 'es'}>{d.switchTo}</a></li>
     </ul>
   </div>
-  <p class="foot__word condensed" aria-hidden="true">Aztrals</p>
+  <p class="foot__word condensed" aria-hidden="true" data-foot-word>Aztrals</p>
   <p class="foot__legal small">© {year} Aztrals · {site.place[lang]}. {d.footer.rights}</p>
   {site.showIntro && <p class="foot__legal small">{d.footer.credits}</p>}
 </footer>

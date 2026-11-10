@@ -224,12 +224,12 @@ button {
   user-select: none;
   -webkit-user-select: none;
   transition:
-    transform 160ms var(--ease-out),
+    scale 160ms var(--ease-out),
     background-color 200ms ease,
     color 200ms ease;
 }
 .btn:active {
-  transform: scale(0.97);
+  scale: 0.97;
 }
 .btn--sun {
   background: var(--sun);
@@ -265,6 +265,32 @@ button {
 @media (hover: hover) and (pointer: fine) {
   .btn:hover .arrow {
     transform: translateX(3px);
+  }
+  /* Magnetic buttons: the arrow leaves to the right and a new one comes in from the left. */
+  .btn[data-magnetic]:hover .arrow {
+    transform: none;
+    animation: arrow-swap 460ms var(--ease-out);
+  }
+}
+.btn .arrow {
+  display: inline-block;
+}
+@keyframes arrow-swap {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  45% {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  46% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 
@@ -350,7 +376,52 @@ button {
    If it never reports ready, the inline guard in Base.astro removes .motion and all shows. */
 .motion [data-reveal],
 .motion [data-stagger] > *,
+.motion [data-grid] > *,
 .motion [data-hero-word],
-.motion [data-hero-figure] {
+.motion [data-hero-figure],
+.motion [data-foot-word] {
   opacity: 0;
+}
+/* Headings that rise line by line stay hidden until they are split into masked lines. */
+.motion [data-split] {
+  visibility: hidden;
+}
+/* Masked lines get a little room so accents and descenders are not clipped. */
+.split-line-mask {
+  padding-block: 0.12em;
+  margin-block: -0.12em;
+}
+.split-char {
+  will-change: transform;
+}
+
+/* Smooth scrolling (Lenis, desktop only) takes over from the browser's smooth anchors. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+html.lenis {
+  scroll-behavior: auto;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+/* Page-to-page transitions (browsers that support cross-document View Transitions). */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+::view-transition-group(product-shot) {
+  animation-duration: 560ms;
+  animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
 }

@@ -25,7 +25,12 @@ const items = plan
 ---
 <section class="moments section wrap" id="momentos" aria-labelledby="moments-title">
   <div class="moments__head">
-    <h2 id="moments-title" class="h2" data-reveal>{d.title}</h2>
+    <h2 id="moments-title" class="h2 moments__title" aria-label={d.title} data-moments-title>
+      <span class="moments__lead" aria-hidden="true">{d.lead}</span>
+      <span class="swap" aria-hidden="true">
+        {d.swap.map((w) => <span class="swap__w" data-swap-word>{w}</span>)}
+      </span>
+    </h2>
     <p class="lede" data-reveal>{d.text}</p>
   </div>
   <ul class="moments__grid">
@@ -35,7 +40,7 @@ const items = plan
         const cw = prod.data.colorways[0];
         const copy = d.items[m.key];
         return (
-          <li class={`moment moment--${i}`} data-reveal>
+          <li class={`moment moment--${i}`} data-moment>
             <Shot photo={sitePhoto(m.key)} alt={`${copy.t}: ${prod.data.name}`} ratio="3 / 4" tone={m.tone} sizes="(min-width: 900px) 30vw, 92vw" class="moment__shot">
               <Silhouette class="moment__sil" body={m.body} lens={tintColor[cw.tint]} flip={m.flip} />
             </Shot>
@@ -63,6 +68,23 @@ const items = plan
     top: 112px;
     display: grid;
     gap: 20px;
+  }
+  .moments__lead {
+    display: block;
+  }
+  /* The last words of the heading: all versions share one grid cell (so the width never jumps);
+     the script rolls between them. Without it, only the first one shows. */
+  .swap {
+    display: grid;
+    overflow: clip;
+    padding-bottom: 0.1em;
+    margin-bottom: -0.1em;
+  }
+  .swap__w {
+    grid-area: 1 / 1;
+  }
+  .swap__w:not(:first-child) {
+    visibility: hidden;
   }
   .moments__grid {
     display: grid;
@@ -115,7 +137,24 @@ const items = plan
     }
   }
   @media (max-width: 560px) {
-    .moments__grid {
+    .moments__lead {
+    display: block;
+  }
+  /* The last words of the heading: all versions share one grid cell (so the width never jumps);
+     the script rolls between them. Without it, only the first one shows. */
+  .swap {
+    display: grid;
+    overflow: clip;
+    padding-bottom: 0.1em;
+    margin-bottom: -0.1em;
+  }
+  .swap__w {
+    grid-area: 1 / 1;
+  }
+  .swap__w:not(:first-child) {
+    visibility: hidden;
+  }
+  .moments__grid {
       grid-template-columns: minmax(0, 1fr);
     }
     .moment--1,

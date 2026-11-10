@@ -63,7 +63,7 @@ const jsonLd = {
     </div>
     <div class="pdp__info">
       <a class="link small pdp__back" href={path(lang, 'shop')}><span aria-hidden="true">←</span> {d.product.back}</a>
-      <h1 class="display pdp__name" data-reveal>{p.name}</h1>
+      <h1 class="display pdp__name" data-split>{p.name}</h1>
       <p class="pdp__tagline" data-reveal>{p.tagline[lang]}</p>
       <p class="pdp__price price" data-reveal>{formatPrice(p.price, lang)}</p>
       <fieldset class="pdp__colors">
@@ -99,7 +99,7 @@ const jsonLd = {
   </article>
 
   <section class="related section wrap" aria-labelledby="related-title">
-    <h2 id="related-title" class="h2" data-reveal>{d.product.related}</h2>
+    <h2 id="related-title" class="h2" data-split>{d.product.related}</h2>
     <div class="related__grid" data-stagger>
       {related.map((r) => <ProductTile product={r} lang={lang} add />)}
     </div>
