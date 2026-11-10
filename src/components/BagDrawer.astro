@@ -10,7 +10,7 @@ const d = t(lang).bag;
 ---
 <div class="bag" data-bag hidden data-checkout={d.checkout} data-checkout-store={d.checkoutStore}>
   <div class="bag__scrim" data-bag-close></div>
-  <aside class="bag__panel" role="dialog" aria-modal="true" aria-labelledby="bag-title">
+  <aside class="bag__panel" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="bag-title">
     <div class="bag__head">
       <h2 id="bag-title" class="h3">{d.title}</h2>
       <button class="bag__x" type="button" data-bag-close aria-label={d.close}>

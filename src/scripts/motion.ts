@@ -13,6 +13,8 @@ import { hero } from './motion/hero';
 import { visor } from './motion/visor';
 import { spotlight } from './motion/spotlight';
 import { moments } from './motion/moments';
+import { releases } from './motion/releases';
+import { smooth } from './motion/smooth';
 
 const root = document.documentElement;
 
@@ -36,12 +38,15 @@ function start() {
       fine: '(hover: hover) and (pointer: fine)',
     },
     (ctx) => {
-      const { motion, wide } = ctx.conditions as { motion: boolean; wide: boolean; fine: boolean };
+      const { motion, wide, fine } = ctx.conditions as { motion: boolean; wide: boolean; fine: boolean };
       if (!motion) return;
+      const cleanups: Array<() => void> = [];
       try {
+        if (wide && fine) cleanups.push(smooth());
         reveals();
         headings();
         hero(wide);
+        releases(wide);
         visor();
         spotlight(wide);
         moments(wide);
@@ -50,6 +55,7 @@ function start() {
         root.classList.remove('motion');
         console.error(err);
       }
+      return () => cleanups.forEach((fn) => fn());
     },
   );
 }
