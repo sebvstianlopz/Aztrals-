@@ -48,6 +48,27 @@ The crowd illustration is loaded from `cdn.21st.dev` (the Skiper UI demo's sprit
 yourself, download it into `public/` and change `CROWD_SRC` in `src/components/ui/crowd-intro.tsx`.
 Skiper UI's free licence asks for attribution; the credit line is in the footer.
 
+## Motion
+
+The page behaves like a pair of sunglasses: light catches the lens, a tint lowers over the view,
+colours change through the lens, and the view clears at the end. Each part has its own module in
+`src/scripts/motion/` (GSAP with ScrollTrigger, SplitText and Flip, plus Lenis for smooth scrolling):
+
+| Where | What moves | Module |
+|---|---|---|
+| Whole site | Smooth scrolling (desktop), headings rise line by line, page-to-page crossfade and tile → product morph | `smooth.ts`, `headings.ts`, `global.css` (view transitions) |
+| Hero | Wordmark assembles letter by letter, light sweeps across the lens, cursor depth, layered scroll exit | `hero.ts`, `glint.ts`, `pointer.ts` |
+| Lanzamientos | Curtain reveal of the tiles, tiles float at their own speeds | `releases.ts` |
+| Into Rincón | The visor lowers over the page | `visor.ts` |
+| Rincón | Sun rises and glasses turn (pinned), staged copy, colour flip | `spotlight.ts`, `lib/fx.ts` |
+| Momentos | Heading follows the pictures, film-curtain portraits, drifting columns | `moments.ts` |
+| Colección | Ripple entrance, tiles glide when filtering, count rolls | `collection.ts`, `scripts/filters.ts` |
+| Closing + footer | The line develops from Olive to Bone; the wordmark returns | `close.ts` |
+| Buttons, tiles, bag | Magnetic buttons, tile colour preview and tilt, fly-to-bag, rolling totals | `pointer.ts`, `scripts/tiles.ts`, `scripts/bag.ts`, `lib/fx.ts` |
+
+With reduced motion turned on, everything shows in its final state and nothing slides. Touch
+screens keep native scrolling and skip the cursor effects.
+
 ## React, Tailwind and shadcn/ui
 
 The site is Astro, with React (`@astrojs/react`) for interactive components and Tailwind CSS v4

@@ -10,13 +10,13 @@ export function smooth() {
   const raf = (time: number) => lenis.raf(time * 1000);
   gsap.ticker.add(raf);
   gsap.ticker.lagSmoothing(0);
-  const lock = () => lenis.stop();
-  const unlock = () => lenis.start();
-  window.addEventListener('aztrals:scroll-lock', lock);
-  window.addEventListener('aztrals:scroll-unlock', unlock);
+  const pause = () => lenis.stop();
+  const resume = () => lenis.start();
+  window.addEventListener('aztrals:scroll-pause', pause);
+  window.addEventListener('aztrals:scroll-resume', resume);
   return () => {
-    window.removeEventListener('aztrals:scroll-lock', lock);
-    window.removeEventListener('aztrals:scroll-unlock', unlock);
+    window.removeEventListener('aztrals:scroll-pause', pause);
+    window.removeEventListener('aztrals:scroll-resume', resume);
     gsap.ticker.remove(raf);
     lenis.destroy();
   };

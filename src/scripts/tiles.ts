@@ -27,6 +27,15 @@ document.querySelectorAll<HTMLElement>('[data-tile]').forEach((tile) => {
   });
   if (finePointer) dots[0]?.parentElement?.addEventListener('pointerleave', () => show(selected));
 
+  // Opening the product: this tile's picture becomes the one that morphs into the product page's.
+  tile.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) =>
+    a.addEventListener('click', () => {
+      document.querySelectorAll<HTMLElement>('[style*="view-transition-name"]').forEach((el) => (el.style.viewTransitionName = ''));
+      const shot = tile.querySelector<HTMLElement>('[data-tile-layer][data-active] .shot');
+      if (shot) shot.style.viewTransitionName = 'product-shot';
+    }),
+  );
+
   // Tilt toward the pointer (mouse/trackpad, motion allowed).
   const media = tile.querySelector<HTMLElement>('[data-tile-media]');
   const wrap = tile.querySelector<HTMLElement>('[data-tile-layers]');
@@ -44,3 +53,8 @@ document.querySelectorAll<HTMLElement>('[data-tile]').forEach((tile) => {
     ry(0);
   });
 });
+
+// Coming back with the browser's back button: forget the morph name so it doesn't linger.
+window.addEventListener('pageshow', () =>
+  document.querySelectorAll<HTMLElement>('[style*="view-transition-name"]').forEach((el) => (el.style.viewTransitionName = '')),
+);

@@ -30,6 +30,8 @@ const line2 = words.slice(-2).join(' ');
       heroPhoto ? (
         <div class="hero__figure hero__cutout" data-hero-figure>
           <Shot photo={heroPhoto} alt={d.hero.photoAlt} ratio="3 / 4" tone="none" fit="contain" loading="eager" sizes="(min-width: 901px) 50vw, 100vw" />
+          {/* A band of light that sweeps across her lens now and then (motion only). */}
+          <span class="hero__glint" aria-hidden="true" data-glint><span></span></span>
         </div>
       ) : (
         <div class="hero__figure" data-hero-figure>
@@ -173,6 +175,33 @@ const line2 = words.slice(-2).join(' ');
   }
   .hero--photo .hero__word {
     color: var(--bone-c);
+  }
+  /* The glint sits over the lens of the glasses in the hero photo (positions are fractions of the
+     1086 × 1448 photo, which fills the figure exactly). */
+  .hero__glint {
+    display: none;
+    position: absolute;
+    left: 30%;
+    top: 43.8%;
+    width: 41%;
+    height: 9.2%;
+    overflow: hidden;
+    border-radius: 30% / 50%;
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  :global(.motion) .hero__glint {
+    display: block;
+  }
+  .hero__glint span {
+    position: absolute;
+    top: -50%;
+    bottom: -50%;
+    left: 0;
+    width: 20%;
+    background: var(--floral);
+    opacity: 0.6;
+    filter: blur(6px);
   }
 
   @media (max-width: 900px) {

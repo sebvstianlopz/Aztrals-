@@ -137,7 +137,7 @@ function open() {
   });
   page().forEach((el) => (el.inert = true));
   document.documentElement.classList.add('bag-open');
-  window.dispatchEvent(new Event('aztrals:scroll-lock'));
+  window.dispatchEvent(new Event('aztrals:scroll-pause'));
 }
 
 function close() {
@@ -145,7 +145,7 @@ function close() {
   drawer.dataset.open = 'false';
   page().forEach((el) => (el.inert = false));
   document.documentElement.classList.remove('bag-open');
-  window.dispatchEvent(new Event('aztrals:scroll-unlock'));
+  window.dispatchEvent(new Event('aztrals:scroll-resume'));
   const panel = drawer.querySelector('.bag__panel');
   const done = () => {
     if (drawer.dataset.open === 'false') drawer.hidden = true;

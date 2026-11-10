@@ -138,6 +138,10 @@ const jsonLd = {
   .pdp__layer :global(.shot) {
     border-radius: var(--radius-tile);
   }
+  /* The picture a product tile morphs into when you open the product (View Transitions). */
+  .pdp__layer[data-active] > :global(.shot:first-child) {
+    view-transition-name: product-shot;
+  }
   .pdp__draw {
     width: 76%;
   }

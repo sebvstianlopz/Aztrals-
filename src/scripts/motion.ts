@@ -17,6 +17,8 @@ import { releases } from './motion/releases';
 import { smooth } from './motion/smooth';
 import { collection } from './motion/collection';
 import { close } from './motion/close';
+import { pointer } from './motion/pointer';
+import { glint } from './motion/glint';
 
 const root = document.documentElement;
 
@@ -54,6 +56,8 @@ function start() {
         moments(wide);
         collection();
         close();
+        glint();
+        if (wide && fine) cleanups.push(pointer());
       } catch (err) {
         // Never leave content hidden because one effect failed.
         root.classList.remove('motion');
