@@ -1,6 +1,7 @@
 ---
 import Shot from '../Shot.astro';
 import Glasses from '../Glasses.astro';
+import TryOn from '../TryOn.astro';
 import { t, path, formatPrice } from '../../i18n';
 import { productPhotos, type Product } from '../../lib/products';
 import { frameColor, tintColor } from '../../lib/swatches';
@@ -72,6 +73,7 @@ const group = `spot-${product.id}`;
         <button class="btn btn--sun" type="button" data-magnetic data-add={product.id} data-colorway={p.colorways[0].id} data-colorway-from={group} data-added={d.spotlight.added}>
           <span data-label>{d.spotlight.add}</span>
         </button>
+        <button class="btn spot__try" type="button" data-tryon-open={product.id}>{d.tryon.open}</button>
         <a class="link spot__more" href={path(lang, 'shop', product.id)}>{d.spotlight.details}</a>
       </div>
     </div>
@@ -80,6 +82,7 @@ const group = `spot-${product.id}`;
     {d.terms.map((term) => <li>{term}</li>)}
   </ul>
 </section>
+<TryOn lang={lang} product={product} />
 
 <style>
   .visor {
@@ -204,6 +207,17 @@ const group = `spot-${product.id}`;
   .spot__price {
     font-size: 1.75rem;
     letter-spacing: -0.02em;
+  }
+  .spot__try {
+    background: transparent;
+    color: var(--on-night);
+    box-shadow: inset 0 0 0 1.5px var(--on-night);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .spot__try:hover {
+      background: var(--on-night);
+      color: var(--night);
+    }
   }
   .spot__buy .btn[data-state='added'] {
     background: var(--bone);

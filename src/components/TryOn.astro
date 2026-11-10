@@ -1,0 +1,196 @@
+---
+// The camera try-on for one product: a full-screen mirror where the glasses follow the visitor's
+// face (MediaPipe face tracking, run entirely on the device by src/scripts/tryon.ts).
+// Opened by any [data-tryon-open="<slug>"] button on the page.
+import { getImage } from 'astro:assets';
+import Glasses from './Glasses.astro';
+import { t } from '../i18n';
+import { tryOnPhoto, type Product } from '../lib/products';
+import { frameColor, tintColor } from '../lib/swatches';
+import type { Lang } from '../config/site';
+
+interface Props {
+  lang: Lang;
+  product: Product;
+}
+const { lang, product } = Astro.props;
+const d = t(lang);
+const p = product.data;
+const group = `tryon-${product.id}`;
+// Each colourway's glasses: the straight-on photo if one exists, otherwise the drawing.
+const art = await Promise.all(
+  p.colorways.map(async (c) => {
+    const photo = tryOnPhoto(product.id, c.id);
+    const img = photo ? await getImage({ src: photo, width: 900, format: 'png' }) : undefined;
+    return { c, src: img?.src };
+  }),
+);
+---
+<div class="tryon" data-tryon-dialog={product.id} data-width-mm={p.frame.widthMm} hidden role="dialog" aria-modal="true" aria-labelledby={`${group}-title`} data-msg-loading={d.tryon.loading} data-msg-camera={d.tryon.camera} data-msg-searching={d.tryon.searching} data-msg-nocamera={d.tryon.noCamera} data-msg-noface={d.tryon.noFace} data-msg-failed={d.tryon.failed} data-msg-saved={d.tryon.saved}>
+  <div class="tryon__head">
+    <h2 id={`${group}-title`} class="h3">{d.tryon.title(p.name)}</h2>
+    <button class="tryon__x" type="button" data-tryon-close aria-label={d.tryon.close}>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+    </button>
+  </div>
+
+  <div class="tryon__stage">
+    <canvas class="tryon__canvas" data-tryon-canvas aria-label={d.tryon.title(p.name)}></canvas>
+    <video class="tryon__video" data-tryon-video playsinline muted aria-hidden="true"></video>
+    <p class="tryon__status" data-tryon-status role="status" aria-live="polite"></p>
+  </div>
+
+  <div class="tryon__bar">
+    <fieldset class="tryon__colors">
+      <legend class="sr-only">{d.tryon.color}</legend>
+      <div class="swatches">
+        {
+          p.colorways.map((c, i) => (
+            <label class="swatch" title={c.name[lang]}>
+              <input type="radio" name={group} value={c.id} checked={i === 0} data-tryon-cw aria-label={c.name[lang]} />
+              <span class="disc" aria-hidden="true"><i style={`background:${frameColor[c.frame]}`} /><i style={`background:${tintColor[c.tint]}`} /></span>
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+    <div class="tryon__actions">
+      <button class="btn btn--quiet" type="button" data-tryon-shot>{d.tryon.shot}</button>
+      <label class="btn btn--quiet tryon__upload">
+        <input class="sr-only" type="file" accept="image/*" data-tryon-file />
+        <span>{d.tryon.upload}</span>
+      </label>
+      <button class="btn btn--quiet" type="button" data-tryon-camera hidden>{d.tryon.camBack}</button>
+      <button class="btn btn--sun" type="button" data-add={product.id} data-colorway={p.colorways[0].id} data-colorway-from={group} data-added={d.spotlight.added}>
+        <span data-label>{d.spotlight.add}</span>
+      </button>
+    </div>
+    <p class="small muted tryon__privacy">{d.tryon.privacy}</p>
+  </div>
+
+  {/* The glasses artwork for each colourway, turned into images by the script. */}
+  <div hidden aria-hidden="true">
+    {
+      art.map(({ c, src }) =>
+        src ? (
+          <img data-tryon-art={c.id} data-kind="photo" src={src} alt="" />
+        ) : (
+          <span data-tryon-art={c.id} data-kind="drawing">
+            <Glasses shape={p.shape} frame={c.frame} tint={c.tint} mirror={p.lens.mirror} />
+          </span>
+        ),
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .tryon {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    background: var(--black);
+    color: var(--white);
+    padding: max(12px, env(safe-area-inset-top)) var(--gutter) max(16px, env(safe-area-inset-bottom));
+    gap: 12px;
+  }
+  .tryon[hidden] {
+    display: none;
+  }
+  .tryon__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .tryon__x {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-right: -10px;
+    border-radius: 50%;
+    transition: transform 160ms var(--ease-out), background-color 200ms ease;
+  }
+  .tryon__x:active {
+    transform: scale(0.94);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .tryon__x:hover {
+      background: var(--bone-2);
+    }
+  }
+  .tryon__stage {
+    position: relative;
+    min-height: 0;
+    border-radius: var(--radius-tile);
+    overflow: hidden;
+    background: var(--bone-2);
+  }
+  .tryon__canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* An uploaded photo is shown whole, not cropped to the frame. */
+  .tryon__canvas.is-photo {
+    object-fit: contain;
+  }
+  .tryon__video {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .tryon__status {
+    position: absolute;
+    left: 50%;
+    bottom: 16px;
+    translate: -50% 0;
+    max-width: min(90%, 460px);
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--black) 72%, transparent);
+    color: var(--white);
+    font-size: var(--step-small);
+    text-align: center;
+  }
+  .tryon__status:empty {
+    display: none;
+  }
+  .tryon__bar {
+    display: grid;
+    gap: 12px;
+    justify-items: center;
+  }
+  .tryon__colors {
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+  .tryon__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  .tryon__upload {
+    cursor: pointer;
+  }
+  .tryon__upload:focus-within {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+  .tryon__privacy {
+    text-align: center;
+  }
+  @media (max-width: 560px) {
+    .tryon__actions .btn {
+      min-height: 46px;
+      padding: 0 1.1em;
+      font-size: var(--step-small);
+    }
+  }
+</style>

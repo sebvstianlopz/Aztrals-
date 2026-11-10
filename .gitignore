@@ -3,3 +3,4 @@ dist/
 .astro/
 .taste-skill/
 .DS_Store
+public/tryon/wasm/
