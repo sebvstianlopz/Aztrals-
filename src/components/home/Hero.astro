@@ -23,14 +23,22 @@ const words = d.hero.title.split(' ');
 const line1 = words.slice(0, -2).join(' ');
 const line2 = words.slice(-2).join(' ');
 ---
-<section class="hero" data-hero>
+<section class:list={['hero', heroPhoto && 'hero--photo']} data-hero>
   <div class="hero__stage">
     <p class="hero__word condensed" aria-hidden="true" data-hero-word>Aztrals</p>
-    <div class="hero__figure" data-hero-figure>
-      <Shot photo={heroPhoto} alt={`${r.name}, ${cw.name[lang]}`} ratio="3 / 4" tone="none" fit="contain" loading="eager" sizes="(min-width: 900px) 46vw, 92vw">
-        <Silhouette class="hero__sil" lens={tintColor[cw.tint]} />
-      </Shot>
-    </div>
+    {
+      heroPhoto ? (
+        <div class="hero__figure hero__panel" data-hero-figure data-photo>
+          <Shot photo={heroPhoto} alt={d.hero.photoAlt} ratio="3 / 4" tone="none" loading="eager" sizes="(min-width: 901px) 50vw, 100vw" />
+        </div>
+      ) : (
+        <div class="hero__figure" data-hero-figure>
+          <Shot alt={`${r.name}, ${cw.name[lang]}`} ratio="3 / 4" tone="none">
+            <Silhouette class="hero__sil" lens={tintColor[cw.tint]} />
+          </Shot>
+        </div>
+      )
+    }
   </div>
   <div class="hero__copy wrap">
     <h1 class="display hero__title" data-reveal>
@@ -153,6 +161,37 @@ const line2 = words.slice(-2).join(' ');
     line-height: 1.1;
   }
 
+  /* ---------- with the hero photo: a full-height panel on the right ---------- */
+  .hero--photo {
+    --h: min(max(640px, 100svh), 1100px);
+    --panel: min(46vw, calc(var(--h) * 0.75));
+    height: var(--h);
+    min-height: 0;
+  }
+  .hero__panel {
+    inset: 0 0 0 auto;
+    left: auto;
+    width: var(--panel);
+    translate: none;
+    overflow: hidden;
+  }
+  .hero__panel :global(.shot) {
+    height: 100%;
+    aspect-ratio: auto;
+  }
+  .hero__panel :global(.shot__img) {
+    object-position: 50% 30%;
+  }
+  .hero--photo .hero__copy {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+    padding-right: calc(var(--panel) + clamp(24px, 4vw, 64px));
+  }
+  .hero--photo .hero__side {
+    max-width: 360px;
+    padding-top: 0;
+  }
+
   @media (max-width: 900px) {
     .hero {
       max-height: none;
@@ -187,6 +226,35 @@ const line2 = words.slice(-2).join(' ');
     .hero__side {
       order: 3;
       padding: 28px var(--gutter) 8px;
+    }
+    .hero--photo {
+      height: auto;
+    }
+    /* On phones the buy button comes before the photo, so it is on the first screen. */
+    .hero--photo .hero__side {
+      order: 2;
+      padding-top: 20px;
+    }
+    .hero--photo .hero__stage {
+      order: 3;
+    }
+    .hero--photo .hero__stage {
+      padding-bottom: 12vw;
+      margin-top: 32px;
+    }
+    .hero--photo .hero__word {
+      bottom: 0;
+    }
+    .hero__panel {
+      position: relative;
+      inset: auto;
+      width: 100%;
+      max-width: none;
+      aspect-ratio: 3 / 4;
+      max-height: 88svh;
+    }
+    .hero--photo .hero__side {
+      max-width: none;
     }
   }
 </style>

@@ -26,7 +26,8 @@ const {
   loading = 'lazy',
   class: cls,
 } = Astro.props;
-const usable = photo ? widths.filter((w) => w <= photo.width) : [];
+// Every listed width the photo can fill, plus the photo's own width so large screens get the original.
+const usable = photo ? [...new Set([...widths.filter((w) => w < photo.width), photo.width])] : [];
 ---
 <div class:list={['shot', `shot--${tone}`, cls]} style={`--ratio:${ratio}`} data-pending={photo ? undefined : ''}>
   {
@@ -34,9 +35,10 @@ const usable = photo ? widths.filter((w) => w <= photo.width) : [];
       <Picture
         src={photo}
         alt={alt}
-        widths={usable.length ? usable : [photo.width]}
+        widths={usable}
         sizes={sizes}
         formats={['avif', 'webp']}
+        fallbackFormat="webp"
         loading={loading}
         fetchpriority={loading === 'eager' ? 'high' : undefined}
         class:list={['shot__img', `shot__img--${fit}`]}

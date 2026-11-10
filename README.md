@@ -44,8 +44,8 @@ Every picture slot shows a drawing until its photo exists. To replace them:
   Photo 1 is the tile and main picture; on the release section photos 1–3 play in turn as the
   visitor scrolls (front, three-quarter, side). Transparent PNG cut-outs work best, because
   they sit on both the light tiles and the black release section. Square, at least 1600 px.
-- **Site photos**: hero portrait and the four "Momentos" pictures go in `src/assets/photos/`
-  (names in the README there).
+- **Site photos**: the hero photo is in place (`src/assets/photos/hero.webp`); the four
+  "Momentos" pictures go in the same folder (names in the README there).
 
 ## Run it locally
 
