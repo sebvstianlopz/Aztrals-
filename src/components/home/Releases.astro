@@ -16,13 +16,13 @@ const sizes = ['(min-width: 900px) 34vw, 92vw', '(min-width: 900px) 20vw, 46vw',
 ---
 <section class="releases section wrap" id="lanzamientos" aria-labelledby="releases-title">
   <div class="releases__head">
-    <h2 id="releases-title" class="h2" data-reveal>{d.releases.title}</h2>
+    <h2 id="releases-title" class="h2" data-split>{d.releases.title}</h2>
     <div class="releases__aside" data-reveal>
       <p class="lede">{d.releases.text}</p>
       <a class="link" href={path(lang, 'shop')}>{d.releases.all} <span aria-hidden="true">→</span></a>
     </div>
   </div>
-  <div class="releases__row" data-stagger>
+  <div class="releases__row" data-releases-row>
     {products.map((p, i) => <ProductTile product={p} lang={lang} ratio={ratios[i % ratios.length]} sizes={sizes[i % sizes.length]} class={`rel rel--${i % 4}`} add />)}
   </div>
 </section>

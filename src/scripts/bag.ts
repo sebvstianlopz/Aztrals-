@@ -1,5 +1,7 @@
 // The bag: a small store kept in localStorage, the drawer, and every "add" button on the page.
+import { gsap } from 'gsap';
 import { checkoutUrl, lineProductUrl, money, type Catalog, type Line } from '../lib/checkout';
+import { collapseOut, flyToBag, reduced, rollNumber } from '../lib/fx';
 
 const KEY = 'aztrals:bag:v1';
 const catalogEl = document.getElementById('catalog');
@@ -29,12 +31,12 @@ function save() {
 
 const count = () => lines.reduce((n, l) => n + l.q, 0);
 
-function add(s: string, c: string) {
+function add(s: string, c: string, bump = true) {
   const found = lines.find((l) => l.s === s && l.c === c);
   if (found) found.q = Math.min(found.q + 1, 9);
   else lines.push({ s, c, q: 1 });
   save();
-  render(true);
+  render(bump);
 }
 
 function setQty(i: number, q: number) {
@@ -47,17 +49,22 @@ function setQty(i: number, q: number) {
 // ---------- rendering ----------
 const strings = drawer?.dataset;
 
+function bumpCount() {
+  if (reduced()) return;
+  document.querySelectorAll<HTMLElement>('[data-bag-count]').forEach((el) =>
+    el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.35)' }, { transform: 'scale(1)' }], {
+      duration: 320,
+      easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
+    }),
+  );
+}
+
+let shownSubtotal = 0;
+
 function render(bump = false) {
   const n = count();
-  document.querySelectorAll<HTMLElement>('[data-bag-count]').forEach((el) => {
-    el.textContent = String(n);
-    if (bump && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.35)' }, { transform: 'scale(1)' }], {
-        duration: 320,
-        easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
-      });
-    }
-  });
+  document.querySelectorAll<HTMLElement>('[data-bag-count]').forEach((el) => (el.textContent = String(n)));
+  if (bump) bumpCount();
   document.querySelectorAll<HTMLElement>('[data-bag-open]').forEach((el) => {
     const label = n === 1 ? el.dataset.labelOne : (el.dataset.labelMany || '').replace('{n}', String(n));
     if (label) el.setAttribute('aria-label', label);
@@ -86,16 +93,24 @@ function render(bump = false) {
     node.querySelector('[data-color]')!.textContent = cw.name;
     node.querySelector('[data-price]')!.textContent = money(p.price * line.q, catalog);
     node.querySelector('[data-q]')!.textContent = String(line.q);
-    node.querySelector('[data-less]')!.addEventListener('click', () => setQty(i, line.q - 1));
+    // Removing a line slides it out and collapses its space before the list redraws.
+    node.querySelector('[data-less]')!.addEventListener('click', () =>
+      line.q > 1 ? setQty(i, line.q - 1) : collapseOut(node, () => setQty(i, 0)),
+    );
     node.querySelector('[data-more]')!.addEventListener('click', () => setQty(i, line.q + 1));
-    node.querySelector('[data-remove]')!.addEventListener('click', () => setQty(i, 0));
+    node.querySelector('[data-remove]')!.addEventListener('click', () => collapseOut(node, () => setQty(i, 0)));
     const buy = node.querySelector<HTMLAnchorElement>('[data-buy]')!;
     if (cw.variant) buy.remove();
     else buy.href = lineProductUrl(line, catalog);
     list.append(node);
   });
 
-  drawer.querySelector('[data-bag-subtotal]')!.textContent = money(subtotal, catalog);
+  // The subtotal rolls to its new value while the drawer is open.
+  const sub = drawer.querySelector<HTMLElement>('[data-bag-subtotal]')!;
+  const fmt = (v: number) => money(v, catalog);
+  if (drawer.dataset.open === 'true') rollNumber(sub, shownSubtotal, subtotal, fmt);
+  else sub.textContent = fmt(subtotal);
+  shownSubtotal = subtotal;
   const go = drawer.querySelector<HTMLAnchorElement>('[data-bag-checkout]')!;
   const { url, direct } = checkoutUrl(lines, catalog);
   go.href = url;
@@ -115,9 +130,14 @@ function open() {
   requestAnimationFrame(() => {
     drawer.dataset.open = 'true';
     drawer.querySelector<HTMLElement>('[data-bag-close]')?.focus({ preventScroll: true });
+    // The lines slide in one after another as the panel arrives.
+    const rows = drawer.querySelectorAll('[data-bag-list] > li');
+    if (rows.length && !reduced())
+      gsap.fromTo(rows, { x: 28, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.6, ease: 'expo.out', stagger: 0.06, delay: 0.12, clearProps: 'all' });
   });
   page().forEach((el) => (el.inert = true));
   document.documentElement.classList.add('bag-open');
+  window.dispatchEvent(new Event('aztrals:scroll-pause'));
 }
 
 function close() {
@@ -125,6 +145,7 @@ function close() {
   drawer.dataset.open = 'false';
   page().forEach((el) => (el.inert = false));
   document.documentElement.classList.remove('bag-open');
+  window.dispatchEvent(new Event('aztrals:scroll-resume'));
   const panel = drawer.querySelector('.bag__panel');
   const done = () => {
     if (drawer.dataset.open === 'false') drawer.hidden = true;
@@ -153,11 +174,23 @@ document.addEventListener('click', (e) => {
     const group = btn.dataset.colorwayFrom;
     if (group) c = document.querySelector<HTMLInputElement>(`input[name="${group}"]:checked`)?.value || c;
     if (!catalog?.products[s]?.colorways[c]) return;
-    add(s, c);
+    add(s, c, false);
     confirm(btn);
-    open();
+    // A copy of the glasses flies to the bag; the counter bumps and the drawer opens as it lands.
+    flyToBag(pictureFor(btn)).then(() => {
+      bumpCount();
+      open();
+    });
   }
 });
+
+/** The picture of the product a button adds: the tile's, the spotlight's or the product page's. */
+function pictureFor(btn: HTMLElement): Element | null {
+  const scope = btn.closest('[data-tile], [data-spot], [data-cw-scope]');
+  if (!scope) return null;
+  const active = scope.querySelector('[data-active] img, [data-active] svg');
+  return active ?? scope.querySelector('img, svg');
+}
 
 function confirm(btn: HTMLButtonElement) {
   const label = btn.querySelector<HTMLElement>('[data-label]');

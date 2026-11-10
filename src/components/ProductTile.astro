@@ -19,7 +19,8 @@ const { product, lang, ratio = '1 / 1', add = false, sizes = '(min-width: 900px)
 const d = t(lang);
 const p = product.data;
 const first = p.colorways[0];
-const photo = productPhotos(product.id, first.id)[0];
+// One picture layer per colourway; the colour dots switch between them.
+const layers = p.colorways.map((c) => ({ c, photo: productPhotos(product.id, c.id)[0] }));
 const url = path(lang, 'shop', product.id);
 ---
 <article
@@ -29,10 +30,18 @@ const url = path(lang, 'shop', product.id);
   data-sport={p.sport ? '' : undefined}
   data-polarized={p.lens.polarized ? '' : undefined}
 >
-  <a class="tile__media" href={url} tabindex="-1" aria-hidden="true">
-    <Shot photo={photo} alt={`${p.name}, ${first.name[lang]}`} ratio={ratio} tone="stone" sizes={sizes}>
-      <Glasses class="tile__draw" shape={p.shape} frame={first.frame} tint={first.tint} mirror={p.lens.mirror} />
-    </Shot>
+  <a class="tile__media" href={url} tabindex="-1" aria-hidden="true" data-tile-media>
+    <span class="tile__layers" data-tile-layers>
+      {
+        layers.map(({ c, photo }, i) => (
+          <span class="tile__layer" data-tile-layer={c.id} data-active={i === 0 ? '' : undefined}>
+            <Shot photo={photo} alt={`${p.name}, ${c.name[lang]}`} ratio={ratio} tone="stone" sizes={sizes}>
+              <Glasses class="tile__draw" shape={p.shape} frame={c.frame} tint={c.tint} mirror={p.lens.mirror} />
+            </Shot>
+          </span>
+        ))
+      }
+    </span>
   </a>
   <div class="tile__meta">
     <h3 class="tile__name"><a href={url}>{p.name}</a></h3>
@@ -40,8 +49,22 @@ const url = path(lang, 'shop', product.id);
   </div>
   <div class="tile__foot">
     <span class="tile__dots small muted">
-      <span class="dots" aria-hidden="true">
-        {p.colorways.map((c) => <i style={`--f:${frameColor[c.frame]};--t:${tintColor[c.tint]}`} />)}
+      <span class="dots" role="group" aria-label={`${p.name}: ${d.card.colorLabel}`}>
+        {
+          p.colorways.map((c, i) => (
+            <button
+              type="button"
+              class="dot"
+              data-tile-dot={c.id}
+              data-name={c.name[lang]}
+              aria-pressed={i === 0 ? 'true' : 'false'}
+              aria-label={c.name[lang]}
+              style={`--f:${frameColor[c.frame]};--t:${tintColor[c.tint]}`}
+            >
+              <i />
+            </button>
+          ))
+        }
       </span>
       <span class="tile__count">{d.card.colors(p.colorways.length)}</span>
     </span>
@@ -49,7 +72,7 @@ const url = path(lang, 'shop', product.id);
       add && (
         <button class="tile__add" type="button" data-add={product.id} data-colorway={first.id} data-added={d.card.added}>
           <span data-label>{d.card.add}</span>
-          <span class="sr-only">
+          <span class="sr-only" data-tile-cwname>
             {' '}
             {p.name}, {first.name[lang]}
           </span>
@@ -136,18 +159,55 @@ const url = path(lang, 'shop', product.id);
   }
   .dots {
     display: inline-flex;
+    margin-left: -5px;
   }
-  .dots i {
+  /* Each colour is a 24px button around a 14px dot (frame ring, lens centre). */
+  .dot {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+  }
+  .dot i {
     width: 14px;
     height: 14px;
     border-radius: 50%;
     background: var(--t);
     border: 3px solid var(--f);
-    margin-right: 4px;
+    transition: transform 200ms var(--ease-out);
   }
-  @media (max-width: 480px) {
-    .tile__count {
-      display: none;
+  .dot[aria-pressed='true'] i {
+    transform: scale(1.25);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .dot:hover i {
+      transform: scale(1.25);
+    }
+  }
+  .dot:focus-visible {
+    outline-offset: 0;
+  }
+  /* Colour layers: crossfade with a slight blur, so it reads as one object changing colour. */
+  .tile__layers {
+    display: grid;
+  }
+  .tile__layer {
+    grid-area: 1 / 1;
+    opacity: 0;
+    filter: blur(3px);
+    transition:
+      opacity 320ms ease,
+      filter 320ms ease;
+  }
+  .tile__layer[data-active] {
+    opacity: 1;
+    filter: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tile__layer {
+      transition: none;
+      filter: none;
     }
   }
   .tile__add {
