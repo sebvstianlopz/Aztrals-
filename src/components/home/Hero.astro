@@ -79,9 +79,11 @@ const line2 = words.slice(-2).join(' ');
     inset: 0;
     z-index: -1;
   }
+  /* The full brand name sits in front of the model, whole and readable. */
   .hero__word {
     position: absolute;
-    inset: auto 0 0;
+    inset: auto 0 clamp(14px, 2.2vw, 36px);
+    z-index: 1;
     margin: 0;
     font-size: var(--step-word);
     line-height: 0.74;
@@ -89,7 +91,6 @@ const line2 = words.slice(-2).join(' ');
     white-space: nowrap;
     letter-spacing: 0.005em;
     color: var(--bone-c);
-    transform: translateY(8%);
     user-select: none;
   }
   .hero__figure {
