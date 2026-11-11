@@ -31,7 +31,7 @@ const line2 = words.slice(cut).join(' ');
       heroPhoto ? (
         <div class="hero__figure hero__cutout" data-hero-figure>
           <Shot photo={heroPhoto} alt={d.hero.photoAlt} ratio="3 / 4" tone="none" fit="contain" loading="eager" sizes="(min-width: 901px) 50vw, 100vw" />
-          {/* A band of light that sweeps across her lens now and then (motion only). */}
+          {/* A band of light that sweeps across the model's lenses now and then (motion only). */}
           <span class="hero__glint" aria-hidden="true" data-glint><span></span></span>
         </div>
       ) : (
@@ -178,15 +178,15 @@ const line2 = words.slice(cut).join(' ');
   .hero--photo .hero__word {
     color: var(--word);
   }
-  /* The glint sits over the lens of the glasses in the hero photo (positions are fractions of the
-     1086 × 1448 photo, which fills the figure exactly). */
+  /* The glint sits over the lenses of the glasses in the hero photo (positions are fractions of the
+     1206 × 1608 photo, which fills the figure exactly). */
   .hero__glint {
     display: none;
     position: absolute;
-    left: 30%;
-    top: 43.8%;
-    width: 41%;
-    height: 9.2%;
+    left: 41.3%;
+    top: 42%;
+    width: 22%;
+    height: 5.8%;
     overflow: hidden;
     border-radius: 30% / 50%;
     mix-blend-mode: screen;
@@ -260,7 +260,7 @@ const line2 = words.slice(cut).join(' ');
     }
     .hero__cutout {
       width: min(100vw, 560px);
-      /* the photo has empty backdrop above her head; pull it up under the buy block */
+      /* the photo has empty space above the model's head; pull it up under the buy block */
       margin-top: -22vw;
     }
   }
