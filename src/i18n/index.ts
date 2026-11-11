@@ -22,7 +22,7 @@ const es = {
   switchTo: 'English',
   switchShort: 'EN',
   skip: 'Saltar al contenido',
-  intro: { enter: 'Entrar', label: 'Bienvenida a Aztrals' },
+  intro: { label: 'Cargando Aztrals' },
   tryon: {
     open: 'Pruébatelas',
     title: (name: string) => `Pruébate las ${name}`,
@@ -98,7 +98,6 @@ const es = {
     store: 'Tienda en línea',
     instagram: 'Instagram',
     rights: 'Todos los derechos reservados.',
-    credits: 'Intro: Skiper UI · Ilustraciones: Open Peeps',
   },
   shop: {
     title: 'Tienda',
@@ -144,7 +143,7 @@ const en: Dict = {
   switchTo: 'Español',
   switchShort: 'ES',
   skip: 'Skip to content',
-  intro: { enter: 'Enter', label: 'Welcome to Aztrals' },
+  intro: { label: 'Loading Aztrals' },
   tryon: {
     open: 'Try them on',
     title: (name: string) => `Try on ${name}`,
@@ -220,7 +219,6 @@ const en: Dict = {
     store: 'Online store',
     instagram: 'Instagram',
     rights: 'All rights reserved.',
-    credits: 'Intro: Skiper UI · Illustrations: Open Peeps',
   },
   shop: {
     title: 'Shop',
