@@ -1,4 +1,4 @@
-// Light catches the lens: a soft band of light sweeps across her glasses shortly after the page
+// Light catches the lens: a soft band of light sweeps across the model's glasses shortly after the page
 // opens, then again every few seconds while the hero is on screen.
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';

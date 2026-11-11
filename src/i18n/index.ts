@@ -52,7 +52,7 @@ const es = {
     text: 'Gafas de sol polarizadas para la luz fuerte de Puerto Rico: la playa, la carretera y el entreno.',
     cta: (name: string) => `Comprar ${name}`,
     latest: 'Lanzamiento',
-    photoAlt: 'Modelo con gafas deportivas Aztrals de lente transparente y jersey azul',
+    photoAlt: 'Modelo con gafas deportivas Aztrals de montura rosada y lente transparente, capucha rosada y abrigo acolchado',
   },
   releases: {
     title: 'Encuentra tus Aztrals',
@@ -173,7 +173,7 @@ const en: Dict = {
     text: 'Polarized sunglasses for the hard light of Puerto Rico: the beach, the road and the workout.',
     cta: (name: string) => `Buy ${name}`,
     latest: 'New release',
-    photoAlt: 'Model wearing clear-lens Aztrals sport glasses and a blue jersey',
+    photoAlt: 'Model wearing pink-frame, clear-lens Aztrals sport glasses, a pink hood and a puffer jacket',
   },
   releases: {
     title: 'Find your Aztrals',
