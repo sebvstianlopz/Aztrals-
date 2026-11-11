@@ -74,8 +74,8 @@ colours change through the lens, and the view clears at the end. Each part has i
 | Whole site | Smooth scrolling (desktop), headings rise line by line, page-to-page crossfade and tile → product morph | `smooth.ts`, `headings.ts`, `global.css` (view transitions) |
 | Hero | The full name sits in front of the model and assembles letter by letter, light sweeps across the lens, cursor depth, layered scroll exit (she stays behind the name) | `hero.ts`, `glint.ts`, `pointer.ts` |
 | Lanzamientos | Curtain reveal of the tiles, tiles float at their own speeds | `releases.ts` |
-| Into Rincón | The visor lowers over the page | `visor.ts` |
-| Rincón | Sun rises and glasses turn (pinned), staged copy, colour flip | `spotlight.ts`, `lib/fx.ts` |
+| Into the featured release | The visor lowers over the page | `visor.ts` |
+| Featured release | Sun rises and glasses turn (pinned), staged copy, colour flip | `spotlight.ts`, `lib/fx.ts` |
 | Momentos | Heading follows the pictures, film-curtain portraits, drifting columns | `moments.ts` |
 | Colección | Ripple entrance, tiles glide when filtering, count rolls | `collection.ts`, `scripts/filters.ts` |
 | Closing + footer | The line develops from Grey to White, ending on a Pink "AQUÍ"; the wordmark returns | `close.ts` |
@@ -112,7 +112,7 @@ Every picture slot shows a drawing until its photo exists. To replace them:
 
 ## Camera try-on ("Pruébatelas")
 
-Each product page and the Rincón section have a **Pruébatelas / Try them on** button. It opens
+Each product page and the featured release section have a **Pruébatelas / Try them on** button. It opens
 a full-screen mirror: the front camera finds the face and the chosen glasses follow it, sized to
 the eyes and tilted with the head. Visitors can switch colours, take a photo (saved or shared
 from their phone), add the pair to the bag, or upload a selfie if they have no camera or

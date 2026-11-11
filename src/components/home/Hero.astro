@@ -18,10 +18,11 @@ const cw = r.colorways[0];
 const heroPhoto = sitePhoto('hero');
 const thumb = productPhotos(release.id, cw.id)[0];
 const url = path(lang, 'shop', release.id);
-// "Ve más allá del sol" → two lines, broken before the last two words.
+// The headline on two lines, words split evenly ("Stay Aztral" → "Stay" / "Aztral").
 const words = d.hero.title.split(' ');
-const line1 = words.slice(0, -2).join(' ');
-const line2 = words.slice(-2).join(' ');
+const cut = Math.ceil(words.length / 2);
+const line1 = words.slice(0, cut).join(' ');
+const line2 = words.slice(cut).join(' ');
 ---
 <section class:list={['hero', heroPhoto && 'hero--photo']} data-hero>
   <div class="hero__stage">

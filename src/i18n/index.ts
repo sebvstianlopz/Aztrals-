@@ -48,7 +48,7 @@ const es = {
     shopDescription: 'Todos los modelos de gafas de sol Aztrals, con precio y colores. Compra en línea con envío en Puerto Rico.',
   },
   hero: {
-    title: 'Ve más allá del sol',
+    title: 'Stay Aztral',
     text: 'Gafas de sol polarizadas para la luz fuerte de Puerto Rico: la playa, la carretera y el entreno.',
     cta: (name: string) => `Comprar ${name}`,
     latest: 'Lanzamiento',
@@ -170,7 +170,7 @@ const en: Dict = {
     shopDescription: 'Every Aztrals sunglasses model, with prices and colours. Buy online with shipping across Puerto Rico.',
   },
   hero: {
-    title: 'See past the sun',
+    title: 'Stay Aztral',
     text: 'Polarized sunglasses for the hard light of Puerto Rico: the beach, the road and the workout.',
     cta: (name: string) => `Buy ${name}`,
     latest: 'New release',
