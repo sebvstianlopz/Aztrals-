@@ -1,5 +1,5 @@
 // Hero.
-// - Typing, in order: first the headline "Ve más allá del sol" types out with a blinking caret, then
+// - Typing, in order: first the headline "Stay Aztral" types out with a blinking caret, then
 //   the caret jumps to the AZTRALS name in front of her, which types out letter by letter.
 // - On scroll she stays behind the name, sinking a little slower than the page (so her cropped base
 //   never lifts into view) while the name holds its place; the headline and buy column lift away
